@@ -4,6 +4,7 @@
  */
 <template>
     <Grid
+        :scope="scope"
         :columns="columns"
         :data-count="filtered"
         :rows="rows"
@@ -44,7 +45,6 @@ import {
 } from '@Core/models/mappers/gridDataMapper';
 import PRIVILEGES from '@Roles/config/privileges';
 import privilegesDefaults from '@Roles/defaults/privileges';
-import Grid from '@UI/components/Grid/Grid';
 import {
     getMappedGridData,
 } from '@Users/models/gridDataMapper';
@@ -55,9 +55,6 @@ import {
 
 export default {
     name: 'UserPrivilegesGrid',
-    components: {
-        Grid,
-    },
     mixins: [
         extendPropsMixin({
             extendedKey: '@Roles/components/Grids/UserPrivilegesGrid/props',
@@ -67,6 +64,12 @@ export default {
         }),
         extendedGridComponentsMixin,
     ],
+    props: {
+        scope: {
+            type: String,
+            default: '',
+        },
+    },
     async fetch() {
         await this.getInitialDictionaries({
             keys: [
@@ -82,10 +85,9 @@ export default {
             selectedData: this.privileges,
             defaults: privilegesDefaults,
         });
-        const config = this.$userCookies.get(`GRID_CONFIG:${this.$route.name}`) || '';
 
         this.filtered = this.dictionaryPrivileges.length;
-        this.columns = getSortedColumnsByIDs(columns, config.split(','));
+        this.columns = getSortedColumnsByIDs(columns, this.$gridCookies.get().split(','));
         this.rows = rows;
         this.isPrefetchingData = false;
     },

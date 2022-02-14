@@ -4,8 +4,8 @@
  */
 <template>
     <GridEditNavigationCell @edit="onEditCell">
-        <GridSelectEditContentCell :style="positionStyle">
-            <TranslationSelect
+        <GridEditContentCell :bounds="bounds">
+            <Select
                 v-model="localValue"
                 :search-value="searchValue"
                 :autofocus="true"
@@ -13,10 +13,13 @@
                 :size="smallSize"
                 :clearable="true"
                 :multiselect="true"
+                :wrap-value="true"
                 :options="localOptions"
+                option-key="id"
+                option-value="value"
                 @focus="onFocus"
                 @search="onSearch" />
-        </GridSelectEditContentCell>
+        </GridEditContentCell>
     </GridEditNavigationCell>
 </template>
 
@@ -35,16 +38,10 @@ import {
     getMappedMatchedArrayOptions,
     getMappedObjectOptions,
 } from '@Core/models/mappers/translationsMapper';
-import GridSelectEditContentCell from '@UI/components/Grid/Layout/Table/Cells/Edit/Content/GridSelectEditContentCell';
-import TranslationSelect from '@UI/components/Select/TranslationSelect';
 import gridEditFilterCellMixin from '@UI/mixins/grid/gridEditFilterCellMixin';
 
 export default {
     name: 'GridMultiSelectEditFilterCell',
-    components: {
-        GridSelectEditContentCell,
-        TranslationSelect,
-    },
     mixins: [
         gridEditFilterCellMixin,
     ],
@@ -98,14 +95,18 @@ export default {
         );
 
         if (!isEqual) {
-            this.$emit('filter-value', {
-                value: {
-                    [FILTER_OPERATOR.EQUAL]: optionIds,
-                },
-                columnId: this.columnId,
-                row: this.row,
-                column: this.column,
-            });
+            if (!this.localValue.length) {
+                this.$emit('filter-clear', this.columnId);
+            } else {
+                this.$emit('filter-value', {
+                    value: {
+                        [FILTER_OPERATOR.EQUAL]: optionIds,
+                    },
+                    columnId: this.columnId,
+                    row: this.row,
+                    column: this.column,
+                });
+            }
         }
     },
     methods: {

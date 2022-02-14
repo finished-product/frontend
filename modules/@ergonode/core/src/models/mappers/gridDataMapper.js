@@ -38,6 +38,44 @@ export function getParsedFilter({
         .join(';');
 }
 
+export function getParsedFiltersList(filters) {
+    const parsedFilters = [];
+    const filterKeys = Object.keys(filters);
+
+    filterKeys.forEach((key) => {
+        const [
+            code,
+            language,
+        ] = key.split(':');
+        const operators = Object.keys(filters[key]);
+
+        operators.forEach((operator) => {
+            const isArray = Array.isArray(filters[key][operator]);
+            const value = isArray
+                ? filters[key][operator].join(',')
+                : filters[key][operator];
+
+            if ((isArray && value.length > 0)
+                || (!isArray
+                    && (value || value === 0))) {
+                const parsedFilter = {
+                    column: code,
+                    operator,
+                    value,
+                };
+
+                if (language) {
+                    parsedFilter.language = language;
+                }
+
+                parsedFilters.push(parsedFilter);
+            }
+        });
+    });
+
+    return parsedFilters;
+}
+
 export function getParsedFilters(filters) {
     return Object
         .keys(filters)
@@ -62,7 +100,6 @@ export function getDraftsBasedOnCellValues(cellValues) {
 export function getFilterQueryParams({
     filter = '',
     advancedFilter = '',
-
 }) {
     const filters = [];
 
@@ -80,6 +117,7 @@ export function getFilterQueryParams({
 export function getParams({
     $route,
     $cookies,
+    layout,
     defaultColumns = '',
 }) {
     const {
@@ -95,7 +133,7 @@ export function getParams({
         offset: (page - 1) * itemsPerPage,
         limit: itemsPerPage,
         extended: true,
-        columns: $cookies.get(`GRID_CONFIG:${$route.name}`) || defaultColumns,
+        columns: $cookies.get(layout) || defaultColumns,
     };
 
     const mappedFilter = getFilterQueryParams($route.query);
@@ -115,8 +153,8 @@ export function getParams({
     return params;
 }
 
-export function getMappedFilters(parsedFilters) {
-    if (!parsedFilters) {
+export function getMappedFilters(queryFilters) {
+    if (!queryFilters) {
         return {};
     }
 
@@ -125,7 +163,7 @@ export function getMappedFilters(parsedFilters) {
         '[',
         ']',
     ];
-    const filters = parsedFilters.split(';');
+    const filters = queryFilters.split(';');
     const mappedFilters = {};
 
     filters.forEach((filter) => {

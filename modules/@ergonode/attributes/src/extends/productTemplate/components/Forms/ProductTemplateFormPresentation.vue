@@ -36,7 +36,9 @@ import {
     TYPES,
 } from '@Attributes/defaults';
 import formFeedbackMixin from '@Core/mixins/feedback/formFeedbackMixin';
-import FormSection from '@UI/components/Form/Section/FormSection';
+import {
+    ATTRIBUTE_TYPES,
+} from '@Media/defaults';
 import {
     mapActions,
     mapState,
@@ -46,7 +48,6 @@ export default {
     name: 'ProductTemplateFormPresentation',
     components: {
         AttributesAutocomplete,
-        FormSection,
     },
     mixins: [
         formFeedbackMixin,
@@ -75,7 +76,7 @@ export default {
         autocompleteDefaultImageParams() {
             return {
                 system: false,
-                type: TYPES.IMAGE,
+                type: ATTRIBUTE_TYPES.IMAGE,
             };
         },
         autocompleteDefaultLabelParams() {

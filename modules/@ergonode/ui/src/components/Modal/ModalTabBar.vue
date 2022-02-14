@@ -4,7 +4,9 @@
  */
 <template>
     <ModalOverlay @close="onClose">
-        <div class="modal-tab-bar">
+        <div
+            class="modal-tab-bar"
+            data-cy="modal">
             <div class="fixed-width-container">
                 <ModalHeader
                     :title="title"
@@ -19,17 +21,9 @@
 import {
     THEME,
 } from '@Core/defaults/theme';
-import ModalHeader from '@UI/components/Modal/ModalHeader';
-import ModalOverlay from '@UI/components/Modal/ModalOverlay';
-import HorizontalTabBar from '@UI/components/TabBar/HorizontalTabBar';
 
 export default {
     name: 'ModalTabBar',
-    components: {
-        ModalHeader,
-        ModalOverlay,
-        HorizontalTabBar,
-    },
     props: {
         /**
          * The title of the component

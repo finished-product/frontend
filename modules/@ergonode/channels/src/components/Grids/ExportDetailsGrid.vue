@@ -4,6 +4,7 @@
  */
 <template>
     <Grid
+        :scope="scope"
         :columns="columns"
         :data-count="filtered"
         :rows="rows"
@@ -74,8 +75,6 @@ import {
 import {
     getGridData,
 } from '@Core/services/grid/getGridData.service';
-import Grid from '@UI/components/Grid/Grid';
-import GridNoDataPlaceholder from '@UI/components/Grid/GridNoDataPlaceholder';
 import Tile from '@UI/components/Tile/Tile';
 import {
     mapActions,
@@ -85,8 +84,6 @@ export default {
     name: 'ExportDetailsGrid',
     components: {
         Tile,
-        Grid,
-        GridNoDataPlaceholder,
         DownloadExportFileButton,
     },
     mixins: [
@@ -99,6 +96,10 @@ export default {
         extendedGridComponentsMixin,
     ],
     props: {
+        scope: {
+            type: String,
+            default: '',
+        },
         channelId: {
             type: String,
             required: true,
@@ -206,8 +207,6 @@ export default {
             };
 
             await getGridData({
-                $route: this.$route,
-                $cookies: this.$userCookies,
                 $axios: this.$axios,
                 path: `channels/${this.channelId}/exports/${this.exportId}/errors`,
                 params,

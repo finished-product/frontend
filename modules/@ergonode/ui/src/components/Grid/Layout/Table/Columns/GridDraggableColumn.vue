@@ -27,6 +27,13 @@ export default {
     ],
     props: {
         /**
+         * Context scope
+         */
+        scope: {
+            type: String,
+            default: '',
+        },
+        /**
          * Index of given component at the loop
          */
         index: {
@@ -156,6 +163,10 @@ export default {
                 value: this.column,
             });
             this.__setState({
+                key: 'draggedInScope',
+                value: this.scope,
+            });
+            this.__setState({
                 key: 'isElementDragging',
                 value: DRAGGED_ELEMENT.COLUMN,
             });
@@ -224,12 +235,12 @@ export default {
             const contentGrid = this.getGridContentElement();
 
             getColumnsTransform().then((response) => {
-                const transforms = response.default(
+                const transforms = response.default({
                     targetGhostIndex,
-                    this.draggedElIndex,
-                    this.ghostIndex,
-                    contentGrid,
-                );
+                    draggedElIndex: this.draggedElIndex,
+                    ghostIndex: this.ghostIndex,
+                    columnsSection: contentGrid,
+                });
 
                 this.updateColumnsTransform(transforms);
 
@@ -301,6 +312,14 @@ export default {
             this.__setState({
                 key: 'draggedElement',
                 value: null,
+            });
+            this.__setState({
+                key: 'draggedInScope',
+                value: '',
+            });
+            this.__setState({
+                key: 'draggedInScope',
+                value: '',
             });
         },
     },

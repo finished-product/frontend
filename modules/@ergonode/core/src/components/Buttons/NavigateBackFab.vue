@@ -3,7 +3,9 @@
  * See LICENSE for license details.
  */
 <template>
-    <Fab @click.native="onBack">
+    <Fab
+        data-cy="navigate-back-fab"
+        @click.native="onBack">
         <template #icon="{ color }">
             <IconArrowPointer :fill-color="color" />
         </template>
@@ -11,15 +13,9 @@
 </template>
 
 <script>
-import Fab from '@UI/components/Fab/Fab';
-import IconArrowPointer from '@UI/components/Icons/Arrows/IconArrowPointer';
 
 export default {
     name: 'NavigateBackFab',
-    components: {
-        IconArrowPointer,
-        Fab,
-    },
     props: {
         previousRoute: {
             type: Object,

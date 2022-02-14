@@ -1,0 +1,140 @@
+{
+  "@Workflow": {
+    "_": {
+      "submit": "Zapisz zmiany",
+      "create": "Stwórz",
+      "proceed": "Stwórz & Edytuj",
+      "cancel": "Anuluj",
+      "deleteConfirm": "Tak, usuń",
+      "routes": {
+        "title": "Statusy & przejścia",
+        "group": "Przepływ pracy",
+        "editOption": "Opcje",
+        "editTranslations": "Tłumaczenia",
+        "editConditions": "Warunki"
+      }
+    },
+    "workflow": {
+      "_": {
+        "title": "Statusy & przejścia",
+        "headTitle": "Statusy & przejścia - Ergonode"
+      },
+      "pages": {
+        "id": {
+          "getStatusRequest": "Status nie została pobrana poprawnie",
+          "getTransitionRequest": "Przejście nie została pobrane poprawnie"
+        }
+      },
+      "store": {
+        "action": {
+          "createStatusCancel": "Tworzenie statusu zostało przerwane",
+          "updateStatusCancel": "Aktualizacja statusu została przerwana",
+          "deleteStatusCancel": "Usuwanie statusu zostało przerwane",
+          "updateTransitionsCancel": "Aktualizacja przejść została przerwana",
+          "createTransitionCancel": "Tworzenie przejścia zostało przerwane",
+          "updateTransitionCancel": "Aktualizacja przejścia została przerwana",
+          "deleteTransitionCancel": "Usuwanie przejścia zostało przerwane"
+        }
+      },
+      "components": {
+        "ConditionsSideBar": {
+          "title": "Warunki"
+        },
+        "WorkflowStatusPreview": {
+          "label": "Podgląd statusu"
+        },
+        "ConditionsVerticalTab": {
+          "title": "Warunki"
+        },
+        "ConditionSetTreeDesignerNoTypeItemParameter": {
+          "placeholderTitle": "Brak wsparcia dla {info} typu parametru warunku"
+        },
+        "RemoveWorkflowTransitionButton": {
+          "title": "Usuń przejście",
+          "confirmTitle": "czy chcesz usunąć to przejście?",
+          "confirmSubtitle": "Przejście zostanie trwale usunięte z systemu.",
+          "deleteConfirm": "USUŃ PRZEJŚCIE",
+          "successMessage": "Przejście zostało usunięte usunięta",
+          "errorMessage": "Przejście nie została usunięte"
+        },
+        "RemoveWorkflowTransitionFab": {
+          "title": "Usuń przejście",
+          "confirmTitle": "czy chcesz usunąć to przejście?",
+          "confirmSubtitle": "Przejście zostanie trwale usunięte z systemu.",
+          "deleteConfirm": "USUŃ PRZEJŚCIE"
+        },
+        "UpdateWorkflowTransitionFab": {
+          "title": "Edytuj przejście"
+        },
+        "UpdateWorkflowTransitionConditionDesignerButton": {
+          "successMessage": "Warunki przejścia zostały zaktualizowane"
+        },
+        "WorkflowTransitionForm": {
+          "title": "Zmiana statusu",
+          "fromLabel": "Od",
+          "toLabel": "Do"
+        },
+        "RemoveTransitionConditionDropZone": {
+          "title": "Usuń warunek"
+        },
+        "WorkflowTransitionGeneralTab": {
+          "successMessage": "Przejście zostało zaktualizowana"
+        },
+        "CreateWorkflowTransitionButton": {
+          "title": "NOWE PRZEJŚCIE"
+        },
+        "WorkflowDesignerDefaultStatusPlaceholder": {
+          "title": "To jest domyślny status",
+          "subtitle": "Stwórz kolejny by móc dodać przejście."
+        },
+        "WorkflowDesigner": {
+          "errorMessage": "Statusy i ich przejdzie nie zostały pobrany poprawnie",
+          "warningMessage": "Brak możliwych kombinacji dla tego statusu",
+          "updateSuccessMessage": "Przejścia zostały utworzone",
+          "updateErrorMessage": "Przejścia nie zostały utworzone",
+          "confirmTitle": "Przed edycją tego przejścia należy zapisać zmiany",
+          "confirmSubtitle": "Aby edytować nowo utworzone przejście, należy najpierw zapisać przepływ pracy.",
+          "applyTitle": "ZAPISZ ZMIANY",
+          "cancelTitle": "NIE ZAPISUJ"
+        },
+        "CreateWorkflowTransitionsButton": {
+          "successMessage": "Przejścia zostały utworzone",
+          "errorMessage": "Przejścia nie zostały utworzone"
+        },
+        "WorkflowStatusGeneralTab": {
+          "successMessage": "Status został zaktualizowany"
+        },
+        "CreateWorkflowStatusModalForm": {
+          "title": "Stwórz nowy status",
+          "successMessage": "Status został stworzony"
+        },
+        "WorkflowStatusForm": {
+          "title": "Opcje",
+          "nameLabel": "Nazwa systemowa",
+          "nameHint": "Nazwa systemowa musi być unikatowa",
+          "defaultStatusLabel": "Domyślny status nowych produktów",
+          "defaultStatusHint": "Możesz ustawić tylko jeden domyślny status dla produktów",
+          "badgeLabel": "Kolor"
+        },
+        "WorkflowStatusTranslationForm": {
+          "nameLabel": "Nazwa statusu",
+          "descriptionLabel": "Opis statusu"
+        },
+        "CreateWorkflowStatusButton": {
+          "title": "Nowy status"
+        },
+        "RemoveWorkflowStatusButton": {
+          "title": "Usuń status",
+          "confirmTitle": "Do you want to delete this status?",
+          "confirmSubtitle": "Status will be permanently deleted from the system.",
+          "applyTitle": "DELETE STATUS",
+          "successMessage": "Status został usunięty",
+          "errorMessage": "Status nie został usunięty"
+        },
+        "UpdateWorkflowTranslationButton": {
+          "successMessage": "Tłumaczenia statusu zostały zaktualizowane"
+        }
+      }
+    }
+  }
+}

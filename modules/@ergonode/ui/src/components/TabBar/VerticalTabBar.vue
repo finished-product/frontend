@@ -38,19 +38,9 @@ import {
 import {
     THEME,
 } from '@Core/defaults/theme';
-import Fab from '@UI/components/Fab/Fab';
-import IconArrowDouble from '@UI/components/Icons/Arrows/IconArrowDouble';
-import VerticalTabBarItem from '@UI/components/TabBar/VerticalTabBarItem';
-import VerticalTabContent from '@UI/components/TabBar/VerticalTabContent';
 
 export default {
     name: 'VerticalTabBar',
-    components: {
-        VerticalTabContent,
-        VerticalTabBarItem,
-        Fab,
-        IconArrowDouble,
-    },
     props: {
         /**
          * List of items
@@ -75,6 +65,13 @@ export default {
         },
         isContentVisible() {
             return this.isExpanded && this.items.length > 0;
+        },
+    },
+    watch: {
+        items(oldValue, newValue) {
+            if (oldValue.length !== newValue.length) {
+                this.selectedTabIndex = 0;
+            }
         },
     },
     methods: {

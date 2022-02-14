@@ -36,8 +36,6 @@ import {
     RED,
     YELLOW,
 } from '@UI/assets/scss/_js-variables/colors.scss';
-import Fab from '@UI/components/Fab/Fab';
-import IconClose from '@UI/components/Icons/Window/IconClose';
 
 /**
  * `Alert` is a default feedback component for user on http response.
@@ -45,10 +43,6 @@ import IconClose from '@UI/components/Icons/Window/IconClose';
  */
 export default {
     name: 'Alert',
-    components: {
-        Fab,
-        IconClose,
-    },
     props: {
         /**
          * The unique ID
@@ -107,7 +101,9 @@ export default {
     },
     methods: {
         onRemoveAlert() {
-            this.$emit('remove', this.id);
+            this.$emit('remove', {
+                id: this.id,
+            });
         },
     },
 };

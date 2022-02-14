@@ -11,7 +11,7 @@
         <slot
             name="option"
             :is-selected="selected">
-            <template v-if="isOptionValid">
+            <template>
                 <ListElementAction
                     v-if="multiselect"
                     :size="size">
@@ -21,8 +21,9 @@
                 </ListElementAction>
                 <ListElementDescription>
                     <ListElementTitle
+                        :hint="value.hint"
                         :size="size"
-                        :title="value" />
+                        :title="presentingValue" />
                 </ListElementDescription>
             </template>
         </slot>
@@ -33,24 +34,9 @@
 import {
     SIZE,
 } from '@Core/defaults/theme';
-import {
-    isObject,
-} from '@Core/models/objectWrapper';
-import CheckBox from '@UI/components/CheckBox/CheckBox';
-import ListElement from '@UI/components/List/ListElement';
-import ListElementAction from '@UI/components/List/ListElementAction';
-import ListElementDescription from '@UI/components/List/ListElementDescription';
-import ListElementTitle from '@UI/components/List/ListElementTitle';
 
 export default {
     name: 'SelectListElement',
-    components: {
-        ListElement,
-        ListElementAction,
-        ListElementDescription,
-        ListElementTitle,
-        CheckBox,
-    },
     props: {
         /**
          * Index of given component at the loop
@@ -95,15 +81,37 @@ export default {
             type: Boolean,
             default: false,
         },
+        /**
+         * The key of the option
+         */
+        optionKey: {
+            type: String,
+            default: '',
+        },
+        /**
+         * The key of the value
+         */
+        optionValue: {
+            type: String,
+            default: '',
+        },
     },
     computed: {
-        isOptionValid() {
-            return !isObject(this.value);
+        presentingValue() {
+            if (this.value[this.optionValue]) {
+                return this.value[this.optionValue];
+            }
+
+            if (this.value[this.optionKey]) {
+                return `#${this.value[this.optionKey]}`;
+            }
+
+            return this.value;
         },
     },
     methods: {
         onSelectValue(event) {
-            if (this.isOptionValid || (!this.isOptionValid && !this.value.disabled)) {
+            if (!this.value.disabled) {
                 this.$emit('input', this.index);
             } else {
                 event.stopPropagation();

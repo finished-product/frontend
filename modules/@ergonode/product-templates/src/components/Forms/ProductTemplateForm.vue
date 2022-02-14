@@ -17,12 +17,20 @@
         <template #body>
             <FormSection>
                 <TextField
+                    :data-cy="dataCyGenerator(codeFieldKey)"
+                    :value="code"
+                    required
+                    :error-messages="errors[codeFieldKey]"
+                    :label="$t('@Templates.productTemplate.components.ProductTemplateForm.codeLabel')"
+                    :disabled="isDisabled || !isAllowedToUpdate"
+                    @input="setCodeValue" />
+                <TextField
                     :data-cy="dataCyGenerator(nameFieldKey)"
                     :value="title"
                     required
                     :error-messages="errors[nameFieldKey]"
                     :label="$t('@Templates.productTemplate.components.ProductTemplateForm.nameLabel')"
-                    :disabled="isDisabled || !isAllowedToUpdate"
+                    :disabled="!isAllowedToUpdate"
                     @input="setTitleValue" />
             </FormSection>
             <template v-for="(field, index) in extendedForm">
@@ -39,9 +47,6 @@
 import formFeedbackMixin from '@Core/mixins/feedback/formFeedbackMixin';
 import formActionsMixin from '@Core/mixins/form/formActionsMixin';
 import PRIVILEGES from '@Templates/config/privileges';
-import Form from '@UI/components/Form/Form';
-import FormSection from '@UI/components/Form/Section/FormSection';
-import TextField from '@UI/components/TextField/TextField';
 import {
     mapActions,
     mapState,
@@ -49,11 +54,6 @@ import {
 
 export default {
     name: 'ProductTemplateForm',
-    components: {
-        Form,
-        FormSection,
-        TextField,
-    },
     mixins: [
         formActionsMixin,
         formFeedbackMixin,
@@ -62,6 +62,7 @@ export default {
         ...mapState('productTemplate', [
             'id',
             'title',
+            'code',
         ]),
         extendedForm() {
             return this.$extendedForm({
@@ -78,6 +79,9 @@ export default {
                 PRIVILEGES.TEMPLATE_DESIGNER.create,
             ]));
         },
+        codeFieldKey() {
+            return 'code';
+        },
         nameFieldKey() {
             return 'name';
         },
@@ -88,6 +92,18 @@ export default {
         ]),
         onSubmit() {
             this.$emit('submit');
+        },
+        setCodeValue(value) {
+            this.__setState({
+                key: 'code',
+                value,
+            });
+
+            this.onScopeValueChange({
+                scope: this.scope,
+                fieldKey: 'code',
+                value,
+            });
         },
         setTitleValue(value) {
             this.__setState({

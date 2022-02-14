@@ -4,9 +4,6 @@
  */
 
 export default {
-    components: {
-        GridCellResizer: () => import('@UI/components/Grid/Layout/Table/Cells/Resizer/GridCellResizer'),
-    },
     data() {
         return {
             isCellResizing: false,
@@ -41,15 +38,17 @@ export default {
 
             return values;
         },
-        onCellResize(isResizing) {
+        onCellResize({
+            isResizing,
+            factor,
+        }) {
             this.isCellResizing = isResizing;
 
             if (!isResizing) {
                 const {
                     row, column,
                 } = this.cellResizer.position;
-                const fixedRow = row + this.headerOffset + this.rowsOffset;
-
+                const fixedRow = row + this.headerOffset + this.rowsOffset + factor;
                 const tableCellElement = this.$el.querySelector(`.coordinates-${column}-${fixedRow}`);
 
                 tableCellElement.focus();

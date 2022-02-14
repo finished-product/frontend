@@ -5,6 +5,7 @@
 
 module.exports = {
     verbose: true,
+    testEnvironment: 'jsdom',
     moduleFileExtensions: [
         'js',
         'jsx',
@@ -22,6 +23,7 @@ module.exports = {
         '@Templates/(.*)$': '<rootDir>/modules/@ergonode/product-templates/src/$1',
         '@Attributes/(.*)$': '<rootDir>/modules/@ergonode/attributes/src/$1',
         '@Notifications/(.*)$': '<rootDir>/modules/@ergonode/notifications/src/$1',
+        '@Workflow/(.*)$': '<rootDir>/modules/@ergonode/workflow/src/$1',
     },
     transform: {
         '^.+\\.(js|jsx)?$': 'babel-jest',
@@ -33,6 +35,9 @@ module.exports = {
     ],
     testMatch: [
         '**/(__tests__|tests)/**/*.test.(js|jsx|ts|tsx)',
+    ],
+    modulePathIgnorePatterns: [
+        '<rootDir>/.*/__mocks__',
     ],
     testURL: 'http://localhost/',
     reporters: [

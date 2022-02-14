@@ -25,7 +25,7 @@ import {
 import DesignerDraggableLayer from '@UI/components/Designer/DesignerDraggableLayer';
 import {
     getBackgroundItem,
-} from '@UI/models/designer/intex';
+} from '@UI/models/designer/index';
 import {
     getDraggedRowPositionState,
 } from '@UI/models/dragAndDrop/helpers';
@@ -90,9 +90,6 @@ export default {
     methods: {
         ...mapActions('draggable', [
             '__setState',
-        ]),
-        ...mapActions('list', [
-            'setDisabledElement',
         ]),
         onDragStart(event) {
             const backgroundItem = getBackgroundItem({
@@ -230,6 +227,10 @@ export default {
             this.__setState({
                 key: 'draggedElement',
                 value: null,
+            });
+            this.__setState({
+                key: 'draggedInScope',
+                value: '',
             });
             this.__setState({
                 key: 'isElementDragging',

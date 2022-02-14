@@ -4,6 +4,7 @@
  */
 <template>
     <Grid
+        :scope="scope"
         :columns="columns"
         :data-count="filtered"
         :rows="rows"
@@ -14,7 +15,6 @@
         :is-prefetching-data="isPrefetchingData"
         :is-basic-filter="true"
         :is-border="true"
-        :is-collection-layout="true"
         @edit-row="onEditRow"
         @preview-row="onEditRow"
         @delete-row="onRemoveRow"
@@ -72,8 +72,6 @@ import {
 import {
     getGridData,
 } from '@Core/services/grid/getGridData.service';
-import Grid from '@UI/components/Grid/Grid';
-import GridNoDataPlaceholder from '@UI/components/Grid/GridNoDataPlaceholder';
 import CreateUserButton from '@Users/components/Buttons/CreateUserButton';
 import PRIVILEGES from '@Users/config/privileges';
 import {
@@ -87,8 +85,6 @@ export default {
     name: 'UsersGrid',
     components: {
         CreateUserButton,
-        Grid,
-        GridNoDataPlaceholder,
     },
     mixins: [
         extendPropsMixin({
@@ -99,6 +95,12 @@ export default {
         }),
         extendedGridComponentsMixin,
     ],
+    props: {
+        scope: {
+            type: String,
+            default: '',
+        },
+    },
     async fetch() {
         await this.onFetchData();
 
@@ -178,13 +180,12 @@ export default {
         },
         async onFetchData() {
             await getGridData({
-                $route: this.$route,
-                $cookies: this.$userCookies,
+                $cookies: this.$gridCookies,
                 $axios: this.$axios,
                 path: 'accounts',
                 params: getParams({
                     $route: this.$route,
-                    $cookies: this.$userCookies,
+                    $cookies: this.$gridCookies,
                 }),
                 onSuccess: this.onFetchDataSuccess,
                 onError: this.onFetchDataError,

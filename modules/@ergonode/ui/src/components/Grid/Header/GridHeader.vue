@@ -10,15 +10,15 @@
                 <slot name="actions" />
             </template>
             <template #configuration>
-                <GridTableLayoutActivator
-                    data-cy="grid-table-view"
-                    :is-selected="isSelectedTableLayout"
-                    @active="onLayoutActivate" />
-                <GridCollectionLayoutActivator
-                    v-if="isCollectionLayout"
-                    data-cy="grid-collection-view"
-                    :is-selected="isSelectedCollectionLayout"
-                    @active="onLayoutActivate" />
+                <template v-if="layoutActivators.length > 1">
+                    <Component
+                        v-for="activator in layoutActivators"
+                        :key="activator.key"
+                        :is="activator.component"
+                        :selected="layout === activator.key"
+                        :data-cy="activator.dataCy"
+                        @active="onLayoutActivate" />
+                </template>
                 <Fab
                     :theme="theme.SECONDARY"
                     @click.native="onShowModal">
@@ -31,9 +31,7 @@
         </GridHeaderSettings>
         <GridSettingsModalForm
             v-if="isSettingsModal"
-            :table-layout-config="tableLayoutConfig"
-            :collection-layout-config="collectionLayoutConfig"
-            :is-collection-layout="isCollectionLayout"
+            :layout-configs="layoutConfigs"
             @close="onCloseModal"
             @apply="onApplySettings" />
         <slot name="append" />
@@ -47,35 +45,22 @@ import {
 import {
     THEME,
 } from '@Core/defaults/theme';
-import Fab from '@UI/components/Fab/Fab';
-import GridHeaderSettings from '@UI/components/Grid/Header/GridHeaderSettings';
-import GridCollectionLayoutActivator from '@UI/components/Grid/Layout/Collection/GridCollectionLayoutActivator';
-import GridTableLayoutActivator from '@UI/components/Grid/Layout/Table/GridTableLayoutActivator';
-import IconSettings from '@UI/components/Icons/Actions/IconSettings';
 
 export default {
     name: 'GridHeader',
-    components: {
-        GridTableLayoutActivator,
-        GridCollectionLayoutActivator,
-        GridHeaderSettings,
-        Fab,
-        IconSettings,
-        GridSettingsModalForm: () => import('@UI/components/Grid/Modals/GridSettingsModalForm'),
-    },
     props: {
         /**
-         * Configuration of table layout
+         * Configuration of layouts
          */
-        tableLayoutConfig: {
+        layoutConfigs: {
             type: Object,
             required: true,
         },
         /**
-         * Configuration of collection layout
+         * The available layouts
          */
-        collectionLayoutConfig: {
-            type: Object,
+        layoutActivators: {
+            type: Array,
             required: true,
         },
         /**
@@ -84,13 +69,6 @@ export default {
         layout: {
             type: String,
             default: GRID_LAYOUT.TABLE,
-        },
-        /**
-         * Determines if collection layout might be chosen
-         */
-        isCollectionLayout: {
-            type: Boolean,
-            default: false,
         },
     },
     data() {
@@ -106,12 +84,6 @@ export default {
         },
         theme() {
             return THEME;
-        },
-        isSelectedTableLayout() {
-            return this.layout === GRID_LAYOUT.TABLE;
-        },
-        isSelectedCollectionLayout() {
-            return this.layout === GRID_LAYOUT.COLLECTION;
         },
     },
     methods: {

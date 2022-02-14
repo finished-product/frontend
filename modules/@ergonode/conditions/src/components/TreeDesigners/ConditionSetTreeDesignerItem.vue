@@ -24,9 +24,9 @@
                     <template #parameter="{ index, parameter }">
                         <ConditionSetTreeDesignerItemParameter
                             :key="index"
+                            :value="conditionsValues[item.id]"
                             :parameter="parameter"
                             :item-id="item.id"
-                            :item-row="item.row"
                             :scope="scope"
                             :error-messages="errors[parameter.name]"
                             :disabled="disabled" />
@@ -47,7 +47,6 @@ import {
     hasOptions,
 } from '@Conditions/models/conditionTypes';
 import DesignerItem from '@UI/components/Designer/DesignerItem';
-import Preloader from '@UI/components/Preloader/Preloader';
 import {
     mapState,
 } from 'vuex';
@@ -58,7 +57,6 @@ export default {
         ConditionSetTreeDesignerItemParameter,
         ConditionSetTreeDesignerItemParameters,
         ConditionSetTreeDesignerItemDescription,
-        Preloader,
         DesignerItem,
     },
     props: {

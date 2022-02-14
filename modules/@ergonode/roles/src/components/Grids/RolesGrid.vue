@@ -4,6 +4,7 @@
  */
 <template>
     <Grid
+        :scope="scope"
         :columns="columns"
         :data-count="filtered"
         :rows="rows"
@@ -14,7 +15,6 @@
         :is-prefetching-data="isPrefetchingData"
         :is-basic-filter="true"
         :is-border="true"
-        :is-collection-layout="true"
         @edit-row="onEditRow"
         @preview-row="onEditRow"
         @delete-row="onRemoveRow"
@@ -80,15 +80,11 @@ import {
 import {
     ROLE_CREATED_EVENT_NAME,
 } from '@Roles/defaults';
-import Grid from '@UI/components/Grid/Grid';
-import GridNoDataPlaceholder from '@UI/components/Grid/GridNoDataPlaceholder';
 
 export default {
     name: 'RolesGrid',
     components: {
         CreateRoleButton,
-        Grid,
-        GridNoDataPlaceholder,
     },
     mixins: [
         extendPropsMixin({
@@ -99,6 +95,12 @@ export default {
         }),
         extendedGridComponentsMixin,
     ],
+    props: {
+        scope: {
+            type: String,
+            default: '',
+        },
+    },
     async fetch() {
         await this.onFetchData();
 
@@ -135,8 +137,8 @@ export default {
         },
     },
     watch: {
-        async $route(from, to) {
-            if (from.name !== to.name) {
+        async $route(to, from) {
+            if (from.name !== to.name || from.query.layout !== to.query.layout) {
                 return;
             }
 
@@ -184,13 +186,12 @@ export default {
         },
         async onFetchData() {
             await getGridData({
-                $route: this.$route,
-                $cookies: this.$userCookies,
+                $cookies: this.$gridCookies,
                 $axios: this.$axios,
                 path: 'roles',
                 params: getParams({
                     $route: this.$route,
-                    $cookies: this.$userCookies,
+                    $cookies: this.$gridCookies,
                 }),
                 onSuccess: this.onFetchDataSuccess,
                 onError: this.onFetchDataError,

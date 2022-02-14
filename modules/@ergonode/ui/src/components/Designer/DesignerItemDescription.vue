@@ -4,10 +4,15 @@
  */
 <template>
     <div class="designer-item-description">
-        <span
-            v-if="title"
-            class="designer-item-description__title"
-            v-text="title" />
+        <Tooltip
+            class="designer-item-description__tooltip"
+            :title="title"
+            max-width="100%">
+            <span
+                v-if="title"
+                class="designer-item-description__title"
+                v-text="title" />
+        </Tooltip>
         <span
             v-if="subtitle"
             class="designer-item-description__subtitle"
@@ -36,13 +41,22 @@ export default {
         display: flex;
         flex: 1;
         flex-direction: column;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
 
-        &__title {
+        &__tooltip {
+            display: flex;
+            width: 100%;
             color: $GRAPHITE_DARK;
             font: $FONT_MEDIUM_14_20;
+        }
+
+        &__title {
+            flex: 1 1 auto;
+            width: 0;
+            color: $GRAPHITE_DARK;
+            font: $FONT_MEDIUM_14_20;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
         &__subtitle {

@@ -2,12 +2,8 @@
  * Copyright © Ergonode Sp. z o.o. All rights reserved.
  * See LICENSE for license details.
  */
-import GridEditNavigationCell from '@UI/components/Grid/Layout/Table/Cells/Navigation/GridEditNavigationCell';
 
 export default {
-    components: {
-        GridEditNavigationCell,
-    },
     props: {
         value: {
             type: [
@@ -60,6 +56,9 @@ export default {
         };
     },
     computed: {
+        /**
+         * @deprecated since 1.2.0 - replaced by GridEditContentCell
+         */
         positionStyle() {
             const {
                 x,

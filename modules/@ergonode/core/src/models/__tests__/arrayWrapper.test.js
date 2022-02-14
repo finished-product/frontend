@@ -122,6 +122,15 @@ describe('arrayWrapper/arraysAreEqual', () => {
         expect(areEqual).toEqual(true);
     });
 
+    it('Arguments are not arrays', () => {
+        const arr1 = 0;
+        const arr2 = undefined;
+
+        const areEqual = arraysAreEqual(arr1, arr2);
+
+        expect(areEqual).toEqual(false);
+    });
+
     it('Arrays are not equal', () => {
         let arr1 = [
             1,
@@ -185,9 +194,9 @@ describe('arrayWrapper/arrayToObject', () => {
                 age: 21,
             },
         ];
-        const keyField = 'id';
+        const fieldKey = 'id';
         const value = 'name';
-        const result = arrayToObject(array, keyField, value);
+        const result = arrayToObject(array, fieldKey, value);
 
         expect(result).toStrictEqual({
             1: 'Maciek',

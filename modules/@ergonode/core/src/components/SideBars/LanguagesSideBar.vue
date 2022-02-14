@@ -4,14 +4,16 @@
  */
 <template>
     <SideBar
-        title="System languages"
+        :title="$t('@Core.core._.systemLanguagesTitle')"
         :items="filteredLanguages"
         :searchable="true"
         :search-value="searchValue"
         @search="onSearch">
         <template #item="{ item }">
             <LanguageSideBarElement
+                :scope="scope"
                 :item="item"
+                :dragging-element-type="draggingElementType"
                 :language-code="userLanguageCode"
                 :disabled="disabled" />
         </template>
@@ -20,7 +22,9 @@
 
 <script>
 import LanguageSideBarElement from '@Core/components/SideBars/LanguageSideBarElement';
-import SideBar from '@UI/components/SideBar/SideBar';
+import {
+    DRAGGED_ELEMENT,
+} from '@Core/defaults/grid';
 import {
     mapState,
 } from 'vuex';
@@ -29,12 +33,22 @@ export default {
     name: 'LanguagesSideBar',
     components: {
         LanguageSideBarElement,
-        SideBar,
     },
     props: {
+        scope: {
+            type: String,
+            default: '',
+        },
         disabled: {
             type: Boolean,
             default: false,
+        },
+        /**
+         * Type of the place from where element is dragging
+         */
+        draggingElementType: {
+            type: String,
+            default: DRAGGED_ELEMENT.LIST,
         },
     },
     data() {

@@ -5,22 +5,43 @@
 <template>
     <div :class="classes">
         <Preloader v-if="isPrefetchingData || !isLayoutResolved" />
-        <div
-            v-else
-            :style="gridTemplateColumns"
-            class="grid-collection-layout__body">
-            <GridCollectionCell
-                v-for="(element, index) in data"
-                :key="index"
-                :data="element"
-                :drafts="drafts"
-                :object-fit="objectFit"
-                :locked="!isEditable"
-                :extended-data-cell="extendedComponents.dataCells
-                    && extendedComponents.dataCells[element.type]"
-                @row-action="onRowAction"
-                @cell-value="onCellValueChange" />
-        </div>
+        <template v-else>
+            <div
+                v-if="isSelectColumn && multiselect"
+                class="grid-collection-layout__header">
+                <GridSelectCollectionHeaderCell
+                    :row-ids="rowIds"
+                    :excluded-from-selection-rows="excludedFromSelectionRows"
+                    :selected-rows="selectedRows"
+                    :is-selected-all="isSelectedAll"
+                    @rows-select="onRowsSelect"
+                    @excluded-rows-select="onExcludedRowsSelect"
+                    @select-all="onSelectAllRows" />
+            </div>
+            <div
+                :style="gridTemplate"
+                class="grid-collection-layout__body">
+                <GridCollectionCell
+                    v-for="(element, index) in data"
+                    :key="index"
+                    :data="element"
+                    :drafts="drafts"
+                    :object-fit="objectFit"
+                    :locked="!isEditable"
+                    :selected-rows="selectedRows"
+                    :multiselect="multiselect"
+                    :excluded-from-selection-rows="excludedFromSelectionRows"
+                    :extended-data-cell="extendedComponents.dataCells
+                        && extendedComponents.dataCells[element.type]"
+                    :is-selected-all="isSelectedAll"
+                    :is-select-column="isSelectColumn"
+                    @rows-select="onRowsSelect"
+                    @excluded-rows-select="onExcludedRowsSelect"
+                    @row-action="onRowAction"
+                    @cell-value="onCellValueChange" />
+            </div>
+            <div class="grid-collection-layout__footer" />
+        </template>
     </div>
 </template>
 
@@ -29,15 +50,23 @@ import {
     GRID_LAYOUT,
 } from '@Core/defaults/grid';
 import GridCollectionCell from '@UI/components/Grid/Layout/Collection/Cells/GridCollectionCell';
-import Preloader from '@UI/components/Preloader/Preloader';
+import GridSelectCollectionHeaderCell
+    from '@UI/components/Grid/Layout/Collection/Cells/Header/GridSelectCollectionHeaderCell';
 
 export default {
     name: 'GridCollectionLayout',
     components: {
-        Preloader,
+        GridSelectCollectionHeaderCell,
         GridCollectionCell,
     },
     props: {
+        /**
+         * Context scope
+         */
+        scope: {
+            type: String,
+            default: '',
+        },
         /**
          * List of rows presented at Grid
          */
@@ -56,6 +85,20 @@ export default {
          * The drafts are unsaved changes, cached changed data at given time
          */
         drafts: {
+            type: Object,
+            default: () => ({}),
+        },
+        /**
+         * The map of selected rows
+         */
+        selectedRows: {
+            type: Object,
+            default: () => ({}),
+        },
+        /**
+         * The map of rows excluded from selection
+         */
+        excludedFromSelectionRows: {
             type: Object,
             default: () => ({}),
         },
@@ -88,6 +131,27 @@ export default {
             default: () => ({}),
         },
         /**
+         * Determines if the component is multiple choice
+         */
+        multiselect: {
+            type: Boolean,
+            default: true,
+        },
+        /**
+         * Determines if selecting row column is visible
+         */
+        isSelectColumn: {
+            type: Boolean,
+            default: false,
+        },
+        /**
+         * Determines if every row should be selected
+         */
+        isSelectedAll: {
+            type: Boolean,
+            default: false,
+        },
+        /**
          * Determines if data is loaded asynchronously
          */
         isPrefetchingData: {
@@ -108,6 +172,13 @@ export default {
             type: Boolean,
             default: false,
         },
+        /**
+         * Determinate if action column is visible
+         */
+        isActionColumn: {
+            type: Boolean,
+            default: true,
+        },
     },
     computed: {
         classes() {
@@ -118,9 +189,12 @@ export default {
                 },
             ];
         },
-        gridTemplateColumns() {
+        gridTemplate() {
+            const width = `${(10 - this.columnsNumber) * 50}px`;
+
             return {
-                gridTemplateColumns: `repeat(${this.columnsNumber}, 1fr)`,
+                gridTemplateColumns: `repeat(${this.columnsNumber}, minmax(130px, 1fr))`,
+                gridTemplateRows: `repeat(${Math.ceil(this.rowIds.length / this.columnsNumber)}, ${width})`,
             };
         },
         data() {
@@ -140,8 +214,13 @@ export default {
                     const additionalData = {};
 
                     if (additionalColumns) {
-                        additionalColumns.forEach((columnId) => {
-                            additionalData[columnId] = row[columnId] ? row[columnId].value : '';
+                        additionalColumns.forEach((columnId, columnIdIndex) => {
+                            // TODO: Think about rewriting mechanism
+                            const key = columnId === 'type'
+                                ? `type${columnIdIndex}`
+                                : columnId;
+
+                            additionalData[key] = row[columnId] ? row[columnId].value : '';
                         });
                     }
 
@@ -150,7 +229,7 @@ export default {
                         image: row[imageColumn] ? row[imageColumn].value : '',
                         description: row[descriptionColumn] ? row[descriptionColumn].value : '',
                         type,
-                        actions: row._links ? row._links.value : '',
+                        actions: this.isActionColumn && row._links ? row._links.value : '',
                         ...additionalData,
                     };
                 });
@@ -169,25 +248,46 @@ export default {
         onCellValueChange(payload) {
             this.$emit('cell-value', payload);
         },
+        onRowsSelect(payload) {
+            this.$emit('rows-select', payload);
+        },
+        onExcludedRowsSelect(excludedFromSelectionRows) {
+            this.$emit('excluded-rows-select', excludedFromSelectionRows);
+        },
+        onSelectAllRows(isSelected) {
+            this.$emit('select-all', isSelected);
+        },
     },
 };
 </script>
 
 <style lang="scss" scoped>
     .grid-collection-layout {
+        position: relative;
         display: flex;
         flex: 1;
         flex-direction: column;
+        overflow: auto;
 
         &__body {
             display: grid;
-            flex: 1 1 auto;
-            grid-template-rows: 190px;
             grid-gap: 24px;
-            height: 0;
-            padding: 24px;
+            padding: 24px 24px 0;
             box-sizing: border-box;
-            overflow: auto;
+        }
+
+        &__footer {
+            flex: 0 0 24px;
+        }
+
+        &__header {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            padding: 24px 24px 0;
+            background-color: $WHITE;
         }
 
         &--placeholder {

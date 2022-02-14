@@ -21,15 +21,9 @@
 </template>
 
 <script>
-import Dropdown from '@UI/components/Select/Dropdown/Dropdown';
-import ToolBarButton from '@UI/components/ToolBar/ToolBarButton';
 
 export default {
     name: 'ToolBarSelectButton',
-    components: {
-        Dropdown,
-        ToolBarButton,
-    },
     data() {
         return {
             isFocused: false,
@@ -44,12 +38,16 @@ export default {
             }
 
             this.isFocused = !this.isFocused;
+
+            this.$emit('focus', this.isFocused);
         },
         onClickOutside({
             isClickedOutside,
         }) {
             if (isClickedOutside) {
                 this.isFocused = false;
+
+                this.$emit('focus', this.isFocused);
             }
         },
     },

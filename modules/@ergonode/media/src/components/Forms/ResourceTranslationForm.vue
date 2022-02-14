@@ -34,13 +34,9 @@
 <script>
 import translationCardMixin from '@Core/mixins/card/translationCardMixin';
 import PRIVILEGES from '@Media/config/privileges';
-import TextArea from '@UI/components/TextArea/TextArea';
 
 export default {
     name: 'ResourceTranslationForm',
-    components: {
-        TextArea,
-    },
     mixins: [
         translationCardMixin,
     ],
@@ -73,7 +69,7 @@ export default {
             };
         },
         dataCyGenerator(key) {
-            return `media-${key}`;
+            return `resource-${key}_${this.languageCode}`;
         },
     },
 };

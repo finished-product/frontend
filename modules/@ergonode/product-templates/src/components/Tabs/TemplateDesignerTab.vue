@@ -29,7 +29,10 @@ import RemoveElementDropZone from '@Templates/components/DropZones/RemoveElement
 import TemplateDesigner from '@Templates/components/TemplateDesigner/TemplateDesigner';
 import PRIVILEGES from '@Templates/config/privileges';
 import GridViewTemplate from '@UI/components/Layout/Templates/GridViewTemplate';
-import VerticalTabBar from '@UI/components/TabBar/VerticalTabBar';
+import {
+    mapActions,
+    mapState,
+} from 'vuex';
 
 export default {
     name: 'TemplateDesignerTab',
@@ -38,17 +41,36 @@ export default {
         TemplateDesigner,
         UpdateTemplateDesignerButton,
         GridViewTemplate,
-        VerticalTabBar,
     },
     mixins: [
         tabFeedbackMixin,
     ],
+    fetch() {
+        const disabledElements = {
+            [this.user.language]: {},
+        };
+
+        for (let i = this.layoutElements.length - 1; i > -1; i -= 1) {
+            disabledElements[this.user.language][this.layoutElements[i].id] = true;
+        }
+
+        this.setDisabledScopeElements({
+            scope: this.scope,
+            disabledElements,
+        });
+    },
     data() {
         return {
             verticalTabs: [],
         };
     },
     computed: {
+        ...mapState('productTemplate', [
+            'layoutElements',
+        ]),
+        ...mapState('authentication', [
+            'user',
+        ]),
         isAllowedToUpdate() {
             return this.$hasAccess([
                 PRIVILEGES.TEMPLATE_DESIGNER.update,
@@ -64,6 +86,11 @@ export default {
         });
 
         this.verticalTabs = [].concat(...extendedVerticalTabs);
+    },
+    methods: {
+        ...mapActions('list', [
+            'setDisabledScopeElements',
+        ]),
     },
 };
 </script>

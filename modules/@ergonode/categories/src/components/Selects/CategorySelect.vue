@@ -7,7 +7,6 @@
         <template #activator>
             <InputController>
                 <InputLabel
-                    :style="{ top: 0 }"
                     :floating="true"
                     :disabled="!isAllowedToCreateCategory"
                     :label="label" />
@@ -107,6 +106,8 @@
                         :searchable="true"
                         :selectable="true"
                         :multiselect="true"
+                        option-key="id"
+                        option-value="label"
                         @input="onValueChange"
                         @search="onSearch">
                         <template #appendSearchHeader>
@@ -136,18 +137,6 @@
                                         @click.native="onClearVisibilitySelection" />
                                 </template>
                             </SelectListNoDataPlaceholder>
-                        </template>
-                        <template #item="{ item, isSelected }">
-                            <ListElementAction :size="smallSize">
-                                <CheckBox
-                                    :value="isSelected"
-                                    :disabled="item.disabled" />
-                            </ListElementAction>
-                            <ListElementDescription>
-                                <ListElementTitle
-                                    :size="smallSize"
-                                    :title="item.label || `#${item.code}`" />
-                            </ListElementDescription>
                         </template>
                     </SelectList>
                     <div
@@ -197,43 +186,15 @@ import {
 } from '@Trees/services';
 import AdvancedFilters from '@UI/components/AdvancedFilters/AdvancedFilters';
 import AdvancedFiltersRemoveAllButton from '@UI/components/AdvancedFilters/AdvancedFiltersRemoveAllButton';
-import Button from '@UI/components/Button/Button';
-import CheckBox from '@UI/components/CheckBox/CheckBox';
-import InputController from '@UI/components/Input/InputController';
-import InputLabel from '@UI/components/Input/InputLabel';
-import InputSolidStyle from '@UI/components/Input/InputSolidStyle';
-import ListElementAction from '@UI/components/List/ListElementAction';
-import ListElementDescription from '@UI/components/List/ListElementDescription';
-import ListElementTitle from '@UI/components/List/ListElementTitle';
-import PlaceholderClearSearchButton from '@UI/components/Placeholder/PlaceholderClearSearchButton';
-import Preloader from '@UI/components/Preloader/Preloader';
-import SelectList from '@UI/components/SelectList/SelectList';
-import SelectListNoDataPlaceholder from '@UI/components/SelectList/SelectListNoDataPlaceholder';
-import Toggler from '@UI/components/Toggler/Toggler';
-import TreeAccordion from '@UI/components/TreeAccordion/TreeAccordion';
 
 export default {
     name: 'CategorySelect',
     components: {
-        PlaceholderClearSearchButton,
-        Button,
         CreateCategoryButton,
         CategorySelectAllTreeCheckBox,
         CategorySelectAllCheckBox,
-        SelectListNoDataPlaceholder,
-        TreeAccordion,
-        InputSolidStyle,
-        InputController,
-        InputLabel,
-        ListElementTitle,
-        ListElementAction,
-        ListElementDescription,
-        Toggler,
-        CheckBox,
         ExpandNumericButton,
         AdvancedFilters,
-        Preloader,
-        SelectList,
         AdvancedFiltersRemoveAllButton,
     },
     props: {
@@ -250,16 +211,7 @@ export default {
         },
     },
     async fetch() {
-        const categories = await getAutocomplete({
-            $axios: this.$axios,
-        });
-
-        this.allCategories = categories.map(category => ({
-            ...category,
-            disabled: this.disabled,
-        }));
-
-        this.isFetchingData = false;
+        await this.getAllCategories();
     },
     data() {
         return {
@@ -448,13 +400,7 @@ export default {
     },
     methods: {
         async onCategoryCreated() {
-            this.isFetchingData = true;
-
-            this.allCategories = await getAutocomplete({
-                $axios: this.$axios,
-            });
-
-            this.isFetchingData = false;
+            await this.getAllCategories();
         },
         onSelectAllVisible(value) {
             this.$emit('input', value);
@@ -521,6 +467,21 @@ export default {
                     id: this.advancedFilterValues.categoryTree,
                 },
             });
+        },
+        async getAllCategories() {
+            this.isFetchingData = true;
+
+            const categories = await getAutocomplete({
+                $axios: this.$axios,
+            });
+
+            this.allCategories = categories.map(category => ({
+                id: category.id,
+                label: category.label || `#${category.code}`,
+                disabled: this.disabled,
+            }));
+
+            this.isFetchingData = false;
         },
         getFilterValue() {
             return this.isSelectedOnlyVisibleCategories

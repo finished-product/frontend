@@ -5,7 +5,7 @@
 <template>
     <Button
         data-cy="new-unit"
-        title="NEW UNIT"
+        :title="$t('@Core.core.components.CreateUnitButton.title')"
         :theme="secondaryTheme"
         :disabled="!isAllowedToCreate"
         :size="smallSize"
@@ -26,14 +26,10 @@ import {
     SIZE,
     THEME,
 } from '@Core/defaults/theme';
-import Button from '@UI/components/Button/Button';
-import IconAdd from '@UI/components/Icons/Actions/IconAdd';
 
 export default {
     name: 'CreateUnitButton',
     components: {
-        Button,
-        IconAdd,
         CreateUnitModalForm: () => import('@Core/components/Modals/CreateUnitModalForm'),
     },
     data() {

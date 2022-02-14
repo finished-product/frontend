@@ -4,8 +4,8 @@
  */
 <template>
     <GridEditNavigationCell @edit="onEditCell">
-        <GridSelectEditContentCell :style="positionStyle">
-            <TranslationSelect
+        <GridEditContentCell :bounds="bounds">
+            <Select
                 v-model="localValue"
                 :search-value="searchValue"
                 :autofocus="true"
@@ -14,11 +14,14 @@
                 :clearable="true"
                 :disabled="disabled"
                 :multiselect="true"
+                :wrap-value="true"
                 :options="localOptions"
                 :error-messages="errorMessages"
+                option-key="id"
+                option-value="value"
                 @focus="onFocus"
                 @search="onSearch" />
-        </GridSelectEditContentCell>
+        </GridEditContentCell>
     </GridEditNavigationCell>
 </template>
 
@@ -34,16 +37,10 @@ import {
     getMappedMatchedArrayOptions,
     getMappedObjectOptions,
 } from '@Core/models/mappers/translationsMapper';
-import GridSelectEditContentCell from '@UI/components/Grid/Layout/Table/Cells/Edit/Content/GridSelectEditContentCell';
-import TranslationSelect from '@UI/components/Select/TranslationSelect';
 import gridEditCellMixin from '@UI/mixins/grid/gridEditCellMixin';
 
 export default {
     name: 'GridMultiSelectEditCell',
-    components: {
-        GridSelectEditContentCell,
-        TranslationSelect,
-    },
     mixins: [
         gridEditCellMixin,
     ],

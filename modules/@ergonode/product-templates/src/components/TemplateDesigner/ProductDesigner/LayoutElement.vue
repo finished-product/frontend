@@ -55,7 +55,6 @@ import {
 import {
     ELEVATOR_HOLE,
 } from '@UI/assets/scss/_js-variables/elevators.scss';
-import IconResize from '@UI/components/Icons/Others/IconResize';
 import {
     mapActions,
     mapState,
@@ -66,10 +65,11 @@ const unregisterResizeEventListeners = () => import('@UI/models/resize/unregiste
 
 export default {
     name: 'LayoutElement',
-    components: {
-        IconResize,
-    },
     props: {
+        scope: {
+            type: String,
+            required: true,
+        },
         index: {
             type: Number,
             required: true,
@@ -168,6 +168,10 @@ export default {
                 },
             });
             this.__setState({
+                key: 'draggedInScope',
+                value: this.scope,
+            });
+            this.__setState({
                 key: 'isElementDragging',
                 value: DRAGGED_ELEMENT.TEMPLATE,
             });
@@ -196,6 +200,10 @@ export default {
             this.__setState({
                 key: 'draggedElement',
                 value: null,
+            });
+            this.__setState({
+                key: 'draggedInScope',
+                value: '',
             });
             this.__setState({
                 key: 'isElementDragging',

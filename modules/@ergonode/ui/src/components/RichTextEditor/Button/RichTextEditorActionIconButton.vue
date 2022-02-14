@@ -7,9 +7,12 @@
         :options="options"
         :size="tinySize"
         :dismissible="false"
-        :theme="secondaryTheme">
+        :theme="secondaryTheme"
+        @focus="onFocus">
         <template #icon="{ color }">
-            <IconArrowDropdown :fill-color="color" />
+            <IconArrowDropdown
+                :fill-color="color"
+                :state="arrowIconState" />
         </template>
         <template #option="{ option }">
             <RichTextEditorButton
@@ -22,18 +25,17 @@
 
 <script>
 import {
+    ARROW,
+} from '@Core/defaults/icons';
+import {
     SIZE,
     THEME,
 } from '@Core/defaults/theme';
-import ActionIconButton from '@UI/components/ActionIconButton/ActionIconButton';
-import IconArrowDropdown from '@UI/components/Icons/Arrows/IconArrowDropdown';
 import RichTextEditorButton from '@UI/components/RichTextEditor/Button/RichTextEditorButton';
 
 export default {
     name: 'RichTextEditorActionIconButton',
     components: {
-        ActionIconButton,
-        IconArrowDropdown,
         RichTextEditorButton,
     },
     props: {
@@ -59,12 +61,25 @@ export default {
             required: true,
         },
     },
+    data() {
+        return {
+            isFocused: false,
+        };
+    },
     computed: {
         tinySize() {
             return SIZE.TINY;
         },
         secondaryTheme() {
             return THEME.SECONDARY;
+        },
+        arrowIconState() {
+            return this.isFocused ? ARROW.UP : ARROW.DOWN;
+        },
+    },
+    methods: {
+        onFocus(isFocused) {
+            this.isFocused = isFocused;
         },
     },
 };

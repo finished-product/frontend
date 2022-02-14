@@ -6,7 +6,7 @@
       "proceed": "Stwórz & Edytuj",
       "cancel": "Anuluj",
       "deleteConfirm": "Tak, usuń",
-      "notAssigned": "Nie przypisane",
+      "notAssigned": "Nieprzypisane",
       "routes": {
         "title": "Atrybuty",
         "group": "Struktura produktu",
@@ -19,7 +19,17 @@
         "title": "Atrybuty",
         "headTitle": "Atrybuty - Ergonode",
         "noAttributes": "Brak atrybutów",
-        "createFirst": "W systemie nie ma atrybutów, stwórz pierwszy."
+        "createFirst": "W systemie nie ma atrybutów, stwórz pierwszy.",
+        "types": {
+          "TEXT": "Tekst",
+          "TEXT_AREA": "Pole tekstowe",
+          "NUMERIC": "Numeryczny",
+          "SELECT": "Pole wyboru",
+          "MULTI_SELECT": "Lista wyboru",
+          "PRICE": "Cena",
+          "UNIT": "Jednostka",
+          "DATE": "Data"
+        }
       },
       "components": {
         "AttributeForm": {
@@ -29,7 +39,7 @@
           "nameLabel": "Nazwa systemowa",
           "nameHint": "Nazwa systemowa musi być unikalna",
           "scopeLabel": "Zakres",
-          "scopeHint": "Global oznacza że ta sama wartość atrybutu dla każdego języja, będzie odziedziczona po jezyku głownym. Wartości opcji mogą być tłumaczone, ale nie mogą być zmienione w szablonie produktu. "
+          "scopeHint": "Global oznacza że ta sama wartość atrybutu dla każdego języja, będzie odziedziczona po języku głównym. Wartości opcji mogą być tłumaczone, ale nie mogą być zmienione w szablonie produktu. "
         },
         "AttributeTranslationForm": {
           "nameLabel": "Nazwa atrybutu",
@@ -40,8 +50,8 @@
         },
         "RemoveAttributeButton": {
           "removeButton": "Usuń atrybut",
-          "deleteTitle": "Czy jesteś pewny że chcesz usunąć ten atrybut?",
-          "deleteSuccess": "Atrybut usuniety",
+          "deleteTitle": "Czy jesteś pewien, że chcesz usunąć ten atrybut?",
+          "deleteSuccess": "Atrybut usunity",
           "deleteRequest": "Atrybut nie został usunięty"
         },
         "UpdateAttributeTranslationButton": {
@@ -49,7 +59,7 @@
         },
         "AttributesGrid": {
           "getRequest": "Atrybuty nie zostały pobrane prawidłowo",
-          "deleteSuccess": "Atrybut usuniety"
+          "deleteSuccess": "Atrybut usunięty"
         },
         "CreateAttributeModalForm": {
           "create": "Stwórz atrybut",
@@ -92,7 +102,7 @@
           "placeholderLabel": "Placeholder"
         },
         "AttributesVerticalTab": {
-          "title": "Atrubuty produktu"
+          "title": "Atrybuty produktu"
         },
         "SystemAttributesVerticalTab": {
           "title": "Atrybuty systemowe"
@@ -111,9 +121,9 @@
       "components": {
         "ProductTemplateFormPresentation": {
           "title": "Prezentacja produktu",
-          "defaultLabel": "Domyślna atrybut etykiety",
+          "defaultLabel": "Domyślny atrybut etykiety",
           "defaultImage": "Domyślny atrybut obrazu",
-          "noLabelTitle": "Brak atrybutu takstowego",
+          "noLabelTitle": "Brak atrybutu tekstowego",
           "noLabelSubtitle": "W systemie nie ma żadnych atrybutów tekstowych, więc można utworzyć pierwszy.",
           "noImageTitle": "Brak atrybutu obrazu ",
           "noImageSubtitle": "W systemie nie ma żadnych atrybutów obrazu, więc można utworzyć pierwszy."

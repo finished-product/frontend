@@ -7,14 +7,13 @@
         :class="classes"
         :style="placeholderStyles">
         <div class="placeholder__description">
-            <span
+            <PlaceholderTitle
                 v-if="title"
-                class="placeholder__title"
-                v-text="title" />
-            <span
+                :size="size"
+                :title="title" />
+            <PlaceholderSubtitle
                 v-if="subtitle"
-                class="placeholder__subtitle"
-                v-text="subtitle" />
+                :title="subtitle" />
         </div>
         <slot name="action" />
     </div>
@@ -43,6 +42,7 @@ export default {
             validator: value => [
                 SIZE.SMALL,
                 SIZE.REGULAR,
+                SIZE.LARGE,
             ].indexOf(value) !== -1,
         },
         /**
@@ -121,10 +121,6 @@ export default {
         &--small {
             padding: 24px;
 
-            #{$placeholder}__title {
-                font: $FONT_SEMI_BOLD_20_24;
-            }
-
             #{$placeholder}__description {
                 grid-template-columns: minmax(min-content, 228px);
             }
@@ -132,11 +128,9 @@ export default {
 
         &--regular {
             padding: 40px 40px 0;
+        }
 
-            #{$placeholder}__title {
-                font: $FONT_SEMI_BOLD_24_32;
-            }
-
+        &--regular, &--large {
             #{$placeholder}__description {
                 grid-template-columns: minmax(min-content, 272px);
             }
@@ -147,10 +141,6 @@ export default {
             flex-direction: column;
             align-items: center;
             padding: 64px 0 0;
-        }
-
-        &__subtitle {
-            font: $FONT_MEDIUM_14_20;
         }
 
         &__description {

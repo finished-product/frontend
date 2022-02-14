@@ -36,29 +36,24 @@ import {
 } from '@Core/defaults/alerts';
 import beforeRouteEnterMixin from '@Core/mixins/route/beforeRouteEnterMixin';
 import beforeRouteLeaveMixin from '@Core/mixins/route/beforeRouteLeaveMixin';
+import beforeRouteUpdateMixin from '@Core/mixins/route/beforeRouteUpdateMixin';
 import asyncTabsMixin from '@Core/mixins/tab/asyncTabsMixin';
 import RemoveProductStatusButton from '@Statuses/components/Buttons/RemoveProductStatusButton';
 import PRIVILEGES from '@Statuses/config/privileges';
-import Page from '@UI/components/Layout/Page';
-import HorizontalRoutingTabBar from '@UI/components/TabBar/Routing/HorizontalRoutingTabBar';
-import TitleBar from '@UI/components/TitleBar/TitleBar';
 import {
-    mapActions,
     mapState,
 } from 'vuex';
 
 export default {
     name: 'StatusEdit',
     components: {
-        Page,
-        TitleBar,
-        HorizontalRoutingTabBar,
         RemoveProductStatusButton,
     },
     mixins: [
         asyncTabsMixin,
         beforeRouteEnterMixin,
         beforeRouteLeaveMixin,
+        beforeRouteUpdateMixin,
     ],
     validate({
         params,
@@ -79,12 +74,10 @@ export default {
                 });
             },
         });
-        await store.dispatch('productStatus/getDefaultStatus', {});
     },
     computed: {
         ...mapState('productStatus', [
             'code',
-            'isDefaultStatus',
         ]),
         extendedMainAction() {
             return this.$getExtendSlot('@Statuses/pages/product-statuses/_status/mainAction');
@@ -93,21 +86,7 @@ export default {
             return this.$isReadOnly(PRIVILEGES.WORKFLOW.namespace);
         },
     },
-    beforeDestroy() {
-        this.__clearStorage();
-        this.__clearTranslationsStorage();
-        this.__clearFeedbackStorage();
-    },
     methods: {
-        ...mapActions('productStatus', [
-            '__clearStorage',
-        ]),
-        ...mapActions('feedback', {
-            __clearFeedbackStorage: '__clearStorage',
-        }),
-        ...mapActions('tab', {
-            __clearTranslationsStorage: '__clearStorage',
-        }),
         bindingProps({
             props = {},
         }) {

@@ -170,6 +170,8 @@ export default {
                 label,
             };
 
+            dispatch('__clearStorage');
+
             commit('__SET_STATE', {
                 key: 'id',
                 value: id,
@@ -342,6 +344,7 @@ export default {
         id,
         languageCode,
         value,
+        productId = null,
         onSuccess = () => {},
         onError = () => {},
     }) {
@@ -353,6 +356,7 @@ export default {
                 data: {
                     value,
                 },
+                productId,
             });
 
             onSuccess(id);

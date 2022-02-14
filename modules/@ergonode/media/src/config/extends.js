@@ -24,7 +24,7 @@ const AttributeIcons = {
     ],
     [ATTRIBUTE_TYPES.GALLERY]: [
         {
-            component: Icons.IconImage,
+            component: Icons.IconGallery,
         },
     ],
     [ATTRIBUTE_TYPES.FILE]: [
@@ -39,13 +39,18 @@ export default {
         productTemplate: Store.Template,
     },
     extendComponents: {
+        '@UI/components/Grid/Layout/Table/Columns': {
+            IMAGE_PREVIEW: Components.GridImagePreviewColumn,
+        },
         '@UI/components/Grid/Layout/Collection/Cells': {
             MEDIA_ATTACH: Components.GridMediaAttachCollectionCell,
+            IMAGE_PREVIEW: Components.GridImagePreviewCollectionCell,
         },
         '@UI/components/Grid/Layout/Table/Cells/Edit': {
             [ATTRIBUTE_TYPES.IMAGE]: Components.GridImageEditCell,
             [ATTRIBUTE_TYPES.GALLERY]: Components.GridGalleryEditCell,
             [ATTRIBUTE_TYPES.FILE]: Components.GridFileEditCell,
+            IMAGE_PREVIEW: Components.GridImagePreviewEditCell,
         },
         '@Templates/components/Forms/ProductTemplateForm': {
             __ALL: [

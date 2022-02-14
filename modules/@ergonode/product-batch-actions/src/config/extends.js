@@ -4,9 +4,12 @@
  */
 
 import {
+    GRID_LAYOUT,
+} from '@Core/defaults/grid';
+import {
     Components,
     Icons,
-} from './imports';
+} from '@ProductBatchActions/config/imports';
 
 export default {
     extendComponents: {
@@ -14,8 +17,15 @@ export default {
             {
                 component: Components.ProductsBatchActionsButton,
                 props: {},
+                layouts: [
+                    GRID_LAYOUT.COLLECTION,
+                    GRID_LAYOUT.TABLE,
+                ],
             },
         ],
+        '@BatchActions/extends/notification/components/Notifications': {
+            ProductEditPrecessed: Components.NotificationListBatchActionsProcessingItem,
+        },
         '@Notifications/components/NotificationList/Item': {
             BatchActionEnded: Components.NotificationListBatchActionEndedItem,
         },
@@ -29,7 +39,10 @@ export default {
                 title: $this.$t('@ProductBatchActions.productBatchAction._.title'),
                 component: Components.AttributesVerticalTab,
                 icon: Icons.IconAttributes,
-                props,
+                props: {
+                    scope: $this.scope,
+                    ...props,
+                },
             },
         ],
         '@Products/components/Grids/ProductsGrid/props': () => ({

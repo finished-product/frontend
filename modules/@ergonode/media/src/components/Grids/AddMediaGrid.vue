@@ -5,13 +5,16 @@
 <template>
     <IntersectionObserver @intersect="onIntersect">
         <Grid
+            :scope="scope"
             :columns="columnsWithAttachColumn"
             :data-count="filtered"
             :drafts="drafts"
             :pagination="pagination"
             :filters="filterValues"
             :rows="rowsWithAttachValues"
+            :sort-order="localParams.sortOrder"
             :collection-cell-binding="collectionCellBinding"
+            :layout="layout"
             :extended-components="extendedGridComponents"
             :is-editable="isAllowedToUpdate"
             :is-prefetching-data="isPrefetchingData"
@@ -26,6 +29,7 @@
             @sort-column="onColumnSortChange"
             @remove-all-filters="onRemoveAllFilters"
             @filter="onFilterChange"
+            @layout="onLayoutChange"
             v-bind="extendedProps['grid']">
             <template #actionsHeader="actionsHeaderProps">
                 <Component
@@ -51,7 +55,7 @@
                     :key="index"
                     v-bind="bindingProps(footerItem)" />
                 <Button
-                    title="SAVE MEDIA"
+                    :title="$t('@Media._.submit')"
                     :size="smallSize"
                     @click.native="onSaveMedia" />
             </template>
@@ -66,6 +70,7 @@ import {
 import {
     DEFAULT_GRID_FETCH_PARAMS,
     DEFAULT_GRID_PAGINATION,
+    GRID_LAYOUT,
 } from '@Core/defaults/grid';
 import {
     FILTER_OPERATOR,
@@ -89,22 +94,12 @@ import {
 import {
     MEDIA_TYPE,
 } from '@Media/defaults';
-import Button from '@UI/components/Button/Button';
-import Grid from '@UI/components/Grid/Grid';
-import GridNoDataPlaceholder from '@UI/components/Grid/GridNoDataPlaceholder';
-import IntersectionObserver from '@UI/components/Observers/IntersectionObserver';
 import {
     debounce,
 } from 'debounce';
 
 export default {
     name: 'AddMediaGrid',
-    components: {
-        Grid,
-        GridNoDataPlaceholder,
-        Button,
-        IntersectionObserver,
-    },
     mixins: [
         extendPropsMixin({
             extendedKey: '@Media/components/Grids/AddMediaGrid/props',
@@ -116,6 +111,10 @@ export default {
         extendedGridComponentsMixin,
     ],
     props: {
+        scope: {
+            type: String,
+            default: '',
+        },
         multiple: {
             type: Boolean,
             default: false,
@@ -137,6 +136,7 @@ export default {
             searchValue: null,
             isPrefetchingData: true,
             filterValues: {},
+            layout: GRID_LAYOUT.TABLE,
             rows: [],
             columns: [],
             filtered: 0,
@@ -160,6 +160,7 @@ export default {
                 descriptionColumn: 'name',
                 type: 'MEDIA_ATTACH',
                 additionalColumns: [
+                    'type',
                     'esa_attached',
                 ],
             };
@@ -173,6 +174,8 @@ export default {
 
             for (let i = 0; i < this.columns.length; i += 1) {
                 if (this.columns[i].id !== 'type') {
+                    columns.push(this.columns[i]);
+
                     if (i === 3) {
                         columns.push({
                             id: 'esa_attached',
@@ -183,8 +186,6 @@ export default {
                             deletable: false,
                             parameters: [],
                         });
-                    } else {
-                        columns.push(this.columns[i]);
                     }
                 }
             }
@@ -220,6 +221,9 @@ export default {
         delete this.onDebounceSearch;
     },
     methods: {
+        onLayoutChange(layout) {
+            this.layout = layout;
+        },
         async onIntersect(isIntersecting) {
             if (isIntersecting) {
                 this.isPrefetchingData = true;
@@ -259,34 +263,26 @@ export default {
         },
         async onFetchData() {
             const {
-                offset,
-                limit,
+                sortOrder = {},
                 filter,
-                sortOrder,
+                ...rest
             } = this.localParams;
 
-            const params = {
-                offset,
-                limit,
-                extended: true,
-                filter: [
-                    filter,
-                    `type=${FILTER_OPERATOR.EQUAL}${this.type}`,
-                ].join(';'),
-            };
+            const filters = [
+                filter,
+            ];
 
-            if (Object.keys(sortOrder).length) {
-                const {
-                    index: colSortID, orderState,
-                } = sortOrder;
-
-                params.field = colSortID;
-                params.order = orderState;
+            if (this.type !== MEDIA_TYPE.APPLICATION) {
+                filters.push(`type${FILTER_OPERATOR.EQUAL}${this.type}`);
             }
 
+            const params = {
+                ...rest,
+                ...sortOrder,
+                filter: filters.join(';'),
+            };
+
             await getGridData({
-                $route: this.$route,
-                $cookies: this.$userCookies,
                 $axios: this.$axios,
                 path: 'multimedia',
                 params,
@@ -299,7 +295,16 @@ export default {
             rows,
             filtered,
         }) {
-            this.columns = columns;
+            this.columns = columns.map((column) => {
+                if (column.id === 'image') {
+                    return {
+                        ...column,
+                        type: 'IMAGE_PREVIEW',
+                    };
+                }
+
+                return column;
+            });
             this.rows = rows;
             this.filtered = filtered;
         },

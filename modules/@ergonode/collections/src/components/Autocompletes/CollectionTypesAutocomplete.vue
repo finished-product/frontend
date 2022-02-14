@@ -8,12 +8,15 @@
         :value="value"
         :required="required"
         :searchable="true"
+        :wrap-value="true"
         :multiselect="multiselect"
         :clearable="clearable"
         :label="$t('@Collections.collection.components.CollectionTypesAutocomplete.label')"
         :custom-fetch-event="collectionCreatedEventName"
         :error-messages="errorMessages"
         :disabled="disabled"
+        option-key="id"
+        option-value="label"
         href="collections/type/autocomplete"
         @input="onValueChange">
         <template #noDataPlaceholder>
@@ -28,15 +31,9 @@
 import {
     COLLECTION_CREATED_EVENT_NAME,
 } from '@Collections/defaults';
-import Autocomplete from '@UI/components/Autocomplete/Autocomplete';
-import SelectListNoDataPlaceholder from '@UI/components/SelectList/SelectListNoDataPlaceholder';
 
 export default {
     name: 'CollectionTypesAutocomplete',
-    components: {
-        SelectListNoDataPlaceholder,
-        Autocomplete,
-    },
     props: {
         value: {
             type: [
@@ -76,8 +73,8 @@ export default {
         },
         noDataPlaceholder() {
             return {
-                title: this.$t('@Collections.collection.noCollection'),
-                subtitle: this.$t('@Collections.collection.createFirst'),
+                title: this.$t('@Collections.collection._.noCollectionType'),
+                subtitle: this.$t('@Collections.collection._.noCollectionTypeDescription'),
             };
         },
     },

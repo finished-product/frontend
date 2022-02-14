@@ -30,19 +30,29 @@ export default {
                 },
             ],
         },
+        '@Products/components/Tabs/ProductTemplateTab/placeholderAction': [
+            {
+                component: Components.EditProductTemplateButton,
+                props: {},
+            },
+        ],
     },
     extendMethods: {
         '@Media/components/Buttons/LinkRelationButton/routeLinks': () => ({
             template: ROUTE_NAME.PRODUCT_TEMPLATE_EDIT_GENERAL,
         }),
         '@Templates/components/Tabs/TemplateDesignerTab/verticalTabs': ({
+            $this,
             props,
         }) => [
             {
-                title: 'Widgets',
+                title: $this.$t('@Templates.productTemplateExtend.methods.widgetsVerticalTabTitle'),
                 component: Components.WidgetsVerticalTab,
                 icon: Icons.IconWidget,
-                props,
+                props: {
+                    scope: $this.scope,
+                    ...props,
+                },
             },
         ],
         '@Products/store/product/action/getProduct/__after': ({

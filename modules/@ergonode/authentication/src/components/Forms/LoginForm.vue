@@ -14,7 +14,9 @@
         @proceed="onProceed"
         @submit="onSubmit">
         <template #header>
-            <header class="login-header">
+            <header
+                data-cy="login-header"
+                class="login-header">
                 <slot name="header" />
             </header>
         </template>
@@ -37,15 +39,9 @@ import formActionsMixin from '@Core/mixins/form/formActionsMixin';
 import {
     isObject,
 } from '@Core/models/objectWrapper';
-import Form from '@UI/components/Form/Form';
-import FormSection from '@UI/components/Form/Section/FormSection';
 
 export default {
     name: 'LoginForm',
-    components: {
-        Form,
-        FormSection,
-    },
     mixins: [
         formActionsMixin,
     ],
@@ -61,7 +57,7 @@ export default {
                 const tmpObject = acc;
 
                 if (isObject(errors[key])) {
-                    tmpObject[key] = Object.values(errors[key]).join(', ');
+                    tmpObject[key] = Object.values(errors[key]).join(' ');
                 } else {
                     tmpObject[key] = errors[key];
                 }

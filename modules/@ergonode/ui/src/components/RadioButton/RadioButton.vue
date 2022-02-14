@@ -4,42 +4,49 @@
  */
 
 <template>
-    <div :class="classes">
-        <input
-            :id="associatedLabel"
-            v-model="radioValue"
-            type="radio"
-            :value="label"
-            :name="name">
-        <label :for="associatedLabel">
-            <div class="radio-button__content">
-                <div
-                    v-show="isSelected"
-                    class="radio-button__mark" />
+    <InputUUIDProvider>
+        <template #default="{ uuid }">
+            <div :class="classes">
+                <input
+                    :id="uuid"
+                    v-model="radioValue"
+                    type="radio"
+                    :value="label"
+                    :name="name">
+                <label :for="uuid">
+                    <div class="radio-button__content">
+                        <div
+                            v-show="isSelected"
+                            class="radio-button__mark" />
+                    </div>
+                    <span
+                        v-if="label"
+                        class="radio-button__label"
+                        v-text="label" />
+                </label>
+                <slot name="append" />
             </div>
-            <span
-                v-if="label"
-                class="radio-button__label"
-                v-text="label" />
-        </label>
-        <slot name="append" />
-    </div>
+        </template>
+    </InputUUIDProvider>
 </template>
 
 <script>
-import associatedLabelMixin from '@UI/mixins/inputs/associatedLabelMixin';
+import InputUUIDProvider from '@UI/components/Input/InputUUIDProvider';
 
 export default {
     name: 'RadioButton',
-    mixins: [
-        associatedLabelMixin,
-    ],
+    components: {
+        InputUUIDProvider,
+    },
     props: {
         /**
          * Component value
          */
         value: {
-            type: String,
+            type: [
+                String,
+                Boolean,
+            ],
             default: '',
         },
         /**
@@ -66,6 +73,10 @@ export default {
     },
     computed: {
         isSelected() {
+            if (typeof this.value === 'boolean') {
+                return this.value;
+            }
+
             return this.value === this.label;
         },
         radioValue: {
@@ -73,7 +84,7 @@ export default {
                 return this.value;
             },
             set() {
-                this.$emit('input', this.label);
+                this.$emit('input', typeof this.value === 'boolean' ? !this.value : this.label);
             },
         },
         classes() {
@@ -97,7 +108,7 @@ export default {
         display: grid;
         grid-template-columns: max-content;
         grid-auto-flow: column;
-        column-gap: 8px;
+        column-gap: 4px;
         align-items: center;
 
         & input[type="radio"] {
@@ -130,6 +141,7 @@ export default {
             width: 18px;
             height: 18px;
             border: $BORDER_1_GREY;
+            margin: 4px;
             box-sizing: border-box;
             cursor: pointer;
         }

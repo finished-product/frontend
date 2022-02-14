@@ -4,6 +4,7 @@
  */
 <template>
     <Grid
+        :scope="scope"
         :columns="columns"
         :data-count="filtered"
         :rows="rows"
@@ -13,6 +14,7 @@
         :collection-cell-binding="collectionCellBinding"
         :pagination="pagination"
         :extended-components="extendedGridComponents"
+        :layout="layout"
         :is-editable="isAllowedToUpdate"
         :is-prefetching-data="isPrefetchingData"
         :is-basic-filter="true"
@@ -24,6 +26,7 @@
         @sort-column="onColumnSortChange"
         @filter="onFilterChange"
         @remove-all-filters="onRemoveAllFilters"
+        @layout="onLayoutChange"
         v-bind="extendedProps['grid']">
         <template #actionsHeader="actionsHeaderProps">
             <Component
@@ -63,6 +66,7 @@ import {
 } from '@Core/defaults/alerts';
 import {
     DEFAULT_PAGE,
+    GRID_LAYOUT,
 } from '@Core/defaults/grid';
 import {
     FILTER_OPERATOR,
@@ -85,8 +89,6 @@ import AddProductsToGroupButton from '@Products/extends/components/Buttons/AddPr
 import {
     PRODUCTS_ATTACHMENT_UPDATED_EVENT_NAME,
 } from '@Products/extends/defaults';
-import Grid from '@UI/components/Grid/Grid';
-import GridNoDataPlaceholder from '@UI/components/Grid/GridNoDataPlaceholder';
 import {
     mapActions,
 } from 'vuex';
@@ -95,8 +97,6 @@ export default {
     name: 'AttachedProductsToGroupGrid',
     components: {
         AddProductsToGroupButton,
-        Grid,
-        GridNoDataPlaceholder,
         AddProductsToGroupActionButton,
     },
     mixins: [
@@ -109,6 +109,12 @@ export default {
         gridDraftMixin,
         extendedGridComponentsMixin,
     ],
+    props: {
+        scope: {
+            type: String,
+            default: '',
+        },
+    },
     async fetch() {
         await this.onFetchData();
 
@@ -125,6 +131,7 @@ export default {
             filterValues,
             pagination,
             sortOrder,
+            layout: GRID_LAYOUT.TABLE,
             rows: [],
             columns: [],
             filtered: 0,
@@ -151,8 +158,8 @@ export default {
         },
     },
     watch: {
-        async $route(from, to) {
-            if (from.name !== to.name) {
+        async $route(to, from) {
+            if (from.name !== to.name || from.query.layout !== to.query.layout) {
                 return;
             }
 
@@ -187,6 +194,9 @@ export default {
         ...mapActions('feedback', [
             'onScopeValueChange',
         ]),
+        onLayoutChange(layout) {
+            this.layout = layout;
+        },
         async onProductsAttachmentUpdated() {
             await this.onFetchData();
         },
@@ -200,7 +210,8 @@ export default {
         async onFetchData() {
             const params = getParams({
                 $route: this.$route,
-                $cookies: this.$userCookies,
+                $cookies: this.$gridCookies,
+                layout: this.layout,
             });
 
             if (typeof params.filter === 'undefined') {
@@ -212,9 +223,9 @@ export default {
             }
 
             await getGridData({
-                $route: this.$route,
-                $cookies: this.$userCookies,
+                $cookies: this.$gridCookies,
                 $axios: this.$axios,
+                layout: this.layout,
                 path: `products/${this.$route.params.id}/children-and-available-products`,
                 params,
                 onSuccess: this.onFetchDataSuccess,

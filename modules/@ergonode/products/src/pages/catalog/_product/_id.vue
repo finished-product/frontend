@@ -37,6 +37,7 @@ import {
 } from '@Core/defaults/theme';
 import beforeRouteEnterMixin from '@Core/mixins/route/beforeRouteEnterMixin';
 import beforeRouteLeaveMixin from '@Core/mixins/route/beforeRouteLeaveMixin';
+import beforeRouteUpdateMixin from '@Core/mixins/route/beforeRouteUpdateMixin';
 import {
     getNestedTabRoutes,
 } from '@Core/models/navigation/tabs';
@@ -46,26 +47,20 @@ import {
 import RemoveProductButton from '@Products/components/Buttons/RemoveProductButton';
 import PRIVILEGES from '@Products/config/privileges';
 import Footer from '@UI/components/Layout/Footer/Footer';
-import Page from '@UI/components/Layout/Page';
-import HorizontalRoutingTabBar from '@UI/components/TabBar/Routing/HorizontalRoutingTabBar';
-import TitleBar from '@UI/components/TitleBar/TitleBar';
 import {
-    mapActions,
     mapState,
 } from 'vuex';
 
 export default {
     name: 'ProductEdit',
     components: {
-        Page,
-        TitleBar,
-        HorizontalRoutingTabBar,
         Footer,
         RemoveProductButton,
     },
     mixins: [
         beforeRouteEnterMixin,
         beforeRouteLeaveMixin,
+        beforeRouteUpdateMixin,
     ],
     validate({
         params,
@@ -144,17 +139,7 @@ export default {
             },
         },
     },
-    beforeDestroy() {
-        this.__clearStorage();
-        this.__clearFeedbackStorage();
-    },
     methods: {
-        ...mapActions('product', [
-            '__clearStorage',
-        ]),
-        ...mapActions('feedback', {
-            __clearFeedbackStorage: '__clearStorage',
-        }),
         bindingProps({
             props = {},
         }) {

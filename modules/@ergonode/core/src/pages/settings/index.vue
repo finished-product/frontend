@@ -5,7 +5,7 @@
 <template>
     <Page>
         <TitleBar
-            title="Settings"
+            :title="$t('@Core.core._.settingsTitle')"
             :is-read-only="isReadOnly">
             <template #mainAction>
                 <template
@@ -29,21 +29,12 @@
 import PRIVILEGES from '@Core/config/privileges';
 import beforeRouteLeaveMixin from '@Core/mixins/route/beforeRouteLeaveMixin';
 import asyncTabsMixin from '@Core/mixins/tab/asyncTabsMixin';
-import Page from '@UI/components/Layout/Page';
-import HorizontalRoutingTabBar from '@UI/components/TabBar/Routing/HorizontalRoutingTabBar';
-import TitleBar from '@UI/components/TitleBar/TitleBar';
 import {
-    mapActions,
     mapState,
 } from 'vuex';
 
 export default {
     name: 'Settings',
-    components: {
-        TitleBar,
-        Page,
-        HorizontalRoutingTabBar,
-    },
     mixins: [
         beforeRouteLeaveMixin,
         asyncTabsMixin,
@@ -60,13 +51,7 @@ export default {
             return this.$isReadOnly(PRIVILEGES.SETTINGS.namespace);
         },
     },
-    beforeDestroy() {
-        this.__clearFeedbackStorage();
-    },
     methods: {
-        ...mapActions('feedback', {
-            __clearFeedbackStorage: '__clearStorage',
-        }),
         bindingProps({
             props = {},
         }) {

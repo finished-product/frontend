@@ -5,7 +5,15 @@
       "components": {
         "ConditionsSideBar": {
           "title": "Conditions"
+        },
+        "ConditionSetTreeDesignerNoTypeItemParameter": {
+          "placeholderTitle": "No support for {info} type of condition parameter"
         }
+      }
+    },
+    "transitionExtend": {
+      "methods": {
+        "verticalTabTitle": "Conditions"
       }
     }
   }

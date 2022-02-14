@@ -9,14 +9,22 @@
         :disabled="disabled">
         <template #activator>
             <InputController>
-                <div class="upload-files">
+                <InputImageController>
                     <Preloader v-show="isPrefetchingData" />
-                    <VerticalFixedScroll v-if="!isPrefetchingData">
-                        <List v-if="isValue">
-                            <ListElement
+                    <VerticalFixedScroll
+                        v-if="!isPrefetchingData && isValue"
+                        :style="{
+                            width: '100%',
+                        }">
+                        <List>
+                            <ListLinkElement
                                 v-for="file in value"
                                 :size="size"
-                                :key="file">
+                                :key="file"
+                                :to="{
+                                    name: resourceRouteName,
+                                    params: { id: file }
+                                }">
                                 <ListElementIcon>
                                     <IconFile :fill-color="greenColor" />
                                 </ListElementIcon>
@@ -26,37 +34,45 @@
                                 <ListElementAction
                                     v-if="!disabled"
                                     :size="smallSize">
-                                    <IconButton
-                                        :size="smallSize"
-                                        :theme="secondaryTheme"
+                                    <Fab
+                                        :size="tinySize"
+                                        :theme="destructiveTheme"
                                         @click.native="onRemoveFile(file)">
                                         <template #icon="{ color }">
                                             <IconFilledClose :fill-color="color" />
                                         </template>
-                                    </IconButton>
+                                    </Fab>
                                 </ListElementAction>
-                            </ListElement>
+                            </ListLinkElement>
+                            <div
+                                v-if="!disabled"
+                                class="centering-container">
+                                <Button
+                                    :title="title"
+                                    :size="smallSize"
+                                    :theme="secondaryTheme"
+                                    @click.native="onShowModal">
+                                    <template #prepend="{ color }">
+                                        <IconAdd :fill-color="color" />
+                                    </template>
+                                </Button>
+                            </div>
                         </List>
-                        <div
-                            v-if="!disabled"
-                            class="centering-container">
-                            <Button
-                                :title="title"
-                                :size="smallSize"
-                                :theme="secondaryTheme"
-                                @click.native="onShowModal">
-                                <template #prepend="{ color }">
-                                    <IconAdd :fill-color="color" />
-                                </template>
-                            </Button>
-                        </div>
                     </VerticalFixedScroll>
-                </div>
+                    <Button
+                        v-if="!disabled && !isValue"
+                        :title="title"
+                        :size="smallSize"
+                        :theme="secondaryTheme"
+                        @click.native="onShowModal">
+                        <template #prepend="{ color }">
+                            <IconAdd :fill-color="color" />
+                        </template>
+                    </Button>
+                </InputImageController>
                 <InputLabel
                     v-if="label"
-                    :style="{ top: 0 }"
                     :required="required"
-                    :size="size"
                     :floating="true"
                     :disabled="disabled"
                     :label="label" />
@@ -75,6 +91,9 @@ import {
     THEME,
 } from '@Core/defaults/theme';
 import {
+    ROUTE_NAME,
+} from '@Media/config/routes';
+import {
     MEDIA_TYPE,
 } from '@Media/defaults';
 import {
@@ -83,40 +102,25 @@ import {
 import {
     GREEN,
 } from '@UI/assets/scss/_js-variables/colors.scss';
-import Button from '@UI/components/Button/Button';
-import IconAdd from '@UI/components/Icons/Actions/IconAdd';
-import InputController from '@UI/components/Input/InputController';
-import InputLabel from '@UI/components/Input/InputLabel';
-import InputSolidStyle from '@UI/components/Input/InputSolidStyle';
 import VerticalFixedScroll from '@UI/components/Layout/Scroll/VerticalFixedScroll';
-import Preloader from '@UI/components/Preloader/Preloader';
 
 export default {
     name: 'UploadFiles',
     components: {
-        Preloader,
-        InputController,
-        Button,
-        IconAdd,
-        InputLabel,
-        InputSolidStyle,
         VerticalFixedScroll,
         ModalMediaTabBar: () => import('@Media/components/Modal/ModalMediaTabBar'),
-        IconFile: () => import('@UI/components/Icons/Others/IconFile'),
-        IconFilledClose: () => import('@UI/components/Icons/Window/IconFilledClose'),
-        IconButton: () => import('@UI/components/IconButton/IconButton'),
-        ListElementDescription: () => import('@UI/components/List/ListElementDescription'),
-        ListElementTitle: () => import('@UI/components/List/ListElementTitle'),
-        ListElementIcon: () => import('@UI/components/List/ListElementIcon'),
-        ListElement: () => import('@UI/components/List/ListElement'),
-        ListElementAction: () => import('@UI/components/List/ListElementAction'),
-        List: () => import('@UI/components/List/List'),
     },
     props: {
+        /**
+         * The value of the component
+         */
         value: {
             type: Array,
             default: () => [],
         },
+        /**
+         * The size of the component
+         */
         size: {
             type: String,
             default: SIZE.REGULAR,
@@ -125,10 +129,16 @@ export default {
                 SIZE.REGULAR,
             ].indexOf(value) !== -1,
         },
+        /**
+         * The height of the component
+         */
         height: {
             type: String,
             default: 'unset',
         },
+        /**
+         * The label is a text caption or description for the component
+         */
         label: {
             type: String,
             default: '',
@@ -140,6 +150,9 @@ export default {
             type: Boolean,
             default: false,
         },
+        /**
+         * Determines if the given field is disabled
+         */
         disabled: {
             type: Boolean,
             default: false,
@@ -153,11 +166,20 @@ export default {
         };
     },
     computed: {
+        resourceRouteName() {
+            return ROUTE_NAME.MEDIA_RESOURCE_EDIT_GENERAL;
+        },
         secondaryTheme() {
             return THEME.SECONDARY;
         },
+        destructiveTheme() {
+            return THEME.DESTRUCTIVE;
+        },
         smallSize() {
             return SIZE.SMALL;
+        },
+        tinySize() {
+            return SIZE.TINY;
         },
         greenColor() {
             return GREEN;
@@ -240,13 +262,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .upload-files {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        height: 100%;
-    }
-
     .centering-container {
         display: flex;
         justify-content: center;

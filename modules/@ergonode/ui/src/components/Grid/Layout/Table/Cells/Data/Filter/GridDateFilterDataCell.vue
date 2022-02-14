@@ -14,7 +14,6 @@
 </template>
 
 <script>
-import GridFilterPresentationCell from '@UI/components/Grid/Layout/Table/Cells/Presentation/GridFilterPresentationCell';
 import gridDataFilterCellMixin from '@UI/mixins/grid/gridDataFilterCellMixin';
 import {
     DEFAULT_FORMAT,
@@ -22,9 +21,6 @@ import {
 
 export default {
     name: 'GridDateFilterDataCell',
-    components: {
-        GridFilterPresentationCell,
-    },
     mixins: [
         gridDataFilterCellMixin,
     ],
@@ -42,7 +38,7 @@ export default {
             this.$emit('edit-filter-cell', {
                 type: this.data.type,
                 props: {
-                    bounds: this.$el.getBoundingClientRect(),
+                    bounds: this.$el.getBoundingClientRect().toJSON(),
                     value: this.value,
                     columnId: this.columnId,
                     row: this.rowIndex,

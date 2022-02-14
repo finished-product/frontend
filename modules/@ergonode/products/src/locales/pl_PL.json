@@ -20,7 +20,7 @@
       "create": "STWÓRZ",
       "proceed": "STWÓRZ & EDYTUJ",
       "submit": "ZAPISZ ZMIANY",
-      "restore": "PRZYWRÓC",
+      "restore": "Przywróć",
       "cancel": "ANULUJ"
     },
     "product": {
@@ -31,6 +31,30 @@
         "createFirst": "W systemie nie ma produktów, stwórz pierwszy."
       },
       "components": {
+        "AddProductRelationsModalGrid": {
+          "title": "Dodaj relacje"
+        },
+        "AddProductRelationsButton": {
+          "title": "Dodaj zaznaczone",
+          "confirmErrorApplyTitle": "Tak, wyczyść",
+          "confirmErrorTitle": "Wybrano {info} relacji produktowych. Tylko 100 relacji może być dodane",
+          "confirmErrorSubtitle": "Czy chciałbyś wyczyścić zaznaczenie?",
+          "errorMessage": "Relacje produktowe nie mogły zostać pobrane",
+          "successMessage": "Relacje produktowe zostały zaktualizowane",
+          "infoMessage": "Żadne zmiany nie zostały zrobione"
+        },
+        "AddProductRelationsGrid": {
+          "filtersButtonTitle": "FILTRY",
+          "successRemoveMessage": "Relacja z produktem został usunięta",
+          "errorGetMessage": "Relacje produktowe nie zostały pobrane poprawnie"
+        },
+        "UploadProductRelations": {
+          "title": "Dodaj relacje",
+          "addRelationOption": "Dodaj kolejną relacje",
+          "removeRelationOption": "Usuń tą relacje",
+          "removeAllRelationsOption": "Usuń wszystkie relacje",
+          "navigateToRelationOption": "Idź do tej relacji"
+        },
         "UpdateProductTemplateButton": {
           "title": "Dodaj produkty po SKU",
           "submitTitle": "DODAJ DO PRODUKTU GRUPUJĄCEGO",
@@ -57,7 +81,7 @@
         },
         "RestoreAttributeParentConfirmModal": {
           "confirmTitle": "Czy chcesz przywrócić tłumaczenia dla języka nadrzędnego?",
-          "buttonTitle": "TAK, PRZYWRÓC",
+          "buttonTitle": "TAK, PRZYWRÓĆ",
           "successMessage": "Wartość produktu została przywrócona",
           "errorMessage": "Nie można było przywrócić wartości produktu"
         },
@@ -77,7 +101,7 @@
           "alertSuccess": "Produkty zostały zaktualizowane"
         },
         "RestoreForm": {
-          "modalTitle": "Wybierz atrybuty, których wartości chcesz przywrócić z {from} do wartości dziedziczonej w ({to})"
+          "modalTitle": "Wybierz atrybuty, których wartości chcesz przywrócić z {from} do wartości dziedziczonej w {to}"
         },
         "ProductWorkflowActionButton": {
           "confirmTitle": "Czy jesteś pewien zmiany statusu na {info}?",
@@ -98,8 +122,17 @@
           "errorAlert": "Produkt nie został usunięty"
         },
         "RestoreProductAttributesModalForm": {
+          "title": "Przywróć wartość rodzica",
           "formValidation": "Proszę oznacz atrybuty do przywrócenia",
           "successAlert": "Atrybuty {info} zostały przywrócone"
+        },
+        "ProductTemplateTab": {
+          "editLanguageSelectLabel": "Edytuj język",
+          "placeholderTitle": "Szablon jest pusty",
+          "placeholderSubtitle": "W szablonie produktowym nie ma atrybutów. Edytuj szablon i wybierz atrybuty, które chcesz wyświetlić."
+        },
+        "EditProductTemplateButton": {
+          "title": "Edytuj szablon"
         }
       },
       "pages": {
@@ -112,8 +145,8 @@
         "action": {
           "skuRequiredLabel": "Sku jest wymagane",
           "segmentRequiredLabel": "Reguły segmentujące są wymagane",
-          "addBySKUCancel": "Dodawnaie produktu po sku zostało przerwane",
-          "addBySKUToCollectionCancel": "Dodawnaie produktu po sku do kolekcji zostało przerwane",
+          "addBySKUCancel": "Dodawanie produktu po sku zostało przerwane",
+          "addBySKUToCollectionCancel": "Dodawanie produktu po sku do kolekcji zostało przerwane",
           "addFromSegmentCancel": "Dodawanie produktu z segmentu zostało przerwane",
           "createCancel": "Tworzenie produktu zostało przerwane",
           "updateCancel": "Aktualizowanie produktu zostało przerwane",
@@ -139,12 +172,13 @@
         },
         "AddBindingAttributesModalForm": {
           "title": "Dodaj atrybuty dowiązujące",
-          "submitTitle": "Dodaj atrybuty",
-          "successMessage": "Atrybuty dowiązujące zostały dodane"
+          "submitTitle": "Wybierz atrybuty",
+          "successMessage": "Atrybuty dowiązujące zostały dodane",
+          "infoMessage": "Brak wybranych atrybutów dowiązujących"
         },
         "ProductVariantsTab": {
           "placeholderTitle": "Brak atrybutów dowiązujących",
-          "placeholderSubtitle": "Atrybuty dowiązujące są częścią wspólną atrybutów w produkcie, która łączy produkty w warianty produktu."
+          "placeholderSubtitle": "Atrybuty dowiązujące są częścią wspólną atrybutów (typu pola wyboru) w produkcie, która łączy produkty w warianty produktu."
         },
         "AddBindingAttributes": {
           "title": "Dodaj atrybut",
@@ -165,7 +199,7 @@
         },
         "ProductVariantsToAttachGrid": {
           "noProducts": "Brak produktów do dowiązania",
-          "changeBindingAttributes": "Brak produktów prostych, które pasują do kreteriów dowiązujących jako wariant, rozwiaż ponowne wybranie atrybudów, po których będą dowiązane produktu, albo uzupełnij brakujące wartości w produktach.",
+          "changeBindingAttributes": "Brak produktów prostych, które pasują do kryteriów dowiązujących jako wariant, rozważ ponowne wybranie atrybutów, po których będą dowiązane produkty, albo uzupełnij brakujące wartości w produktach.",
           "getRequest": "Warianty produktowe nie zostały pobrane",
           "attachedLabel": "Przypięte",
           "notAttachedLabel": "Odpięte"
@@ -174,7 +208,7 @@
           "noProductsInGroup": "Brak produktów w grupie",
           "addProductToGroup": "Brak produktów w grupie, dodaj pierwszy.",
           "successMessage": "Produkt został usunięty z grupy",
-          "errorMessage": "Produkt należacy do grupy nie został pobrany poprawnie"
+          "errorMessage": "Produkt należący do grupy nie został pobrany poprawnie"
         },
         "ProductsToAttachForGroupGrid": {
           "noProducts": "Brak produktów",
@@ -189,10 +223,20 @@
           "label": "Dowiązujący atrybut"
         },
         "ProductAttributesBindingForm": {
-          "listTitle": "DODAJ ATRYBUT DOWIĄZUJĄCY"
+          "paragraphInfo": "Atrybuty dowiązujące są częścią wspólną atrybutów (typu pola wyboru) w produkcie, która łączy produkty w warianty produktu.",
+          "listTitle": "DODAJ ATRYBUT DOWIĄZUJĄCY",
+          "listTittleTooltip": "Nie ma więcej atrybutów typu pola wyboru"
         },
         "UpdateProductsAttachmentButton": {
           "successMessage": "Załącznik do produktów został zaktualizowany"
+        }
+      }
+    },
+    "uiExtend": {
+      "components": {
+        "GridProductRelationDataCell": {
+          "singularLabel": "{info} relacja",
+          "pluralLabel": "{info} relacje"
         }
       }
     }

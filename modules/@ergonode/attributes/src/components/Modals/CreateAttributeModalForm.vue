@@ -33,7 +33,6 @@ import {
     THEME,
 } from '@Core/defaults/theme';
 import modalFeedbackMixin from '@Core/mixins/feedback/modalFeedbackMixin';
-import ModalForm from '@UI/components/Modal/ModalForm';
 import {
     mapActions,
 } from 'vuex';
@@ -41,13 +40,14 @@ import {
 export default {
     name: 'CreateAttributeModalForm',
     components: {
-        ModalForm,
         AttributeForm,
     },
     mixins: [
         modalFeedbackMixin,
     ],
     async fetch() {
+        this.__clearStorage();
+
         await this.getInitialDictionaries({
             keys: [
                 'attrTypes',

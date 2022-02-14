@@ -17,6 +17,7 @@
         <template #body>
             <FormSection>
                 <TextField
+                    :data-cy="dataCyGenerator(nameFieldKey)"
                     :value="name"
                     required
                     :label="$t('@Roles.role.components.UserRoleForm.nameLabel')"
@@ -25,6 +26,7 @@
                     :disabled="!isAllowedToUpdate"
                     @input="setNameValue" />
                 <TextArea
+                    :data-cy="dataCyGenerator(descriptionFieldKey)"
                     :value="description"
                     :label="$t('@Roles.role.components.UserRoleForm.descLabel')"
                     resize="none"
@@ -47,10 +49,6 @@
 import formFeedbackMixin from '@Core/mixins/feedback/formFeedbackMixin';
 import formActionsMixin from '@Core/mixins/form/formActionsMixin';
 import PRIVILEGES from '@Roles/config/privileges';
-import Form from '@UI/components/Form/Form';
-import FormSection from '@UI/components/Form/Section/FormSection';
-import TextArea from '@UI/components/TextArea/TextArea';
-import TextField from '@UI/components/TextField/TextField';
 import {
     mapActions,
     mapState,
@@ -58,12 +56,6 @@ import {
 
 export default {
     name: 'UserRoleForm',
-    components: {
-        Form,
-        FormSection,
-        TextField,
-        TextArea,
-    },
     mixins: [
         formActionsMixin,
         formFeedbackMixin,
@@ -137,6 +129,9 @@ export default {
                 fieldKey: this.descriptionFieldKey,
                 value,
             });
+        },
+        dataCyGenerator(key) {
+            return `role-${key}`;
         },
     },
 };

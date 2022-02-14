@@ -37,27 +37,22 @@ import {
 } from '@Core/defaults/alerts';
 import beforeRouteEnterMixin from '@Core/mixins/route/beforeRouteEnterMixin';
 import beforeRouteLeaveMixin from '@Core/mixins/route/beforeRouteLeaveMixin';
+import beforeRouteUpdateMixin from '@Core/mixins/route/beforeRouteUpdateMixin';
 import asyncTabsMixin from '@Core/mixins/tab/asyncTabsMixin';
-import Page from '@UI/components/Layout/Page';
-import HorizontalRoutingTabBar from '@UI/components/TabBar/Routing/HorizontalRoutingTabBar';
-import TitleBar from '@UI/components/TitleBar/TitleBar';
 import {
-    mapActions,
     mapState,
 } from 'vuex';
 
 export default {
     name: 'UnitEdit',
     components: {
-        Page,
-        TitleBar,
-        HorizontalRoutingTabBar,
         RemoveUnitButton,
     },
     mixins: [
         asyncTabsMixin,
         beforeRouteEnterMixin,
         beforeRouteLeaveMixin,
+        beforeRouteUpdateMixin,
     ],
     validate({
         params,
@@ -90,13 +85,7 @@ export default {
             return this.$isReadOnly(PRIVILEGES.SETTINGS.namespace);
         },
     },
-    beforeDestroy() {
-        this.clearUnitStorage();
-    },
     methods: {
-        ...mapActions('unit', {
-            clearUnitStorage: '__clearStorage',
-        }),
         bindingProps({
             props = {},
         }) {

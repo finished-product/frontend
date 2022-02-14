@@ -33,7 +33,6 @@ import CategoryTreeForm from '@Trees/components/Forms/CategoryTreeForm';
 import {
     ROUTE_NAME,
 } from '@Trees/config/routes';
-import ModalForm from '@UI/components/Modal/ModalForm';
 import {
     mapActions,
 } from 'vuex';
@@ -41,12 +40,14 @@ import {
 export default {
     name: 'CreateCategoryTreeModalForm',
     components: {
-        ModalForm,
         CategoryTreeForm,
     },
     mixins: [
         modalFeedbackMixin,
     ],
+    fetch() {
+        this.__clearStorage();
+    },
     data() {
         return {
             isSubmitting: false,

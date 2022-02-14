@@ -35,29 +35,24 @@ import {
 } from '@Core/defaults/alerts';
 import beforeRouteEnterMixin from '@Core/mixins/route/beforeRouteEnterMixin';
 import beforeRouteLeaveMixin from '@Core/mixins/route/beforeRouteLeaveMixin';
+import beforeRouteUpdateMixin from '@Core/mixins/route/beforeRouteUpdateMixin';
 import asyncTabsMixin from '@Core/mixins/tab/asyncTabsMixin';
 import RemoveRoleButton from '@Roles/components/Buttons/RemoveRoleButton';
 import PRIVILEGES from '@Roles/config/privileges';
-import Page from '@UI/components/Layout/Page';
-import HorizontalRoutingTabBar from '@UI/components/TabBar/Routing/HorizontalRoutingTabBar';
-import TitleBar from '@UI/components/TitleBar/TitleBar';
 import {
-    mapActions,
     mapState,
 } from 'vuex';
 
 export default {
     name: 'EditUserRoles',
     components: {
-        Page,
-        TitleBar,
-        HorizontalRoutingTabBar,
         RemoveRoleButton,
     },
     mixins: [
         asyncTabsMixin,
         beforeRouteEnterMixin,
         beforeRouteLeaveMixin,
+        beforeRouteUpdateMixin,
     ],
     validate({
         params,
@@ -90,17 +85,7 @@ export default {
             return this.$isReadOnly(PRIVILEGES.USER_ROLE.namespace);
         },
     },
-    beforeDestroy() {
-        this.__clearStorage();
-        this.__clearFeedbackStorage();
-    },
     methods: {
-        ...mapActions('role', [
-            '__clearStorage',
-        ]),
-        ...mapActions('feedback', {
-            __clearFeedbackStorage: '__clearStorage',
-        }),
         bindingProps({
             props = {},
         }) {

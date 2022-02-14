@@ -21,6 +21,7 @@
                 :is="element.component"
                 :value="value[element.key]"
                 :schema="element.props"
+                :required="schema.required"
                 :errors="errors[element.key]"
                 @input="onValueChange" />
         </div>
@@ -35,15 +36,11 @@ import {
 import {
     toCapitalize,
 } from '@Core/models/stringWrapper';
-import Fab from '@UI/components/Fab/Fab';
 import JSONSchemaFormTableRowArrowWidget from '@UI/components/Form/JSONSchemaForm/JSONSchemaFormTableRowArrowWidget';
-import IconDelete from '@UI/components/Icons/Actions/IconDelete';
 
 export default {
     name: 'JSONSchemaFormTableRowWidget',
     components: {
-        Fab,
-        IconDelete,
         JSONSchemaFormTableRowArrowWidget,
     },
     props: {
@@ -86,6 +83,7 @@ export default {
     data() {
         return {
             rowComponents: [],
+            fieldKeys: [],
         };
     },
     computed: {
@@ -99,14 +97,20 @@ export default {
                 gridTemplateColumns,
             };
         },
-        fieldsKeys() {
-            return Object.keys(this.schema.properties);
+    },
+    watch: {
+        schema: {
+            immediate: true,
+            handler() {
+                this.fieldsKeys = this.getFieldKeys();
+                this.rowComponents = this.getComponents();
+            },
         },
     },
-    created() {
-        this.rowComponents = this.getComponents();
-    },
     methods: {
+        getFieldKeys() {
+            return this.schema.properties ? Object.keys(this.schema.properties) : [];
+        },
         getComponents() {
             const {
                 length,
@@ -122,7 +126,6 @@ export default {
                 components.push({
                     key,
                     props: {
-                        isRequired: this.schema.required.indexOf(key) !== -1,
                         disabled: this.disabled,
                         ...rest,
                         size: SIZE.SMALL,

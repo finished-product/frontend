@@ -32,7 +32,6 @@ import {
 } from '@Core/models/arrayWrapper';
 import ProductAttributesBindingForm
     from '@Products/extends/components/Forms/ProductAttributesBindingForm';
-import ModalForm from '@UI/components/Modal/ModalForm';
 import {
     mapActions,
     mapState,
@@ -41,7 +40,6 @@ import {
 export default {
     name: 'AddBindingAttributesModalForm',
     components: {
-        ModalForm,
         ProductAttributesBindingForm,
     },
     mixins: [
@@ -85,7 +83,12 @@ export default {
                 return;
             }
 
-            if (!arraysAreEqual(this.localBindings, this.bindings)) {
+            if (!this.localBindings.length && !this.bindings.length) {
+                this.$addAlert({
+                    type: ALERT_TYPE.INFO,
+                    message: this.$t('@Products.productExtend.components.AddBindingAttributesModalForm.infoMessage'),
+                });
+            } else if (!arraysAreEqual(this.localBindings, this.bindings)) {
                 this.isSubmitting = true;
 
                 this.removeScopeErrors(this.scope);

@@ -15,6 +15,7 @@
         "editCollections": "Kolekcje"
       },
       "addProducts": {
+        "fromListTitle": "Dodaj produkty z listy",
         "fromSkuOption": "Dodaj po SKU",
         "fromSegmentOption": "Dodaj z reguł segmentacji"
       }
@@ -24,7 +25,9 @@
         "title": "Kolekcje",
         "headTitle": "Kolekcje - Ergonode",
         "noCollection": "Brak kolekcji",
-        "createFirst": "W systemie nie ma kolekcji, dodaj pierwszą."
+        "noCollectionType": "Brak typów kolekcji",
+        "createFirst": "W systemie nie ma kolekcji, dodaj pierwszą.",
+        "noCollectionTypeDescription": "W systemie nie ma typów kolekcji, skontaktuj się z supportem."
       },
       "pages": {
         "id": {
@@ -39,6 +42,9 @@
         }
       },
       "components": {
+        "UpdateCollectionProductsVisibilityButton": {
+          "successMessage": "Widoczność produktów w kolekcji została zaktualizowana"
+        },
         "CollectionTypesAutocomplete": {
           "label": "Typ"
         },
@@ -52,12 +58,15 @@
         "AddProductsFromSegmentModalForm": {
           "title": "Dodaj produkty z reguł segmentujących",
           "formSubtitle": "Dodaj do kolekcji",
-          "successMessage": "Prodkuty zostały dodane do kolekcji"
+          "successMessage": "Produkty zostały dodane do kolekcji"
         },
         "AddProductsBySKUModalForm": {
           "title": "Dodaj produkty po SKU",
           "formSubtitle": "Dodaj do kolekcji",
-          "successMessage": "Prodkuty zostały dodane do kolekcji"
+          "successMessage": "Produkty zostały dodane do kolekcji"
+        },
+        "UpdateProductsAttachmentButton": {
+          "successMessage": "Produkty zostały dodane do kolekcji"
         },
         "CollectionsGrid": {
           "successMessage": "Kolekcja została usunięta",
@@ -65,6 +74,13 @@
         },
         "CollectionProductsGrid": {
           "successMessage": "Kolekcja produktów nie została pobrana prawidłowo"
+        },
+        "ProductsToAttachForCollectionGrid": {
+          "noProducts": "Brak produktów",
+          "createFirst": "Brak produktów z wariantami albo produktów prostych w systemie, stwórz pierwszy.",
+          "attachedLabel": "Przypięte",
+          "notAttachedLabel": "Nie przypięte",
+          "getRequest": "Produkty nie zostały pobrane"
         },
         "CollectionTranslationForm": {
           "collectionNameLabel": "Nazwa kolekcji",
@@ -77,7 +93,7 @@
         },
         "AddProductsBySKUForm": {
           "skuLabel": "Po SKU",
-          "skuHint": "Oddziel wiele SKU uzywając nowej lini albo przecinka np. “SKU1, SKU2, SKU3”"
+          "skuHint": "Oddziel wiele SKU używając nowej linii albo przecinka np. “SKU1, SKU2, SKU3”"
         },
         "UpdateCollectionTranslationButton": {
           "successMessage": "Tłumaczenia kolekcji zostały zaktualizowane"

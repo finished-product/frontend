@@ -22,6 +22,7 @@ export default {
     async getRole(
         {
             commit,
+            dispatch,
         },
         {
             id,
@@ -47,6 +48,8 @@ export default {
                 description,
                 privileges,
             } = data;
+
+            dispatch('__clearStorage');
 
             commit('__SET_STATE', {
                 key: 'id',
@@ -86,7 +89,7 @@ export default {
         },
         {
             scope,
-            drafts,
+            drafts = {},
             onSuccess = () => {},
             onError = () => {},
         },

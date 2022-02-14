@@ -4,7 +4,7 @@
  */
 <template>
     <GridEditNavigationCell @edit="onEditCell">
-        <GridSelectEditContentCell :style="positionStyle">
+        <GridEditContentCell :bounds="bounds">
             <DatePicker
                 v-model="localValue"
                 :size="smallSize"
@@ -12,7 +12,7 @@
                 :placeholder="format"
                 :format="format"
                 @focus="onFocus" />
-        </GridSelectEditContentCell>
+        </GridEditContentCell>
     </GridEditNavigationCell>
 </template>
 
@@ -23,8 +23,6 @@ import {
 import {
     SIZE,
 } from '@Core/defaults/theme';
-import DatePicker from '@UI/components/DatePicker/DatePicker';
-import GridSelectEditContentCell from '@UI/components/Grid/Layout/Table/Cells/Edit/Content/GridSelectEditContentCell';
 import gridEditFilterCellMixin from '@UI/mixins/grid/gridEditFilterCellMixin';
 import {
     DEFAULT_FORMAT,
@@ -36,10 +34,6 @@ import {
 
 export default {
     name: 'GridDateEditFilterCell',
-    components: {
-        GridSelectEditContentCell,
-        DatePicker,
-    },
     mixins: [
         gridEditFilterCellMixin,
     ],
@@ -82,14 +76,18 @@ export default {
         const localValue = this.localValue ? formatDate(this.localValue, DEFAULT_FORMAT) : '';
 
         if (localValue !== this.value[FILTER_OPERATOR.EQUAL]) {
-            this.$emit('filter-value', {
-                value: {
-                    [FILTER_OPERATOR.EQUAL]: localValue,
-                },
-                columnId: this.columnId,
-                row: this.row,
-                column: this.column,
-            });
+            if (this.localValue === '') {
+                this.$emit('filter-clear', this.columnId);
+            } else {
+                this.$emit('filter-value', {
+                    value: {
+                        [FILTER_OPERATOR.EQUAL]: localValue,
+                    },
+                    columnId: this.columnId,
+                    row: this.row,
+                    column: this.column,
+                });
+            }
         }
     },
     methods: {

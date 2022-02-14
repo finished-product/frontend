@@ -31,6 +31,30 @@
         "createFirst": "There are no product in the system, so you can add the first one."
       },
       "components": {
+        "AddProductRelationsModalGrid": {
+          "title": "Add relations"
+        },
+        "AddProductRelationsButton": {
+          "title": "Add selected",
+          "confirmErrorApplyTitle": "Yes, clear",
+          "confirmErrorTitle": "Selected {info} product relations. Only 100 relations might be added",
+          "confirmErrorSubtitle": "Would you like to clear selection?",
+          "errorMessage": "Product relations couldn't be fetched",
+          "successMessage": "Product relations have been updated",
+          "infoMessage": "No changes have been made"
+        },
+        "AddProductRelationsGrid": {
+          "filtersButtonTitle": "FILTERS",
+          "successRemoveMessage": "Product relation removed",
+          "errorGetMessage": "Product relations haven’t been fetched properly"
+        },
+        "UploadProductRelations": {
+          "title": "Add relations",
+          "addRelationOption": "Add next relation",
+          "removeRelationOption": "Remove this relation",
+          "removeAllRelationsOption": "Remove all relations",
+          "navigateToRelationOption": "Navigate to this relation"
+        },
         "UpdateProductTemplateButton": {
           "successMessage": "Product has been updated"
         },
@@ -51,7 +75,7 @@
           "filtersButtonTitle": "FILTERS",
           "noFilterErrorMessage": "Attribute has no filter",
           "removeSuccessMessage": "Product removed",
-          "getErrorMessage": "Products haven’t been fetched properl"
+          "getErrorMessage": "Products haven’t been fetched properly"
         },
         "RestoreAttributeParentConfirmModal": {
           "confirmTitle": "Do you want to restore parent translation value of selected cell?",
@@ -75,7 +99,7 @@
           "alertSuccess": "Products have been updated"
         },
         "RestoreForm": {
-          "modalTitle": "Select attributes which values you want to restore from {from} to parent translation ({to})"
+          "modalTitle": "Select attributes which values you want to restore from {from} to parent translation {to}"
         },
         "ProductWorkflowActionButton": {
           "confirmTitle": "Are you sure you want to change status to {info}?",
@@ -92,8 +116,17 @@
           "errorAlert": "Product hasn't been deleted"
         },
         "RestoreProductAttributesModalForm": {
+          "title": "Restore parent value",
           "formValidation": "Please mark attributes to restore",
           "successAlert": "Attributes {info} have been restored"
+        },
+        "ProductTemplateTab": {
+          "editLanguageSelectLabel": "Edit language",
+          "placeholderTitle": "Template is empty",
+          "placeholderSubtitle": "No attribute has been added in the Template Designer. Edit the template and select attributes to display."
+        },
+        "EditProductTemplateButton": {
+          "title": "Edit template"
         }
       },
       "pages": {
@@ -133,12 +166,13 @@
         },
         "AddBindingAttributesModalForm": {
           "title": "Add binding attributes",
-          "submitTitle": "ADD ATTRIBUTES",
-          "successMessage": "Attribute bindings added"
+          "submitTitle": "CHOOSE ATTRIBUTES",
+          "successMessage": "Attribute bindings added",
+          "infoMessage": "No binding attributes have been chosen"
         },
         "ProductVariantsTab": {
           "placeholderTitle": "No binding attributes",
-          "placeholderSubtitle": "Binding attribute is the common attribute of the products, which link products together into the product with variants."
+          "placeholderSubtitle": "Binding attribute is the common attribute (select type) of the products, which link products together into the product with variants."
         },
         "AddBindingAttributes": {
           "title": "Add attribute",
@@ -186,10 +220,20 @@
           "label": "Binding attribute"
         },
         "ProductAttributesBindingForm": {
-          "listTitle": "ADD BINDING ATTRIBUTE"
+          "paragraphInfo": "Binding attribute is the common attribute (select type) of the products, which link products together into the product with variants.",
+          "listTitle": "ADD BINDING ATTRIBUTE",
+          "listTittleTooltip": "There are no more select type attributes"
         },
         "UpdateProductsAttachmentButton": {
           "successMessage": "Products attachment have been updated"
+        }
+      }
+    },
+    "uiExtend": {
+      "components": {
+        "GridProductRelationDataCell": {
+          "singularLabel": "{info} relation",
+          "pluralLabel": "{info} relations"
         }
       }
     }

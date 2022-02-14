@@ -4,6 +4,7 @@
  */
 <template>
     <Grid
+        :scope="scope"
         :columns="columns"
         :data-count="filtered"
         :rows="rows"
@@ -13,6 +14,7 @@
         :collection-cell-binding="collectionCellBinding"
         :pagination="pagination"
         :extended-components="extendedGridComponents"
+        :layout="layout"
         :is-editable="isAllowedToUpdate"
         :is-prefetching-data="isPrefetchingData"
         :is-basic-filter="true"
@@ -24,6 +26,7 @@
         @sort-column="onColumnSortChange"
         @filter="onFilterChange"
         @remove-all-filters="onRemoveAllFilters"
+        @layout="onLayoutChange"
         v-bind="extendedProps['grid']">
         <template #actionsHeader="actionsHeaderProps">
             <Component
@@ -85,6 +88,7 @@ import {
 } from '@Core/defaults/alerts';
 import {
     DEFAULT_PAGE,
+    GRID_LAYOUT,
 } from '@Core/defaults/grid';
 import {
     FILTER_OPERATOR,
@@ -111,9 +115,6 @@ import {
     ATTRIBUTE_BINDING_ADDED_EVENT_NAME,
     PRODUCTS_ATTACHMENT_UPDATED_EVENT_NAME,
 } from '@Products/extends/defaults';
-import Grid from '@UI/components/Grid/Grid';
-import GridNoDataPlaceholder from '@UI/components/Grid/GridNoDataPlaceholder';
-import IconAdd from '@UI/components/Icons/Actions/IconAdd';
 import {
     mapActions,
     mapState,
@@ -122,11 +123,8 @@ import {
 export default {
     name: 'AttachedProductVariantsGrid',
     components: {
-        Grid,
-        GridNoDataPlaceholder,
         ExpandNumericButton,
         BindingAttributes,
-        IconAdd,
         AddProductVariantsButton,
     },
     mixins: [
@@ -139,6 +137,12 @@ export default {
         gridDraftMixin,
         extendedGridComponentsMixin,
     ],
+    props: {
+        scope: {
+            type: String,
+            default: '',
+        },
+    },
     async fetch() {
         await this.onFetchData();
 
@@ -155,6 +159,7 @@ export default {
             filterValues,
             pagination,
             sortOrder,
+            layout: GRID_LAYOUT.TABLE,
             rows: [],
             columns: [],
             filtered: 0,
@@ -198,8 +203,8 @@ export default {
         },
     },
     watch: {
-        async $route(from, to) {
-            if (from.name !== to.name) {
+        async $route(to, from) {
+            if (from.name !== to.name || from.query.layout !== to.query.layout) {
                 return;
             }
 
@@ -246,6 +251,9 @@ export default {
         ...mapActions('feedback', [
             'onScopeValueChange',
         ]),
+        onLayoutChange(layout) {
+            this.layout = layout;
+        },
         async onProductsAttachmentUpdated() {
             await this.onFetchData();
         },
@@ -277,7 +285,8 @@ export default {
         async onFetchData() {
             const params = getParams({
                 $route: this.$route,
-                $cookies: this.$userCookies,
+                $cookies: this.$gridCookies,
+                layout: this.layout,
             });
 
             if (typeof params.filter === 'undefined') {
@@ -291,8 +300,8 @@ export default {
             params.columns = this.bindingAttributes.map(attribute => attribute.key).join(',');
 
             await getGridData({
-                $route: this.$route,
-                $cookies: this.$userCookies,
+                $cookies: this.$gridCookies,
+                layout: this.layout,
                 $axios: this.$axios,
                 path: `products/${this.$route.params.id}/children-and-available-products`,
                 params,

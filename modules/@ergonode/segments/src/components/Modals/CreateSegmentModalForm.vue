@@ -30,7 +30,6 @@ import SegmentForm from '@Segments/components/Forms/SegmentForm';
 import {
     ROUTE_NAME,
 } from '@Segments/config/routes';
-import ModalForm from '@UI/components/Modal/ModalForm';
 import {
     mapActions,
 } from 'vuex';
@@ -38,12 +37,14 @@ import {
 export default {
     name: 'CreateSegmentModalForm',
     components: {
-        ModalForm,
         SegmentForm,
     },
     mixins: [
         modalFeedbackMixin,
     ],
+    fetch() {
+        this.__clearStorage();
+    },
     data() {
         return {
             isSubmitting: false,

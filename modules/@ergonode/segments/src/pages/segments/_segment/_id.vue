@@ -35,29 +35,24 @@ import {
 } from '@Core/defaults/alerts';
 import beforeRouteEnterMixin from '@Core/mixins/route/beforeRouteEnterMixin';
 import beforeRouteLeaveMixin from '@Core/mixins/route/beforeRouteLeaveMixin';
+import beforeRouteUpdateMixin from '@Core/mixins/route/beforeRouteUpdateMixin';
 import asyncTabsMixin from '@Core/mixins/tab/asyncTabsMixin';
 import RemoveSegmentButton from '@Segments/components/Buttons/RemoveSegmentButton';
 import PRIVILEGES from '@Segments/config/privileges';
-import Page from '@UI/components/Layout/Page';
-import HorizontalRoutingTabBar from '@UI/components/TabBar/Routing/HorizontalRoutingTabBar';
-import TitleBar from '@UI/components/TitleBar/TitleBar';
 import {
-    mapActions,
     mapState,
 } from 'vuex';
 
 export default {
     name: 'SegmentEdit',
     components: {
-        Page,
-        TitleBar,
-        HorizontalRoutingTabBar,
         RemoveSegmentButton,
     },
     mixins: [
         asyncTabsMixin,
         beforeRouteEnterMixin,
         beforeRouteLeaveMixin,
+        beforeRouteUpdateMixin,
     ],
     validate({
         params,
@@ -90,21 +85,7 @@ export default {
             return this.$isReadOnly(PRIVILEGES.SEGMENT.namespace);
         },
     },
-    beforeDestroy() {
-        this.__clearSegmentStorage();
-        this.__clearConditionStorage();
-        this.__clearFeedbackStorage();
-    },
     methods: {
-        ...mapActions('condition', {
-            __clearConditionStorage: '__clearStorage',
-        }),
-        ...mapActions('segment', {
-            __clearSegmentStorage: '__clearStorage',
-        }),
-        ...mapActions('feedback', {
-            __clearFeedbackStorage: '__clearStorage',
-        }),
         bindingProps({
             props = {},
         }) {

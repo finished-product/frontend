@@ -42,12 +42,9 @@ import PRIVILEGES from '@Trees/config/privileges';
 import {
     GRAPHITE_LIGHT,
 } from '@UI/assets/scss/_js-variables/colors.scss';
-import DropZone from '@UI/components/DropZone/DropZone';
-import IconRemoveFilter from '@UI/components/Icons/Actions/IconRemoveFilter';
 import GridViewTemplate from '@UI/components/Layout/Templates/GridViewTemplate';
-import VerticalTabBar from '@UI/components/TabBar/VerticalTabBar';
-import FadeTransition from '@UI/components/Transitions/FadeTransition';
 import {
+    mapActions,
     mapState,
 } from 'vuex';
 
@@ -55,22 +52,38 @@ export default {
     name: 'CategoryTreeDesignerTab',
     components: {
         UpdateCategoryTreeDesignerButton,
-        VerticalTabBar,
         CategoryTreeDesigner,
         GridViewTemplate,
-        IconRemoveFilter,
-        DropZone,
-        FadeTransition,
     },
     mixins: [
         tabFeedbackMixin,
     ],
+    fetch() {
+        const disabledElements = {
+            [this.user.language]: {},
+        };
+
+        for (let i = this.tree.length - 1; i > -1; i -= 1) {
+            disabledElements[this.user.language][this.tree[i].id] = true;
+        }
+
+        this.setDisabledScopeElements({
+            scope: this.scope,
+            disabledElements,
+        });
+    },
     data() {
         return {
             verticalTabs: [],
         };
     },
     computed: {
+        ...mapState('categoryTree', [
+            'tree',
+        ]),
+        ...mapState('authentication', [
+            'user',
+        ]),
         ...mapState('draggable', [
             'isElementDragging',
         ]),
@@ -95,6 +108,11 @@ export default {
         });
 
         this.verticalTabs = [].concat(...extendedVerticalTabs);
+    },
+    methods: {
+        ...mapActions('list', [
+            'setDisabledScopeElements',
+        ]),
     },
 };
 </script>

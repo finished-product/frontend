@@ -23,24 +23,26 @@ import {
 import {
     ORIENTATION,
 } from '@Core/defaults/layout';
-import DropZone from '@UI/components/DropZone/DropZone';
-import IconAddFilter from '@UI/components/Icons/Actions/IconAddFilter';
-import FadeTransition from '@UI/components/Transitions/FadeTransition';
 import {
     mapState,
 } from 'vuex';
 
 export default {
     name: 'AddFilterDropZone',
-    components: {
-        FadeTransition,
-        DropZone,
-        IconAddFilter,
-    },
     props: {
+        /**
+         * List of filters
+         */
         filters: {
             type: Array,
             default: () => [],
+        },
+        /**
+         * Type of the place from where element is dragging
+         */
+        draggingElementType: {
+            type: String,
+            default: DRAGGED_ELEMENT.LIST,
         },
     },
     computed: {
@@ -52,7 +54,7 @@ export default {
             return ORIENTATION.HORIZONTAL;
         },
         isDropZoneVisible() {
-            return this.isElementDragging === DRAGGED_ELEMENT.LIST
+            return this.isElementDragging === this.draggingElementType
                 && !this.filters.some(
                     filter => filter.id === this.draggedElement,
                 );

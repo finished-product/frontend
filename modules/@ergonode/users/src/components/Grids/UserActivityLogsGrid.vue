@@ -4,6 +4,7 @@
  */
 <template>
     <Grid
+        :scope="scope"
         :columns="columns"
         :data-count="filtered"
         :rows="rows"
@@ -59,14 +60,10 @@ import {
 import {
     getGridData,
 } from '@Core/services/grid/getGridData.service';
-import Grid from '@UI/components/Grid/Grid';
 import PRIVILEGES from '@Users/config/privileges';
 
 export default {
     name: 'UserActivityLogsGrid',
-    components: {
-        Grid,
-    },
     mixins: [
         extendPropsMixin({
             extendedKey: '@Users/components/Grids/UserActivityLogsGrid/props',
@@ -76,6 +73,12 @@ export default {
         }),
         extendedGridComponentsMixin,
     ],
+    props: {
+        scope: {
+            type: String,
+            default: '',
+        },
+    },
     async fetch() {
         await this.onFetchData();
 
@@ -112,8 +115,8 @@ export default {
         },
     },
     watch: {
-        async $route(from, to) {
-            if (from.name !== to.name) {
+        async $route(to, from) {
+            if (from.name !== to.name || from.query.layout !== to.query.layout) {
                 return;
             }
 
@@ -135,13 +138,12 @@ export default {
     methods: {
         async onFetchData() {
             await getGridData({
-                $route: this.$route,
-                $cookies: this.$userCookies,
+                $cookies: this.$gridCookies,
                 $axios: this.$axios,
                 path: 'profile/log',
                 params: getParams({
                     $route: this.$route,
-                    $cookies: this.$userCookies,
+                    $cookies: this.$gridCookies,
                 }),
                 onSuccess: this.onFetchDataSuccess,
                 onError: this.onFetchDataError,

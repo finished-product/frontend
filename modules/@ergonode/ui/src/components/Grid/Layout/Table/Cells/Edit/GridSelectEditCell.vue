@@ -4,20 +4,23 @@
  */
 <template>
     <GridEditNavigationCell @edit="onEditCell">
-        <GridSelectEditContentCell :style="positionStyle">
-            <TranslationSelect
+        <GridEditContentCell :bounds="bounds">
+            <Select
                 v-model="localValue"
                 :search-value="searchValue"
                 :autofocus="true"
                 :size="smallSize"
                 :searchable="true"
                 :clearable="true"
+                :wrap-value="true"
                 :disabled="disabled"
                 :options="localOptions"
                 :error-messages="errorMessages"
+                option-key="id"
+                option-value="value"
                 @focus="onFocus"
                 @search="onSearch" />
-        </GridSelectEditContentCell>
+        </GridEditContentCell>
     </GridEditNavigationCell>
 </template>
 
@@ -32,16 +35,10 @@ import {
     getMappedObjectOption,
     getMappedObjectOptions,
 } from '@Core/models/mappers/translationsMapper';
-import GridSelectEditContentCell from '@UI/components/Grid/Layout/Table/Cells/Edit/Content/GridSelectEditContentCell';
-import TranslationSelect from '@UI/components/Select/TranslationSelect';
 import gridEditCellMixin from '@UI/mixins/grid/gridEditCellMixin';
 
 export default {
     name: 'GridSelectEditCell',
-    components: {
-        GridSelectEditContentCell,
-        TranslationSelect,
-    },
     mixins: [
         gridEditCellMixin,
     ],
@@ -110,7 +107,7 @@ export default {
             this.searchValue = value;
 
             this.localOptions = simpleSearch(
-                this.allCategories,
+                this.allOptions,
                 value,
                 [
                     'value',

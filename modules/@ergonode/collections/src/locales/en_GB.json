@@ -15,6 +15,7 @@
         "editCollections": "Collections"
       },
       "addProducts": {
+        "fromListOption": "Select from list",
         "fromSkuOption": "Add by SKU",
         "fromSegmentOption": "Add from segment"
       }
@@ -24,7 +25,9 @@
         "title": "Collections",
         "headTitle": "Collections - Ergonode",
         "noCollection": "No collection",
-        "createFirst": "There are no collections in the system, so you can add the first one."
+        "noCollectionType": "No collection type",
+        "createFirst": "There are no collections in the system, so you can add the first one.",
+        "noCollectionTypeDescription": "There are no collection types in the system, contact with support."
       },
       "pages": {
         "id": {
@@ -44,6 +47,9 @@
         }
       },
       "components": {
+        "UpdateCollectionProductsVisibilityButton": {
+          "successMessage": "Product visibilities in collection have been updated"
+        },
         "CollectionTypesAutocomplete": {
           "label": "Type"
         },
@@ -64,12 +70,22 @@
           "formSubtitle": "Add to collection",
           "successMessage": "Products have been added to collection"
         },
+        "UpdateProductsAttachmentButton": {
+          "successMessage": "Products have been added to collection"
+        },
         "CollectionsGrid": {
           "successMessage": "Collection removed",
           "errorMessage": "Collections haven’t been fetched properly"
         },
         "CollectionProductsGrid": {
           "successMessage": "Collection products haven’t been fetched properly"
+        },
+        "ProductsToAttachForCollectionGrid": {
+          "noProducts": "No products",
+          "createFirst": "There are either no product with variants nor simple products in the system, so you can add the first one.",
+          "attachedLabel": "Attached",
+          "notAttachedLabel": "Not attached",
+          "getRequest": "Products haven’t been fetched properly"
         },
         "CollectionTranslationForm": {
           "collectionNameLabel": "Collection name",

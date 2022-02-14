@@ -6,7 +6,7 @@
     <ProductTemplateFormField
         :size="size"
         :position="position">
-        <TranslationSelect
+        <Select
             :value="localValue"
             :clearable="true"
             :multiselect="true"
@@ -16,6 +16,8 @@
             :error-messages="errors[fieldKey]"
             :required="properties.required"
             :disabled="disabled"
+            option-key="key"
+            option-value="value"
             @focus="onFocus"
             @input="onValueChange">
             <template #append>
@@ -26,7 +28,7 @@
             <template #details>
                 <div />
             </template>
-        </TranslationSelect>
+        </Select>
     </ProductTemplateFormField>
 </template>
 
@@ -39,8 +41,6 @@ import {
     getMappedObjectOptions,
 } from '@Core/models/mappers/translationsMapper';
 import ProductTemplateFormField from '@Products/components/Forms/Field/ProductTemplateFormField';
-import InfoHint from '@UI/components/Hints/InfoHint';
-import TranslationSelect from '@UI/components/Select/TranslationSelect';
 import {
     mapState,
 } from 'vuex';
@@ -49,8 +49,6 @@ export default {
     name: 'ProductTemplateFormMultiSelectField',
     components: {
         ProductTemplateFormField,
-        TranslationSelect,
-        InfoHint,
     },
     props: {
         size: {

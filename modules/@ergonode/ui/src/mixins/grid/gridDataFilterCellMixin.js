@@ -5,12 +5,8 @@
 import {
     FILTER_OPERATOR,
 } from '@Core/defaults/operators';
-import GridTableCell from '@UI/components/Grid/Layout/Table/Cells/GridTableCell';
 
 export default {
-    components: {
-        GridTableCell,
-    },
     props: {
         rowIndex: {
             type: Number,
@@ -46,7 +42,7 @@ export default {
             this.$emit('edit-filter-cell', {
                 type: this.data.type,
                 props: {
-                    bounds: this.$el.getBoundingClientRect(),
+                    bounds: this.$el.getBoundingClientRect().toJSON(),
                     value: this.value,
                     columnId: this.columnId,
                     row: this.rowIndex,

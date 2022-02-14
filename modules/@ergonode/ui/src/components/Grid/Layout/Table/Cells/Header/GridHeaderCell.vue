@@ -6,6 +6,7 @@
     <GridTableCell
         :row="rowIndex"
         :column="columnIndex"
+        :data-cy="columnId"
         :locked="true">
         <div
             :class="classes"
@@ -51,25 +52,12 @@ import {
 import {
     GRAPHITE_LIGHT,
 } from '@UI/assets/scss/_js-variables/colors.scss';
-import ActionIconButton from '@UI/components/ActionIconButton/ActionIconButton';
-import GridTableCell from '@UI/components/Grid/Layout/Table/Cells/GridTableCell';
-import GridTitleHeaderCell from '@UI/components/Grid/Layout/Table/Cells/Header/GridTitleHeaderCell';
-import IconArrowSort from '@UI/components/Icons/Arrows/IconArrowSort';
-import IconDots from '@UI/components/Icons/Others/IconDots';
 import {
-    mapActions,
     mapState,
 } from 'vuex';
 
 export default {
     name: 'GridHeaderCell',
-    components: {
-        GridTableCell,
-        GridTitleHeaderCell,
-        ActionIconButton,
-        IconArrowSort,
-        IconDots,
-    },
     props: {
         /**
          * The label is a text caption or description for the component
@@ -125,7 +113,6 @@ export default {
     },
     computed: {
         ...mapState('draggable', [
-            'isElementDragging',
             'draggedElement',
         ]),
         classes() {
@@ -194,9 +181,6 @@ export default {
         },
     },
     methods: {
-        ...mapActions('list', [
-            'setDisabledElement',
-        ]),
         onClickSort() {
             let order = SORTING_ORDER.ASC;
 

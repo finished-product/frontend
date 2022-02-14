@@ -10,9 +10,8 @@
         <GridHeader
             v-if="isHeaderVisible"
             :layout="layout"
-            :table-layout-config="tableLayoutConfig"
-            :collection-layout-config="collectionLayoutConfig"
-            :is-collection-layout="isCollectionLayout"
+            :layout-configs="layoutConfigs"
+            :layout-activators="layoutActivators"
             @layout-change="onLayoutChange"
             @apply-settings="onApplySettings">
             <template #prepend>
@@ -24,6 +23,7 @@
                     :selected-rows="selectedRows"
                     :excluded-from-selection-rows="excludedFromSelectionRows"
                     :selected-rows-count="selectedRowsCount"
+                    :is-selected-all="isSelectedAll"
                     :on-clear-selected-rows="onClearSelectedRows" />
             </template>
             <template #configuration>
@@ -34,15 +34,17 @@
             </template>
         </GridHeader>
         <GridBody
-            :disabled="isListElementDragging && isColumnExist"
+            :disabled="isElementDraggingToAdd && isColumnExist"
             :is-border="isHeaderVisible">
             <slot name="body">
                 <AddGridColumnDropZone
-                    :column-exist="isColumnExist"
+                    :is-visible="isDropZoneVisible"
                     @drop="onDropColumn" />
                 <KeepAlive>
-                    <GridTableLayout
-                        v-if="isTableLayout"
+                    <Component
+                        v-if="activeLayout"
+                        :is="activeLayout.layout.component"
+                        :scope="scope"
                         :columns="columns"
                         :rows="rows"
                         :row-ids="rowIds"
@@ -52,16 +54,18 @@
                         :filters="filters"
                         :sort-order="sortOrder"
                         :pagination="pagination"
-                        :row-height="tableLayoutConfig.rowHeight"
-                        :extended-components="extendedComponents[gridLayout.TABLE]"
+                        :extended-components="extendedComponents[activeLayout.key]"
                         :selected-rows="selectedRows"
                         :excluded-from-selection-rows="excludedFromSelectionRows"
+                        :multiselect="multiselect"
                         :is-prefetching-data="isPrefetchingData"
                         :is-layout-resolved="isLayoutResolved[layout]"
                         :is-editable="isEditable"
                         :is-select-column="isSelectColumn"
                         :is-basic-filter="isBasicFilter"
                         :is-selected-all="isSelectedAll"
+                        :is-action-column="isActionColumn"
+                        v-bind="layoutConfigs[activeLayout.key]"
                         @sort-column="onSortColumn"
                         @filter="onFilterChange"
                         @cell-value="onCellValueChange"
@@ -72,22 +76,6 @@
                         @rows-select="onRowsSelect"
                         @excluded-rows-select="onExcludedRowsSelect"
                         @select-all="onSelectAllRows"
-                        @resolved="onResolvedLayout" />
-                    <GridCollectionLayout
-                        v-else
-                        :rows="rows"
-                        :row-ids="rowIds"
-                        :collection-cell-binding="collectionCellBinding"
-                        :drafts="drafts"
-                        :disabled-rows="disabledRows"
-                        :columns-number="collectionLayoutConfig.columnsNumber"
-                        :object-fit="collectionLayoutConfig.scaling"
-                        :extended-components="extendedComponents[gridLayout.COLLECTION]"
-                        :is-editable="isEditable"
-                        :is-prefetching-data="isPrefetchingData"
-                        :is-layout-resolved="isLayoutResolved[layout]"
-                        @row-action="onRowAction"
-                        @cell-value="onCellValueChange"
                         @resolved="onResolvedLayout" />
                 </KeepAlive>
                 <slot
@@ -102,7 +90,7 @@
                 </slot>
             </slot>
         </GridBody>
-        <GridFooter v-if="isFooterVisible">
+        <GridFooter v-if="isFooterVisible && activeLayout && activeLayout.isFooterVisible">
             <slot name="footer">
                 <GridPageSelector
                     :value="pagination.itemsPerPage"
@@ -112,7 +100,13 @@
                     :value="pagination.page"
                     :max-page="maxPage"
                     @input="onPageChange" />
-                <slot name="appendFooter" />
+                <slot
+                    name="appendFooter"
+                    :selected-rows="selectedRows"
+                    :excluded-from-selection-rows="excludedFromSelectionRows"
+                    :selected-rows-count="selectedRowsCount"
+                    :is-selected-all="isSelectedAll"
+                    :on-clear-selected-rows="onClearSelectedRows" />
             </slot>
         </GridFooter>
         <slot />
@@ -126,41 +120,31 @@ import {
     DEFAULT_PAGE,
     DRAGGED_ELEMENT,
     GRID_LAYOUT,
-    IMAGE_SCALING,
+    OBJECT_FIT,
     ROW_HEIGHT,
 } from '@Core/defaults/grid';
 import {
     getUUID,
 } from '@Core/models/stringWrapper';
-import AddGridColumnDropZone from '@UI/components/Grid/DropZone/AddGridColumnDropZone';
-import GridPageSelector from '@UI/components/Grid/Footer/GridPageSelector';
-import GridPagination from '@UI/components/Grid/Footer/GridPagination';
-import GridBody from '@UI/components/Grid/GridBody';
-import GridFooter from '@UI/components/Grid/GridFooter';
-import GridNoDataPlaceholder from '@UI/components/Grid/GridNoDataPlaceholder';
-import GridNoResultsPlaceholder from '@UI/components/Grid/GridNoResultsPlaceholder';
-import GridHeader from '@UI/components/Grid/Header/GridHeader';
 import GridCollectionLayout from '@UI/components/Grid/Layout/Collection/GridCollectionLayout';
+import GridCollectionLayoutActivator from '@UI/components/Grid/Layout/Collection/GridCollectionLayoutActivator';
 import GridTableLayout from '@UI/components/Grid/Layout/Table/GridTableLayout';
+import GridTableLayoutActivator from '@UI/components/Grid/Layout/Table/GridTableLayoutActivator';
+import deepmerge from 'deepmerge';
 import {
     mapState,
 } from 'vuex';
 
 export default {
     name: 'Grid',
-    components: {
-        AddGridColumnDropZone,
-        GridNoDataPlaceholder,
-        GridNoResultsPlaceholder,
-        GridPagination,
-        GridHeader,
-        GridBody,
-        GridFooter,
-        GridTableLayout,
-        GridCollectionLayout,
-        GridPageSelector,
-    },
     props: {
+        /**
+         * Context scope
+         */
+        scope: {
+            type: String,
+            default: '',
+        },
         /**
          * List of columns presented at Grid
          */
@@ -226,11 +210,32 @@ export default {
             validator: value => Object.values(GRID_LAYOUT).indexOf(value) !== -1,
         },
         /**
+         * Determines chosen layout of Grid
+         */
+        layout: {
+            type: String,
+            default: GRID_LAYOUT.TABLE,
+        },
+        /**
          * Number of all data
          */
         dataCount: {
             type: Number,
             required: true,
+        },
+        /**
+         * Type of the place from where element is dragging
+         */
+        draggingElementType: {
+            type: String,
+            default: DRAGGED_ELEMENT.LIST,
+        },
+        /**
+         * Determines if the component is multiple choice
+         */
+        multiselect: {
+            type: Boolean,
+            default: true,
         },
         /**
          * Determines if data is loaded asynchronously
@@ -252,6 +257,13 @@ export default {
         isBorder: {
             type: Boolean,
             default: false,
+        },
+        /**
+         * Determinate if action column is visible
+         */
+        isActionColumn: {
+            type: Boolean,
+            default: true,
         },
         /**
          * Determinate if the component is being able to edit
@@ -305,17 +317,42 @@ export default {
                 [GRID_LAYOUT.COLLECTION]: {},
             }),
         },
+        /**
+         * Custom layout definitions
+         */
+        customLayouts: {
+            type: Array,
+            default: () => [],
+        },
+        /**
+         * The state of the selected rows
+         */
+        selectionState: {
+            type: Object,
+            default: () => ({
+                isSelectedAll: false,
+                selectedRows: {},
+                excludedFromSelectionRows: {},
+            }),
+        },
     },
     data() {
-        return {
-            layout: this.defaultLayout,
-            collectionLayoutConfig: {
-                columnsNumber: COLUMNS_NUMBER.FOURTH_COLUMNS.value,
-                scaling: IMAGE_SCALING.FIT_TO_SIZE.value,
-            },
-            tableLayoutConfig: {
+        const layoutConfigs = {
+            [GRID_LAYOUT.TABLE]: {
                 rowHeight: ROW_HEIGHT.SMALL,
             },
+        };
+
+        if (this.isCollectionLayout) {
+            layoutConfigs[GRID_LAYOUT.COLLECTION] = {
+                columnsNumber: COLUMNS_NUMBER.FOURTH_COLUMNS.value,
+                objectFit: OBJECT_FIT.FIT_TO_SIZE.value,
+                collectionCellBinding: this.collectionCellBinding,
+            };
+        }
+
+        return {
+            layoutConfigs,
             selectedRows: {},
             excludedFromSelectionRows: {},
             isSelectedAll: false,
@@ -337,6 +374,51 @@ export default {
                     'grid--border': this.isBorder,
                 },
             ];
+        },
+        layouts() {
+            const layouts = [
+                {
+                    key: GRID_LAYOUT.TABLE,
+                    layout: {
+                        component: GridTableLayout,
+                    },
+                    activator: {
+                        component: GridTableLayoutActivator,
+                        dataCy: 'grid-table-view',
+                    },
+                    isFooterVisible: true,
+                },
+            ];
+
+            if (this.isCollectionLayout) {
+                layouts.push(
+                    {
+                        key: GRID_LAYOUT.COLLECTION,
+                        layout: {
+                            component: GridCollectionLayout,
+                        },
+                        activator: {
+                            component: GridCollectionLayoutActivator,
+                            dataCy: 'grid-collection-view',
+                        },
+                        isFooterVisible: true,
+                    },
+                );
+            }
+
+            return [
+                ...layouts,
+                ...this.customLayouts,
+            ];
+        },
+        layoutActivators() {
+            return this.layouts.map(layout => ({
+                key: layout.key,
+                ...layout.activator,
+            }));
+        },
+        activeLayout() {
+            return this.layouts.find(layout => layout.key === this.layout);
         },
         gridLayout() {
             return GRID_LAYOUT;
@@ -367,15 +449,18 @@ export default {
 
             return Object.keys(this.selectedRows).filter(key => this.selectedRows[key]).length;
         },
+        isDropZoneVisible() {
+            return this.isElementDraggingToAdd && !this.isColumnExist && this.isTableLayout;
+        },
         isAnyFilter() {
             return Object.keys(this.filters).length > 0;
         },
-        isListElementDragging() {
-            return this.isElementDragging === DRAGGED_ELEMENT.LIST;
+        isElementDraggingToAdd() {
+            return this.isElementDragging === this.draggingElementType;
         },
         isColumnExist() {
             return this.columns.some(
-                column => column.id === this.draggedElement,
+                column => column.id === this.draggedElement && column.visible,
             );
         },
         isTableLayout() {
@@ -397,6 +482,19 @@ export default {
                 && this.isLayoutResolved[this.layout];
         },
     },
+    watch: {
+        selectionState() {
+            const {
+                isSelectedAll,
+                selectedRows,
+                excludedFromSelectionRows,
+            } = this.selectionState;
+
+            this.isSelectedAll = isSelectedAll;
+            this.selectedRows = selectedRows;
+            this.excludedFromSelectionRows = excludedFromSelectionRows;
+        },
+    },
     methods: {
         onResolvedLayout({
             layout,
@@ -411,13 +509,27 @@ export default {
             isSelected,
             rowIds,
         }) {
-            rowIds.forEach((rowId) => {
-                this.selectedRows[rowId] = isSelected;
-            });
+            let selectedRows = {};
 
-            this.selectedRows = {
-                ...this.selectedRows,
-            };
+            if (this.multiselect) {
+                selectedRows = {
+                    ...this.selectedRows,
+                };
+
+                rowIds.forEach((rowId) => {
+                    selectedRows[rowId] = isSelected;
+                });
+            } else {
+                selectedRows[rowIds[0]] = isSelected;
+            }
+
+            this.selectedRows = selectedRows;
+
+            this.$emit('selection-state', {
+                isSelectedAll: this.isSelectedAll,
+                selectedRows,
+                excludedFromSelectionRows: this.excludedFromSelectionRows,
+            });
         },
         onExcludedRowsSelect({
             isExcluded,
@@ -430,22 +542,39 @@ export default {
             this.excludedFromSelectionRows = {
                 ...this.excludedFromSelectionRows,
             };
+
+            this.$emit('selection-state', {
+                isSelectedAll: this.isSelectedAll,
+                selectedRows: this.selectedRows,
+                excludedFromSelectionRows: this.excludedFromSelectionRows,
+            });
         },
         onSelectAllRows(isSelectedAll) {
             this.isSelectedAll = isSelectedAll;
 
             this.selectedRows = {};
             this.excludedFromSelectionRows = {};
+
+            this.$emit('selection-state', {
+                isSelectedAll,
+                selectedRows: {},
+                excludedFromSelectionRows: {},
+            });
         },
-        onApplySettings({
-            tableConfig,
-            collectionConfig,
-        }) {
-            this.tableLayoutConfig = tableConfig;
-            this.collectionLayoutConfig = collectionConfig;
+        onApplySettings(layoutConfigs) {
+            this.layoutConfigs = deepmerge(this.layoutConfigs, layoutConfigs);
         },
         onLayoutChange(layout) {
-            this.layout = layout;
+            if (this.isHeaderVisible && this.$route.query.layout !== layout) {
+                this.$router.replace({
+                    query: {
+                        ...this.$route.query,
+                        layout,
+                    },
+                });
+            }
+
+            this.$emit('layout', layout);
         },
         onCellValueChange(payload) {
             this.$emit('cell-value', payload);
@@ -466,6 +595,12 @@ export default {
             this.excludedFromSelectionRows = {
                 ...this.excludedFromSelectionRows,
             };
+
+            this.$emit('selection-state', {
+                isSelectedAll: this.isSelectedAll,
+                selectedRows: this.selectedRows,
+                excludedFromSelectionRows: this.excludedFromSelectionRows,
+            });
 
             this.$emit(`${key}-row`, value);
         },
@@ -505,6 +640,12 @@ export default {
             this.isSelectedAll = false;
             this.selectedRows = {};
             this.excludedFromSelectionRows = {};
+
+            this.$emit('selection-state', {
+                isSelectedAll: false,
+                selectedRows: {},
+                excludedFromSelectionRows: {},
+            });
         },
     },
 };
@@ -516,7 +657,6 @@ export default {
         display: flex;
         flex: 1 1 auto;
         flex-direction: column;
-        min-width: 0;
         overflow: hidden;
 
         &--border {

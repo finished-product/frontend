@@ -9,11 +9,14 @@
         :required="required"
         :searchable="true"
         :multiselect="multiselect"
+        :wrap-value="true"
         :clearable="clearable"
         :label="$t('@Segments.segment.components.SegmentsAutocomplete.label')"
         :custom-fetch-event="segmentCreatedEventName"
         :error-messages="errorMessages"
         :disabled="disabled"
+        option-key="id"
+        option-value="label"
         href="segments/autocomplete"
         @input="onValueChange">
         <template #noDataPlaceholder>
@@ -33,15 +36,11 @@ import CreateSegmentButton from '@Segments/components/Buttons/CreateSegmentButto
 import {
     SEGMENT_CREATED_EVENT_NAME,
 } from '@Segments/defaults';
-import Autocomplete from '@UI/components/Autocomplete/Autocomplete';
-import SelectListNoDataPlaceholder from '@UI/components/SelectList/SelectListNoDataPlaceholder';
 
 export default {
     name: 'SegmentsAutocomplete',
     components: {
         CreateSegmentButton,
-        SelectListNoDataPlaceholder,
-        Autocomplete,
     },
     props: {
         value: {

@@ -37,6 +37,7 @@
                 @click.native="onExpandGroup({ item, onExpand })" />
             <AttributeSideBarElement
                 v-else
+                :scope="scope"
                 :item="item"
                 :language-code="languageCode" />
         </template>
@@ -63,10 +64,6 @@ import AttributeSideBarGroupElement from '@ProductBatchActions/components/SideBa
 import {
     getTemplates,
 } from '@ProductBatchActions/services';
-import ListSearchSelectHeader from '@UI/components/List/ListSearchSelectHeader';
-import Preloader from '@UI/components/Preloader/Preloader';
-import SideBar from '@UI/components/SideBar/SideBar';
-import SideBarNoDataPlaceholder from '@UI/components/SideBar/SideBarNoDataPlaceholder';
 import {
     mapGetters,
 } from 'vuex';
@@ -74,15 +71,15 @@ import {
 export default {
     name: 'AttributesSideBar',
     components: {
-        SideBarNoDataPlaceholder,
         AttributeSideBarGroupElement,
-        SideBar,
-        ListSearchSelectHeader,
         LanguageTreeSelect,
-        Preloader,
         AttributeSideBarElement,
     },
     props: {
+        scope: {
+            type: String,
+            default: '',
+        },
         filter: {
             type: [
                 Object,

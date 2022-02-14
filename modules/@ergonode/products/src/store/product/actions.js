@@ -82,6 +82,7 @@ export default {
     async getProduct({
         commit,
         rootState,
+        dispatch,
     }, {
         id,
         onError = () => {},
@@ -104,6 +105,8 @@ export default {
                 $axios: this.app.$axios,
                 id,
             });
+
+            dispatch('__clearStorage');
 
             const {
                 sku,
@@ -491,6 +494,7 @@ export default {
                     id: attributeId,
                     languageCode,
                     value,
+                    productId: id,
                 },
                 {
                     root: true,
@@ -708,12 +712,14 @@ export default {
         }
     },
     async validateProduct({
+        state,
         dispatch,
         rootState,
     }, {
         languageCode,
         fieldKey,
         elementId,
+        productId = null,
         value,
         scope,
     }) {
@@ -724,6 +730,10 @@ export default {
                     id: elementId,
                     languageCode,
                     value,
+                    productId: productId || state.id,
+                    onError: (errors) => {
+                        throw errors;
+                    },
                 },
                 {
                     root: true,

@@ -3,55 +3,53 @@
  * See LICENSE for license details.
  */
 <template>
-    <ModalOverlay>
-        <div class="update-products-modal">
-            <ModalHeader
-                :title="title"
-                @close="onClose" />
-            <div class="update-products-modal__body">
-                <VerticalTabBar :items="verticalTabs">
-                    <RemoveFormFieldDropZone />
-                </VerticalTabBar>
-                <div class="update-products-modal__form-section">
-                    <VerticalFixedScroll>
-                        <div class="update-products-modal__form">
-                            <DraggableForm
-                                :title="$t('@ProductBatchActions.productBatchAction.components.UpdateProductsModal.draggableFormTitle')"
-                                :width="424"
-                                :items="formItems"
-                                @add-item="onAddItem"
-                                @remove-item="onRemoveItem">
-                                <template #item="{ item }">
-                                    <AttributeFormField
-                                        :is-prefetching-data="fetching[item.id]">
-                                        <template #attribute>
-                                            <Component
-                                                v-if="attributes[item.id]"
-                                                :is="components[item.type]"
-                                                :value="values[`${item.id}|${item.languageCode}`]"
-                                                :attribute="attributes[item.id]"
-                                                :language-code="item.languageCode"
-                                                :error-messages="scopeErrors[
-                                                    `${item.id}|${item.languageCode}`
-                                                ]"
-                                                @blur="onBlur"
-                                                @input="onValueChange" />
-                                        </template>
-                                    </AttributeFormField>
-                                </template>
-                            </DraggableForm>
-                        </div>
-                    </VerticalFixedScroll>
-                    <UpdateProductsButton
-                        :filter="filter"
-                        :selected-rows-count="selectedRowsCount"
-                        :drafts="values"
-                        :change-values="changeValues"
-                        @apply="onApplyProductsUpdateBatchAction" />
-                </div>
+    <ModalGrid
+        :title="title"
+        @close="onClose">
+        <template #body>
+            <VerticalTabBar :items="verticalTabs">
+                <RemoveFormFieldDropZone :scope="scope" />
+            </VerticalTabBar>
+            <div class="update-products-modal__form-section">
+                <VerticalFixedScroll>
+                    <div class="update-products-modal__form">
+                        <DraggableForm
+                            :title="$t('@ProductBatchActions.productBatchAction.components.UpdateProductsModal.draggableFormTitle')"
+                            :width="424"
+                            :scope="scope"
+                            :items="formItems"
+                            @add-item="onAddItem"
+                            @remove-item="onRemoveItem">
+                            <template #item="{ item }">
+                                <AttributeFormField
+                                    :is-prefetching-data="fetching[item.id]">
+                                    <template #attribute>
+                                        <Component
+                                            v-if="attributes[item.id]"
+                                            :is="components[item.type]"
+                                            :value="values[`${item.id}|${item.languageCode}`]"
+                                            :attribute="attributes[item.id]"
+                                            :language-code="item.languageCode"
+                                            :error-messages="scopeErrors[
+                                                `${item.id}|${item.languageCode}`
+                                            ]"
+                                            @blur="onBlur"
+                                            @input="onValueChange" />
+                                    </template>
+                                </AttributeFormField>
+                            </template>
+                        </DraggableForm>
+                    </div>
+                </VerticalFixedScroll>
+                <UpdateProductsButton
+                    :filter="filter"
+                    :selected-rows-count="selectedRowsCount"
+                    :drafts="values"
+                    :change-values="changeValues"
+                    @apply="onApplyProductsUpdateBatchAction" />
             </div>
-        </div>
-    </ModalOverlay>
+        </template>
+    </ModalGrid>
 </template>
 
 <script>
@@ -63,6 +61,9 @@ import {
 } from '@Core/defaults/alerts';
 import modalFeedbackMixin from '@Core/mixins/feedback/modalFeedbackMixin';
 import {
+    removeObjectProperty,
+} from '@Core/models/objectWrapper';
+import {
     capitalizeAndConcatenationArray,
 } from '@Core/models/stringWrapper';
 import UpdateProductsButton
@@ -71,11 +72,7 @@ import RemoveFormFieldDropZone
     from '@ProductBatchActions/components/DropZones/RemoveFormFieldDropZone';
 import AttributeFormField
     from '@ProductBatchActions/components/Forms/Fields/AttributeFormField';
-import DraggableForm from '@UI/components/DraggableForm/DraggableForm';
 import VerticalFixedScroll from '@UI/components/Layout/Scroll/VerticalFixedScroll';
-import ModalHeader from '@UI/components/Modal/ModalHeader';
-import ModalOverlay from '@UI/components/Modal/ModalOverlay';
-import VerticalTabBar from '@UI/components/TabBar/VerticalTabBar';
 import {
     mapActions,
 } from 'vuex';
@@ -87,10 +84,6 @@ export default {
         RemoveFormFieldDropZone,
         AttributeFormField,
         VerticalFixedScroll,
-        ModalOverlay,
-        ModalHeader,
-        DraggableForm,
-        VerticalTabBar,
     },
     mixins: [
         modalFeedbackMixin,
@@ -143,9 +136,10 @@ export default {
     },
     beforeDestroy() {
         this.formItems.forEach((item) => {
-            this.removeDisabledElement({
+            this.removeDisabledScopeElement({
                 languageCode: item.languageCode,
                 elementId: `${item.id}|${item.code}`,
+                scope: this.scope,
             });
         });
 
@@ -153,8 +147,8 @@ export default {
     },
     methods: {
         ...mapActions('list', [
-            'setDisabledElement',
-            'removeDisabledElement',
+            'setDisabledScopeElement',
+            'removeDisabledScopeElement',
         ]),
         ...mapActions('attribute', [
             'validateAttributeValue',
@@ -249,10 +243,13 @@ export default {
                     };
                 }
 
-                this.setDisabledElement({
-                    languageCode: item.languageCode,
-                    elementId: `${item.id}|${item.code}`,
-                    disabled: true,
+                this.setDisabledScopeElement({
+                    scope: this.scope,
+                    disabledElement: {
+                        languageCode: item.languageCode,
+                        elementId: `${item.id}|${item.code}`,
+                        disabled: true,
+                    },
                 });
             } catch (e) {
                 if (!this.app.$axios.isCancel(e)) {
@@ -266,12 +263,16 @@ export default {
             }
         },
         onRemoveItem(item) {
-            this.removeDisabledElement({
+            this.removeDisabledScopeElement({
                 languageCode: item.languageCode,
                 elementId: `${item.id}|${item.code}`,
+                scope: this.scope,
             });
 
-            this.formItems = this.formItems.filter(formItem => formItem.id !== item.id);
+            this.values = removeObjectProperty(this.values, `${item.id}|${item.languageCode}`);
+            this.formItems = this.formItems.filter(({
+                id, languageCode,
+            }) => !(languageCode === item.languageCode && id === item.id));
         },
         onApplyProductsUpdateBatchAction() {
             this.onApply();
@@ -312,24 +313,6 @@ export default {
 
 <style lang="scss" scoped>
     .update-products-modal {
-        display: flex;
-        flex-direction: column;
-        width: 1080px;
-        height: 80%;
-        background-color: $WHITE;
-        box-shadow: $ELEVATOR_6_DP;
-
-        &__body {
-            display: flex;
-            height: 100%;
-        }
-
-        &__sidebar {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
         &__form-section {
             position: relative;
             display: flex;

@@ -3,83 +3,76 @@
  * See LICENSE for license details.
  */
 <template>
-    <VirtualScroll
-        :items="items"
-        :render-ahead="4"
-        :estimated-height="20">
-        <template #header>
-            <div
-                v-if="!isPlaceholderVisible"
-                class="select-list-header">
-                <slot name="prependHeader" />
-                <div class="select-list-header__search">
-                    <SelectListSearch
-                        v-if="searchable"
-                        :placeholder="searchPlaceholder"
-                        :value="searchValue"
-                        :size="size"
-                        @input="onSearch" />
-                    <slot name="appendSearchHeader" />
-                </div>
-                <slot name="appendHeader" />
+    <div class="select-list">
+        <div
+            v-if="!isPlaceholderVisible"
+            class="select-list__header">
+            <slot name="prependHeader" />
+            <div class="select-list__search">
+                <SelectListSearch
+                    v-if="searchable"
+                    :placeholder="searchPlaceholder"
+                    :value="searchValue"
+                    :size="size"
+                    @input="onSearch" />
+                <slot name="appendSearchHeader" />
             </div>
-        </template>
-        <template #body>
-            <slot name="body">
-                <slot
-                    v-if="isPlaceholderVisible"
-                    name="noDataPlaceholder">
-                    <SelectListNoDataPlaceholder />
-                </slot>
-                <slot
-                    v-else-if="isSearchPlaceholderVisible"
-                    name="noResultsPlaceholder">
-                    <SelectListNoResultsPlaceholder @clear="onClearSearch" />
-                </slot>
+            <slot name="appendHeader" />
+        </div>
+        <slot name="body">
+            <slot
+                v-if="isPlaceholderVisible"
+                name="noDataPlaceholder">
+                <SelectListNoDataPlaceholder />
             </slot>
-        </template>
-        <template #item="{ item, index }">
-            <SelectListElement
-                :key="index"
-                :index="index"
-                :size="size"
-                :value="item"
-                :multiselect="multiselect"
-                :selected="isItemSelected(index)"
-                @input="onValueChange">
-                <template #option="{ isSelected }">
-                    <slot
-                        name="item"
+            <slot
+                v-else-if="isSearchPlaceholderVisible"
+                name="noResultsPlaceholder">
+                <SelectListNoResultsPlaceholder @clear="onClearSearch" />
+            </slot>
+            <DynamicScroller
+                v-if="!isPlaceholderVisible && !isSearchPlaceholderVisible"
+                :style="{ maxHeight: itemsMaxHeight }"
+                :items="items"
+                :key-field="optionKey"
+                :min-item-size="minItemSize">
+                <template #default="{ item, index, active }">
+                    <DynamicScrollerItem
                         :item="item"
-                        :is-selected="isSelected"
-                        :index="index" />
+                        :active="active"
+                        :index="index">
+                        <SelectListElement
+                            :key="index"
+                            :index="index"
+                            :size="size"
+                            :value="item"
+                            :multiselect="multiselect"
+                            :option-key="optionKey"
+                            :option-value="optionValue"
+                            :selected="selectedItems[item[optionKey] || item]"
+                            @input="onValueChange">
+                            <template #option="{ isSelected }">
+                                <slot
+                                    name="item"
+                                    :item="item"
+                                    :is-selected="isSelected"
+                                    :index="index" />
+                            </template>
+                        </SelectListElement>
+                    </DynamicScrollerItem>
                 </template>
-            </SelectListElement>
-        </template>
-    </VirtualScroll>
+            </DynamicScroller>
+        </slot>
+    </div>
 </template>
 
 <script>
 import {
     SIZE,
 } from '@Core/defaults/theme';
-import SelectListElement from '@UI/components/SelectList/SelectListElement';
-import SelectListNoDataPlaceholder from '@UI/components/SelectList/SelectListNoDataPlaceholder';
-import SelectListNoResultsPlaceholder from '@UI/components/SelectList/SelectListNoResultsPlaceholder';
-import SelectListSearch from '@UI/components/SelectList/SelectListSearch';
-import {
-    VirtualScroll,
-} from 'vue-windowing';
 
 export default {
     name: 'SelectList',
-    components: {
-        SelectListNoResultsPlaceholder,
-        SelectListNoDataPlaceholder,
-        VirtualScroll,
-        SelectListElement,
-        SelectListSearch,
-    },
     props: {
         /**
          * Map of selected item values
@@ -136,15 +129,64 @@ export default {
             type: Boolean,
             default: false,
         },
-    },
-    data() {
-        return {
-            selectedItems: {},
-        };
+        /**
+         * The key of the option
+         */
+        optionKey: {
+            type: String,
+            default: '',
+        },
+        /**
+         * The key of the value
+         */
+        optionValue: {
+            type: String,
+            default: '',
+        },
+        /**
+         * The max height of elements list
+         */
+        itemsMaxHeight: {
+            type: String,
+            default: '100%',
+        },
     },
     computed: {
-        stringifiedItems() {
-            return this.items.map(option => JSON.stringify(option));
+        minItemSize() {
+            switch (this.size) {
+            case SIZE.SMALL:
+                return 32;
+            case SIZE.REGULAR:
+                return 40;
+            case SIZE.LARGE:
+                return 48;
+            default: return 48;
+            }
+        },
+        selectedItems() {
+            if (!this.value) {
+                return {};
+            }
+
+            let value = [
+                this.value,
+            ];
+
+            if (this.multiselect) {
+                value = this.value;
+            }
+
+            if (this.optionKey) {
+                return value.reduce((prev, curr) => ({
+                    ...prev,
+                    [curr[this.optionKey]]: true,
+                }), {});
+            }
+
+            return value.reduce((prev, curr) => ({
+                ...prev,
+                [curr]: true,
+            }), {});
         },
         isAnyItem() {
             return this.items.length > 0;
@@ -162,45 +204,29 @@ export default {
             return this.isAnyItem || this.isAnySearchPhrase;
         },
     },
-    watch: {
-        value: {
-            immediate: true,
-            handler() {
-                let selectedItems = {};
-
-                if (Array.isArray(this.value) && this.value.length) {
-                    this.value.forEach((option) => {
-                        selectedItems[JSON.stringify(option)] = option;
-                    });
-                } else if (!Array.isArray(this.value) && (this.value || this.value === 0)) {
-                    selectedItems = {
-                        [JSON.stringify(this.value)]: this.value,
-                    };
-                }
-
-                this.selectedItems = selectedItems;
-            },
-        },
-    },
     methods: {
-        isItemSelected(index) {
-            return typeof this.selectedItems[this.stringifiedItems[index]] !== 'undefined';
-        },
         onValueChange(index) {
             const value = this.items[index];
 
             if (this.multiselect) {
-                const selectedItems = {
-                    ...this.selectedItems,
-                };
+                const isSelected = this.optionKey
+                    ? this.selectedItems[value[this.optionKey]]
+                    : this.selectedItems[value];
 
-                if (this.isItemSelected(index)) {
-                    delete selectedItems[this.stringifiedItems[index]];
+                if (isSelected) {
+                    this.$emit('input', this.value.filter((item) => {
+                        if (this.optionKey) {
+                            return item[this.optionKey] !== value[this.optionKey];
+                        }
+
+                        return item !== value;
+                    }));
                 } else {
-                    selectedItems[this.stringifiedItems[index]] = value;
+                    this.$emit('input', [
+                        ...this.value,
+                        value,
+                    ]);
                 }
-
-                this.$emit('input', Object.values(selectedItems));
             } else {
                 this.$emit('input', value);
             }
@@ -216,13 +242,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .select-list-header {
-        position: sticky;
-        top: 0;
-        z-index: $Z_INDEX_LVL_1;
+    .select-list {
         display: flex;
         flex-direction: column;
-        background-color: $WHITE;
+        height: 100%;
+        overflow: hidden;
+
+        &__header {
+            position: sticky;
+            top: 0;
+            z-index: $Z_INDEX_LVL_1;
+            display: flex;
+            flex-direction: column;
+            background-color: $WHITE;
+        }
 
         &__search {
             display: flex;

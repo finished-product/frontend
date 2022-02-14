@@ -4,7 +4,7 @@
  */
 <template>
     <Form
-        title="Options"
+        :title="$t('@Core.core.components.UnitForm.title')"
         :submit-title="submitTitle"
         :proceed-title="proceedTitle"
         :is-submitting="isSubmitting"
@@ -22,8 +22,8 @@
                     required
                     :error-messages="errors[nameFieldKey]"
                     :disabled="!isAllowedToUpdate"
-                    label="Unit name"
-                    hint="Unit name must be unique"
+                    :label="$t('@Core.core.components.UnitForm.nameLabel')"
+                    :hint="$t('@Core.core.components.UnitForm.nameHint')"
                     @input="setNameValue" />
                 <TextField
                     :data-cy="dataCyGenerator(symbolFieldKey)"
@@ -31,8 +31,8 @@
                     required
                     :error-messages="errors[symbolFieldKey]"
                     :disabled="!isAllowedToUpdate"
-                    label="Unit symbol"
-                    hint="Unit symbol must be unique"
+                    :label="$t('@Core.core.components.UnitForm.symbolLabel')"
+                    :hint="$t('@Core.core.components.UnitForm.symbolHint')"
                     @input="setSymbolValue" />
                 <template v-for="(field, index) in extendedForm">
                     <Component
@@ -49,9 +49,6 @@
 import PRIVILEGES from '@Core/config/privileges';
 import formFeedbackMixin from '@Core/mixins/feedback/formFeedbackMixin';
 import formActionsMixin from '@Core/mixins/form/formActionsMixin';
-import Form from '@UI/components/Form/Form';
-import FormSection from '@UI/components/Form/Section/FormSection';
-import TextField from '@UI/components/TextField/TextField';
 import {
     mapActions,
     mapState,
@@ -59,11 +56,6 @@ import {
 
 export default {
     name: 'UnitForm',
-    components: {
-        Form,
-        FormSection,
-        TextField,
-    },
     mixins: [
         formActionsMixin,
         formFeedbackMixin,

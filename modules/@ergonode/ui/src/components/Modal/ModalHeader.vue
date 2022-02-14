@@ -13,7 +13,7 @@
         <Fab
             data-cy="modal-close"
             :theme="secondaryTheme"
-            @click.native="onClose">
+            @click.native.prevent.stop="onClose">
             <template #icon="{ color }">
                 <IconClose :fill-color="color" />
             </template>
@@ -25,15 +25,9 @@
 import {
     THEME,
 } from '@Core/defaults/theme';
-import Fab from '@UI/components/Fab/Fab';
-import IconClose from '@UI/components/Icons/Window/IconClose';
 
 export default {
     name: 'ModalHeader',
-    components: {
-        Fab,
-        IconClose,
-    },
     props: {
         /**
          * The title of the component

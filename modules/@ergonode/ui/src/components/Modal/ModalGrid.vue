@@ -12,7 +12,9 @@
                     <slot name="prependHeader" />
                 </template>
             </ModalHeader>
-            <slot name="body" />
+            <div class="modal-grid__body">
+                <slot name="body" />
+            </div>
         </div>
     </ModalOverlay>
 </template>
@@ -22,15 +24,9 @@ import {
     SIZE,
     THEME,
 } from '@Core/defaults/theme';
-import ModalHeader from '@UI/components/Modal/ModalHeader';
-import ModalOverlay from '@UI/components/Modal/ModalOverlay';
 
 export default {
     name: 'ModalGrid',
-    components: {
-        ModalOverlay,
-        ModalHeader,
-    },
     props: {
         /**
          * The title of the component
@@ -64,5 +60,10 @@ export default {
         height: 80%;
         background-color: $WHITE;
         box-shadow: $ELEVATOR_6_DP;
+
+        &__body {
+            display: flex;
+            flex: 1;
+        }
     }
 </style>

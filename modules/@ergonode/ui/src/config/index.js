@@ -12,11 +12,17 @@ export default {
         '@UI': '/',
     },
     css: [
-        './assets/scss/reset.scss',
-        './assets/scss/font-inter-ui.scss',
-        './assets/scss/global.scss',
+        './assets/scss/reset',
+        './assets/scss/font-inter-ui',
+        './assets/scss/global',
     ],
     styleResources: {
         scss: './assets/scss/main.scss',
     },
+    plugins: [
+        {
+            ssr: true,
+            src: './plugins/global-component-loader',
+        },
+    ],
 };

@@ -13,7 +13,13 @@ import {
     get,
     remove,
     update,
-} from '@Transitions/services/index';
+} from '@Transitions/services';
+import {
+    getFromAndToTransition,
+} from '@Workflow/models/workflowDesigner';
+import {
+    getTransitionConditions,
+} from '@Workflow/services';
 
 export default {
     async getStatusTransition(
@@ -32,9 +38,9 @@ export default {
                 statuses: statusOptions,
             } = rootState.productStatus;
             const [
-                source,
-                destination,
-            ] = id.split('--');
+                from,
+                to,
+            ] = getFromAndToTransition(id);
 
             // EXTENDED BEFORE METHOD
             await this.$getExtendMethod('@Transitions/store/statusTransition/action/getStatusTransition/__before', {
@@ -47,38 +53,39 @@ export default {
 
             const data = await get({
                 $axios: this.app.$axios,
-                source,
-                destination,
+                from,
+                to,
             });
-            const {
-                condition_set_id: conditionSetId,
-            } = data;
-
+            const conditions = await getTransitionConditions({
+                $axios: this.app.$axios,
+                from,
+                to,
+            });
             const regex = /%20/g;
-
-            const sourceOption = statusOptions.find(
-                status => status.id === source.replace(regex, ' '),
+            const fromOption = statusOptions.find(
+                status => status.id === from.replace(regex, ' '),
             );
-            const destinationOption = statusOptions.find(
-                status => status.id === destination.replace(regex, ' '),
+            const toOption = statusOptions.find(
+                status => status.id === to.replace(regex, ' '),
             );
 
-            commit('__SET_STATE', {
-                key: 'source',
-                value: sourceOption,
-            });
-            commit('__SET_STATE', {
-                key: 'destination',
-                value: destinationOption,
-            });
-            commit('__SET_STATE', {
-                key: 'conditionSetId',
-                value: conditionSetId,
+            dispatch('__clearStorage');
+            dispatch('workflowConditions/__clearStorage', {}, {
+                root: true,
             });
 
-            if (conditionSetId) {
-                await dispatch('condition/getConditionSet', {
-                    id: conditionSetId,
+            commit('__SET_STATE', {
+                key: 'from',
+                value: fromOption,
+            });
+            commit('__SET_STATE', {
+                key: 'to',
+                value: toOption,
+            });
+
+            if (conditions) {
+                await dispatch('workflowConditions/setConditions', {
+                    conditions,
                 }, {
                     root: true,
                 });
@@ -109,22 +116,17 @@ export default {
     ) {
         try {
             const {
-                source,
-                destination,
-                conditionSetId,
+                from,
+                to,
             } = state;
             let data = {};
-
-            if (conditionSetId) {
-                data.condition_set = conditionSetId;
-            }
 
             // EXTENDED BEFORE METHOD
             const extendedData = await this.$getExtendMethod('@Transitions/store/statusTransition/action/updateStatusTransition/__before', {
                 $this: this,
                 data: {
-                    source,
-                    destination,
+                    from,
+                    to,
                     ...data,
                 },
             });
@@ -138,8 +140,8 @@ export default {
 
             await update({
                 $axios: this.app.$axios,
-                source: source.id,
-                destination: destination.id,
+                from: from.id,
+                to: to.id,
                 data,
             });
 
@@ -178,12 +180,12 @@ export default {
     ) {
         try {
             const {
-                source,
-                destination,
+                from,
+                to,
             } = state;
             let data = {
-                source: isObject(source) ? source.id : null,
-                destination: isObject(destination) ? destination.id : null,
+                from: isObject(from) ? from.id : null,
+                to: isObject(to) ? to.id : null,
             };
             // EXTENDED BEFORE METHOD
             const extendedData = await this.$getExtendMethod('@Transitions/store/statusTransition/action/createStatusTransition/__before', {
@@ -240,30 +242,26 @@ export default {
     }) {
         try {
             const {
-                source,
-                destination,
-                conditionSetId,
+                from,
+                to,
             } = state;
 
             // EXTENDED BEFORE METHOD
             await this.$getExtendMethod('@Transitions/store/statusTransition/action/removeStatusTransition/__before', {
                 $this: this,
                 data: {
-                    source,
-                    destination,
+                    from,
+                    to,
                 },
             });
             // EXTENDED BEFORE METHOD
 
             await remove({
                 $axios: this.app.$axios,
-                source: source.id,
-                destination: destination.id,
+                from: from.id,
+                to: to.id,
             });
 
-            if (conditionSetId) {
-                await this.app.$axios.$delete(`conditionsets/${conditionSetId}`);
-            }
             // EXTENDED AFTER METHOD
             await this.$getExtendMethod('@Transitions/store/statusTransition/action/removeStatusTransition/__after', {
                 $this: this,

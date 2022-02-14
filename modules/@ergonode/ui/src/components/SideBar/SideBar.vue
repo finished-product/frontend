@@ -7,7 +7,8 @@
         class="side-bar"
         :items="items"
         :expanded="expanded"
-        :render-ahead="8">
+        :render-ahead="8"
+        :option-key="optionKey">
         <template #header>
             <SideBarStickyHeader>
                 <slot name="header">
@@ -50,26 +51,8 @@
 </template>
 
 <script>
-
-import ListSearchHeader from '@UI/components/List/ListSearchHeader';
-import SideBarFooter from '@UI/components/SideBar/SideBarFooter';
-import SideBarNoDataPlaceholder from '@UI/components/SideBar/SideBarNoDataPlaceholder';
-import SideBarNoResultsPlaceholder from '@UI/components/SideBar/SideBarNoResultsPlaceholder';
-import SideBarStickyHeader from '@UI/components/SideBar/SideBarStickyHeader';
-import {
-    ExpandingList,
-} from 'vue-windowing';
-
 export default {
     name: 'SideBar',
-    components: {
-        SideBarNoDataPlaceholder,
-        SideBarNoResultsPlaceholder,
-        SideBarStickyHeader,
-        SideBarFooter,
-        ListSearchHeader,
-        ExpandingList,
-    },
     props: {
         /**
          * The title of the component
@@ -109,6 +92,13 @@ export default {
             ],
             default: false,
         },
+        /**
+         * The key of the option
+         */
+        optionKey: {
+            type: String,
+            default: 'id',
+        },
     },
     computed: {
         isAnyItem() {
@@ -137,6 +127,8 @@ export default {
 
 <style lang="scss" scoped>
     .side-bar {
-        max-height: 100%;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
 </style>

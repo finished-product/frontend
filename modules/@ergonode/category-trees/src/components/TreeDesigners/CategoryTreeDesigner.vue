@@ -26,7 +26,6 @@ import {
     ROW_HEIGHT,
 } from '@Trees/defaults/designer';
 import DesignerItemDescription from '@UI/components/Designer/DesignerItemDescription';
-import TreeDesigner from '@UI/components/TreeDesigner/TreeDesigner';
 import {
     mapActions,
     mapState,
@@ -35,7 +34,6 @@ import {
 export default {
     name: 'CategoryTreeDesigner',
     components: {
-        TreeDesigner,
         DesignerItemDescription,
     },
     props: {
@@ -79,19 +77,23 @@ export default {
             'onScopeValueChange',
         ]),
         ...mapActions('list', [
-            'removeDisabledElement',
-            'setDisabledElement',
+            'removeDisabledScopeElement',
+            'setDisabledScopeElement',
         ]),
         itemSubtitle(childrenLength) {
-            return childrenLength
-                ? `${this.$t('@Trees.tree.components.CategoryTreeDesigner.itemSubtitle')}: ${childrenLength}`
-                : '';
+            if (childrenLength) {
+                return this.$t('@Trees.tree.components.CategoryTreeDesigner.itemSubtitle', {
+                    info: childrenLength,
+                });
+            }
+            return '';
         },
         onRemoveItems(ids) {
             ids.forEach((id) => {
-                this.removeDisabledElement({
+                this.removeDisabledScopeElement({
                     languageCode: this.languageCode,
                     elementId: id,
+                    scope: this.scope,
                 });
             });
 
@@ -104,10 +106,13 @@ export default {
         onAddItem({
             id,
         }) {
-            this.setDisabledElement({
-                languageCode: this.languageCode,
-                elementId: id,
-                disabled: true,
+            this.setDisabledScopeElement({
+                scope: this.scope,
+                disabledElement: {
+                    languageCode: this.languageCode,
+                    elementId: id,
+                    disabled: true,
+                },
             });
         },
         onValueChange(value) {

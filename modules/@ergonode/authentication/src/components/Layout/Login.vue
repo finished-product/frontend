@@ -15,14 +15,17 @@
         <Footer space-between>
             <div class="login__footer-info">
                 <Select
+                    data-cy="change-language"
                     :value="value"
                     :options="languageOptions"
                     :size="smallSize"
                     @input="onValueChange" />
                 <LinkButton
+                    data-cy="help-button"
                     :title="$t('@Authentication.authentication.components.LoginLayout.help')"
                     @click.native="onHelpClicked" />
                 <LinkButton
+                    data-cy="guide-button"
                     :title="$t('@Authentication.authentication.components.LoginLayout.userGuide')"
                     @click.native="onUserGuideOpen" />
                 <template
@@ -59,19 +62,13 @@ import {
 import {
     getKeyByValue,
 } from '@Core/models/objectWrapper';
-import FluidBlob from '@UI/components/FluidBlob/FluidBlob';
 import Footer from '@UI/components/Layout/Footer/Footer';
-import LinkButton from '@UI/components/LinkButton/LinkButton';
-import Select from '@UI/components/Select/Select';
 
 export default {
     name: 'Login',
     components: {
-        LinkButton,
         Footer,
         IconLogoName,
-        FluidBlob,
-        Select,
         GitReleaseInformation: () => import('@Core/components/GitReleaseInformation/GitReleaseInformation'),
     },
     data() {

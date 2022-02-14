@@ -7,6 +7,7 @@
 import {
     join,
 } from 'path';
+import webpack from 'webpack';
 
 import modulesConfig from './modules.config';
 import {
@@ -101,6 +102,14 @@ module.exports = {
             },
         },
     },
+    polyfill: {
+        features: [
+            {
+                require: 'intersection-observer',
+                detect: () => 'IntersectionObserver' in window,
+            },
+        ],
+    },
     modules: [
         'nuxt-i18n',
         '@nuxtjs/style-resources',
@@ -112,6 +121,7 @@ module.exports = {
         ],
         'cookie-universal-nuxt',
         '@nuxtjs/axios',
+        'nuxt-polyfill',
     ],
     vuems: {
         required: _requiredModules,
@@ -144,7 +154,13 @@ module.exports = {
     axios: {
         baseURL: 'http://localhost:8080',
     },
+    alias: {
+        '@Vendor': join(__dirname, '/vendor'),
+    },
     build: {
+        plugins: [
+            new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        ],
         babel: {
             configFile: './babel.config.js',
         },
@@ -183,12 +199,6 @@ module.exports = {
             isDev,
             isClient,
         }) {
-            const alias = config.resolve.alias || {};
-
-            alias['@Root'] = join(__dirname, './');
-            alias['@Modules'] = join(__dirname, '/modules');
-            alias['@Vendor'] = join(__dirname, '/vendor');
-
             if (isDev) {
                 config.devtool = isClient ? 'source-map' : 'inline-source-map';
             }
@@ -200,7 +210,7 @@ module.exports = {
         optimization: {
             splitChunks: {
                 chunks: 'all',
-                maxSize: 200000,
+                maxSize: 249856,
             },
         },
     },

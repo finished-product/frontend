@@ -5,17 +5,16 @@
 <template>
     <InputSolidStyle
         :size="size"
+        :border="border"
         :height="height"
         :disabled="disabled">
         <template #activator>
             <InputController>
-                <div
-                    v-if="isValue"
-                    class="upload-image-file">
-                    <div class="fixed-container">
+                <InputImageController>
+                    <template v-if="isValue">
                         <div
-                            class="upload-image-file__image"
-                            v-if="!multiple">
+                            v-if="!multiple"
+                            class="fixed-container">
                             <LazyImage
                                 :href="`multimedia/${value}/download/default`"
                                 :value="value"
@@ -27,32 +26,32 @@
                             href="multimedia/[[ID]]/download/default"
                             :current-index="currentIndex"
                             @current="onCurrentIndexChange" />
-                        <div
+                        <ActionFab
                             v-if="!disabled"
-                            class="upload-image-file__image-settings">
-                            <ActionIconButton
-                                :size="smallSize"
-                                :theme="secondaryPlainTheme"
-                                :options="settingsOptions"
-                                @input="onSelectSetting">
-                                <template #icon="{ color }">
-                                    <IconDots :fill-color="color" />
-                                </template>
-                                <template #option="{ option }">
-                                    <ListElementDescription>
-                                        <ListElementTitle
-                                            :size="smallSize"
-                                            :title="option.text" />
-                                    </ListElementDescription>
-                                </template>
-                            </ActionIconButton>
-                        </div>
-                    </div>
-                </div>
-                <div
-                    class="centering-container"
-                    v-else-if="!disabled">
+                            :floating="{
+                                top: '4px',
+                                right: '4px',
+                                backgroundColor: whiteColor,
+                                borderRadius: '50%',
+                            }"
+                            :size="smallSize"
+                            :theme="secondaryTheme"
+                            :options="settingsOptions"
+                            @input="onSelectSetting">
+                            <template #icon="{ color }">
+                                <IconDots :fill-color="color" />
+                            </template>
+                            <template #option="{ option }">
+                                <ListElementDescription>
+                                    <ListElementTitle
+                                        :size="smallSize"
+                                        :title="option.text" />
+                                </ListElementDescription>
+                            </template>
+                        </ActionFab>
+                    </template>
                     <Button
+                        v-else-if="!disabled"
                         :title="title"
                         :size="smallSize"
                         :theme="secondaryTheme"
@@ -61,12 +60,10 @@
                             <IconAdd :fill-color="color" />
                         </template>
                     </Button>
-                </div>
+                </InputImageController>
                 <InputLabel
                     v-if="label"
-                    :style="{ top: 0 }"
                     :required="required"
-                    :size="size"
                     :floating="true"
                     :disabled="disabled"
                     :label="label" />
@@ -88,29 +85,22 @@ import PRIVILEGES from '@Media/config/privileges';
 import {
     MEDIA_TYPE,
 } from '@Media/defaults';
-import Button from '@UI/components/Button/Button';
-import IconAdd from '@UI/components/Icons/Actions/IconAdd';
-import InputController from '@UI/components/Input/InputController';
-import InputLabel from '@UI/components/Input/InputLabel';
-import InputSolidStyle from '@UI/components/Input/InputSolidStyle';
+import {
+    WHITE,
+} from '@UI/assets/scss/_js-variables/colors.scss';
+import {
+    mapState,
+} from 'vuex';
 
 export default {
     name: 'UploadImageFile',
     components: {
-        InputController,
-        InputSolidStyle,
-        InputLabel,
-        Button,
-        IconAdd,
-        IconDots: () => import('@UI/components/Icons/Others/IconDots'),
-        LazyImage: () => import('@UI/components/LazyImage/LazyImage'),
-        ImageCarousel: () => import('@UI/components/ImageCarousel/ImageCarousel'),
         ModalMediaTabBar: () => import('@Media/components/Modal/ModalMediaTabBar'),
-        ActionIconButton: () => import('@UI/components/ActionIconButton/ActionIconButton'),
-        ListElementDescription: () => import('@UI/components/List/ListElementDescription'),
-        ListElementTitle: () => import('@UI/components/List/ListElementTitle'),
     },
     props: {
+        /**
+         * The value of the component
+         */
         value: {
             type: [
                 String,
@@ -118,6 +108,9 @@ export default {
             ],
             default: '',
         },
+        /**
+         * The size of the component
+         */
         size: {
             type: String,
             default: SIZE.REGULAR,
@@ -126,14 +119,23 @@ export default {
                 SIZE.REGULAR,
             ].indexOf(value) !== -1,
         },
+        /**
+         * Determines image objectFit property
+         */
         objectFit: {
             type: String,
             default: 'none',
         },
+        /**
+         * The height of the component
+         */
         height: {
             type: String,
             default: 'unset',
         },
+        /**
+         * The label is a text caption or description for the component
+         */
         label: {
             type: String,
             default: '',
@@ -145,13 +147,40 @@ export default {
             type: Boolean,
             default: false,
         },
+        /**
+         * Determines if the given field is disabled
+         */
         disabled: {
             type: Boolean,
             default: false,
         },
+        /**
+         * Determines if the given uploader might have more than one value
+         */
         multiple: {
             type: Boolean,
             default: false,
+        },
+        /**
+         * Determines if the image is able to change / remove
+         */
+        editable: {
+            type: Boolean,
+            default: true,
+        },
+        /**
+         * Determines if the image is able to download
+         */
+        downloadable: {
+            type: Boolean,
+            default: true,
+        },
+        /**
+         * Determines if the component has border
+         */
+        border: {
+            type: Boolean,
+            default: true,
         },
     },
     data() {
@@ -161,14 +190,17 @@ export default {
         };
     },
     computed: {
+        ...mapState('media', [
+            'extension',
+        ]),
         secondaryTheme() {
             return THEME.SECONDARY;
         },
-        secondaryPlainTheme() {
-            return THEME.SECONDARY_PLAIN;
-        },
         smallSize() {
             return SIZE.SMALL;
+        },
+        whiteColor() {
+            return WHITE;
         },
         title() {
             if (this.multiple) {
@@ -217,37 +249,57 @@ export default {
             return Boolean(this.value);
         },
         settingsOptions() {
+            const options = [];
+
             if (!this.multiple) {
-                return [
+                if (this.editable) {
+                    options.push(
+                        {
+                            text: this.$t('@Media.media.components.UploadImageFile.changeImageOptionTitle'),
+                            action: this.onShowModal,
+                        },
+                        {
+                            text: this.$t('@Media.media.components.UploadImageFile.removeImageOptionTitle'),
+                            action: this.onRemoveImage,
+                        },
+                    );
+                }
+
+                if (this.downloadable) {
+                    options.push(
+                        {
+                            text: this.$t('@Media.media.components.UploadImageFile.downloadImageOptionTitle'),
+                            action: this.onDownloadImage,
+                        },
+                    );
+                }
+
+                return options;
+            }
+
+            if (this.editable) {
+                options.push(
                     {
-                        text: this.$t('@Media.media.components.UploadImageFile.changeImageOptionTitle'),
+                        text: this.$t('@Media.media.components.UploadImageFile.addImageToGalleryOptionTitle'),
                         action: this.onShowModal,
                     },
+                    {
+                        text: this.$t('@Media.media.components.UploadImageFile.detachFromGalleryOptionTitle'),
+                        action: this.onRemoveImage,
+                    },
+                );
+            }
+
+            if (this.downloadable) {
+                options.push(
                     {
                         text: this.$t('@Media.media.components.UploadImageFile.downloadImageOptionTitle'),
                         action: this.onDownloadImage,
                     },
-                    {
-                        text: this.$t('@Media.media.components.UploadImageFile.removeImageOptionTitle'),
-                        action: this.onRemoveImage,
-                    },
-                ];
+                );
             }
 
-            return [
-                {
-                    text: this.$t('@Media.media.components.UploadImageFile.addImageToGalleryOptionTitle'),
-                    action: this.onShowModal,
-                },
-                {
-                    text: this.$t('@Media.media.components.UploadImageFile.downloadImageOptionTitle'),
-                    action: this.onDownloadImage,
-                },
-                {
-                    text: this.$t('@Media.media.components.UploadImageFile.detachFromGalleryOptionTitle'),
-                    action: this.onRemoveImage,
-                },
-            ];
+            return options;
         },
         isAllowedToCreate() {
             return this.$hasAccess([
@@ -266,7 +318,7 @@ export default {
             const value = this.multiple
                 ? this.value[this.currentIndex]
                 : this.value;
-            const url = `multimedia/${value}/download/default`;
+            const url = `multimedia/${value}/download`;
 
             this.$axios.$get(url, {
                 responseType: 'arraybuffer',
@@ -276,10 +328,11 @@ export default {
                     const downloadUrl = window.URL.createObjectURL(new Blob([
                         response,
                     ]));
+
                     const link = document.createElement('a');
 
                     link.href = downloadUrl;
-                    link.setAttribute('download', `${value}.png`);
+                    link.setAttribute('download', `${value}.${this.extension}`);
                     document.body.appendChild(link);
                     link.click();
                     link.remove();
@@ -308,40 +361,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .centering-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-    }
-
     .fixed-container {
         position: relative;
-        flex: 1 1 auto;
-        height: 0;
-        margin: 4px 0;
-        overflow: hidden;
-    }
-
-    .upload-image-file {
         display: flex;
-        flex-direction: column;
+        flex: 1 1 auto;
         width: 100%;
-        height: 100%;
-
-        &__image-settings {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background-color: $WHITE;
-            border-radius: 50%;
-        }
-
-        &__image {
-            position: relative;
-            display: flex;
-            flex: 1;
-            height: 100%;
-        }
+        height: 0;
+        overflow: hidden;
     }
 </style>

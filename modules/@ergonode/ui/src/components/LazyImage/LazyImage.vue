@@ -5,12 +5,18 @@
 <template>
     <IntersectionObserver
         observe-once
+        :options="{
+            threshold: [
+                0.0,
+            ],
+            trackVisibility: true,
+            delay: 100,
+        }"
         @intersect="onIntersect">
         <img
-            ref="img"
             :style="styles"
             :class="classes"
-            :src="require('@UI/assets/images/placeholders/no_image.svg')"
+            :src="image"
             alt="Image loaded asynchronously">
     </IntersectionObserver>
 </template>
@@ -19,13 +25,9 @@
 import {
     getImageData,
 } from '@Core/models/multimedia';
-import IntersectionObserver from '@UI/components/Observers/IntersectionObserver';
 
 export default {
     name: 'LazyImage',
-    components: {
-        IntersectionObserver,
-    },
     props: {
         /**
          * Component value
@@ -65,6 +67,7 @@ export default {
     },
     data() {
         return {
+            image: require('@UI/assets/images/placeholders/no_image.svg'),
             isLoading: true,
         };
     },
@@ -96,6 +99,8 @@ export default {
         },
         async getImage() {
             try {
+                this.isLoading = true;
+
                 const response = await this.$axios.$get(this.href, {
                     useCache: this.useCache,
                     responseType: 'arraybuffer',
@@ -107,9 +112,7 @@ export default {
             }
         },
         onSuccess(response) {
-            if (this.$refs.img) {
-                this.$refs.img.src = getImageData(response);
-            }
+            this.image = getImageData(response);
 
             this.isLoading = false;
         },
@@ -118,9 +121,7 @@ export default {
                 return;
             }
 
-            if (this.$refs.img) {
-                this.$refs.img.src = require('@UI/assets/images/placeholders/image_error.svg'); // eslint-disable-line global-require, import/no-dynamic-require
-            }
+            this.image = require('@UI/assets/images/placeholders/image_error.svg'); // eslint-disable-line global-require, import/no-dynamic-require
 
             this.isLoading = false;
         },

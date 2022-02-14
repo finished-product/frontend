@@ -4,33 +4,39 @@
  */
 <template>
     <GridEditNavigationCell @edit="onEditCell">
-        <GridSelectEditContentCell :style="positionStyle">
-            <GridImageEditContentCell>
-                <UploadFiles
-                    v-model="localValue"
-                    height="181px"
-                    :disabled="disabled"
-                    :multiple="true" />
-            </GridImageEditContentCell>
-        </GridSelectEditContentCell>
+        <GridEditContentCell
+            :bounds="bounds"
+            :shadow="true"
+            :fixed-width="width"
+            :fixed-height="height">
+            <UploadFiles
+                v-model="localValue"
+                :height="`${height}px`"
+                :disabled="disabled"
+                :size="smallSize"
+                :multiple="true" />
+        </GridEditContentCell>
     </GridEditNavigationCell>
 </template>
 
 <script>
 import {
+    DEFAULT_EDIT_CELL_CONTENT_HEIGHT,
+    DEFAULT_EDIT_CELL_CONTENT_WIDTH,
+} from '@Core/defaults/grid';
+import {
+    SIZE,
+} from '@Core/defaults/theme';
+import {
     arraysAreEqual,
 } from '@Core/models/arrayWrapper';
 import UploadFiles from '@Media/components/Inputs/UploadFile/UploadFiles';
-import GridImageEditContentCell from '@UI/components/Grid/Layout/Table/Cells/Edit/Content/GridImageEditContentCell';
-import GridSelectEditContentCell from '@UI/components/Grid/Layout/Table/Cells/Edit/Content/GridSelectEditContentCell';
 import gridEditCellMixin from '@UI/mixins/grid/gridEditCellMixin';
 
 export default {
     name: 'GridFileEditCell',
     components: {
         UploadFiles,
-        GridSelectEditContentCell,
-        GridImageEditContentCell,
     },
     mixins: [
         gridEditCellMixin,
@@ -45,17 +51,14 @@ export default {
         },
     },
     computed: {
-        positionStyle() {
-            const {
-                x,
-                y,
-            } = this.bounds;
-
-            return {
-                top: `${y}px`,
-                left: `${x}px`,
-                width: '304px',
-            };
+        height() {
+            return DEFAULT_EDIT_CELL_CONTENT_HEIGHT;
+        },
+        width() {
+            return DEFAULT_EDIT_CELL_CONTENT_WIDTH;
+        },
+        smallSize() {
+            return SIZE.SMALL;
         },
     },
     beforeDestroy() {

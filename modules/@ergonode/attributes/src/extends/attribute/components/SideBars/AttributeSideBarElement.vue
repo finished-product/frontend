@@ -41,11 +41,6 @@ import {
     GRAPHITE,
     GREY,
 } from '@UI/assets/scss/_js-variables/colors.scss';
-import ListDraggableElement from '@UI/components/List/ListDraggableElement';
-import ListElementDescription from '@UI/components/List/ListElementDescription';
-import ListElementHint from '@UI/components/List/ListElementHint';
-import ListElementIcon from '@UI/components/List/ListElementIcon';
-import ListElementTitle from '@UI/components/List/ListElementTitle';
 import {
     mapActions,
     mapState,
@@ -53,14 +48,11 @@ import {
 
 export default {
     name: 'AttributeSideBarElement',
-    components: {
-        ListElementDescription,
-        ListElementTitle,
-        ListElementHint,
-        ListElementIcon,
-        ListDraggableElement,
-    },
     props: {
+        scope: {
+            type: String,
+            default: '',
+        },
         item: {
             type: Object,
             required: true,
@@ -73,15 +65,26 @@ export default {
             type: Boolean,
             default: false,
         },
+        /**
+         * Type of the place from where element is dragging
+         */
+        draggingElementType: {
+            type: String,
+            default: DRAGGED_ELEMENT.LIST,
+        },
     },
     computed: {
         ...mapState('list', [
             'disabledElements',
         ]),
+        ...mapState('dictionaries', [
+            'attrTypes',
+        ]),
         isDisabled() {
             return this.disabled
-                || (this.disabledElements[this.languageCode]
-                    && this.disabledElements[this.languageCode][this.item.id]);
+                || (this.disabledElements[this.scope]
+                    && this.disabledElements[this.scope][this.languageCode]
+                    && this.disabledElements[this.scope][this.languageCode][this.item.id]);
         },
         iconFillColor() {
             return this.isDisabled ? GREY : GRAPHITE;
@@ -106,7 +109,7 @@ export default {
             return icon;
         },
         formattedAttributeType() {
-            return capitalizeAndConcatenationArray(this.item.type.split('_'));
+            return this.attrTypes[this.item.type] || capitalizeAndConcatenationArray(this.item.type.split('_'));
         },
         hint() {
             return this.item.label ? `#${this.item.code} ${this.languageCode}` : '';
@@ -119,11 +122,15 @@ export default {
         onDragStart() {
             this.__setState({
                 key: 'isElementDragging',
-                value: DRAGGED_ELEMENT.LIST,
+                value: this.draggingElementType,
             });
             this.__setState({
                 key: 'draggedElement',
                 value: `${this.item.code}:${this.languageCode}`,
+            });
+            this.__setState({
+                key: 'draggedInScope',
+                value: this.scope,
             });
         },
         onDragEnd() {
@@ -134,6 +141,10 @@ export default {
             this.__setState({
                 key: 'draggedElement',
                 value: null,
+            });
+            this.__setState({
+                key: 'draggedInScope',
+                value: '',
             });
         },
     },

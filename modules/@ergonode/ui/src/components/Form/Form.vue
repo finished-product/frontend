@@ -9,6 +9,7 @@
         <template #default="{ hasError, hasValueToSave }">
             <form
                 class="form"
+                data-cy="form"
                 :style="styles"
                 @submit.prevent="onSubmit">
                 <slot name="header">
@@ -26,12 +27,10 @@
                             <h3 class="errors-list__header">
                                 Please review errors below
                             </h3>
-                            <div class="errors-list__links">
-                                <LinkButton
-                                    v-for="(error, index) in presentationErrors"
-                                    :title="error"
-                                    :key="index" />
-                            </div>
+                            <LinkButton
+                                v-for="(error, index) in presentationErrors"
+                                :title="error"
+                                :key="index" />
                         </div>
                     </section>
                     <Divider />
@@ -88,25 +87,9 @@ import formActionsMixin from '@Core/mixins/form/formActionsMixin';
 import {
     RED,
 } from '@UI/assets/scss/_js-variables/colors.scss';
-import Button from '@UI/components/Button/Button';
-import Divider from '@UI/components/Dividers/Divider';
-import FeedbackProvider from '@UI/components/Feedback/FeedbackProvider';
-import IconError from '@UI/components/Icons/Feedback/IconError';
-import IconSpinner from '@UI/components/Icons/Feedback/IconSpinner';
-import IconSync from '@UI/components/Icons/Feedback/IconSync';
-import LinkButton from '@UI/components/LinkButton/LinkButton';
 
 export default {
     name: 'Form',
-    components: {
-        FeedbackProvider,
-        Button,
-        LinkButton,
-        IconError,
-        Divider,
-        IconSpinner,
-        IconSync,
-    },
     mixins: [
         formActionsMixin,
     ],
@@ -230,10 +213,6 @@ export default {
             &__header {
                 color: $GRAPHITE_DARK;
                 font: $FONT_SEMI_BOLD_14_20;
-            }
-
-            &__links {
-                display: contents;
             }
         }
     }

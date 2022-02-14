@@ -27,8 +27,10 @@
         </template>
         <template #item="{ item }">
             <AttributeSideBarElement
+                :scope="scope"
                 :item="item"
                 :language-code="languageCode"
+                :dragging-element-type="draggingElementType"
                 :disabled="disabled" />
         </template>
     </SideBar>
@@ -38,14 +40,14 @@
 import AttributeSideBarElement from '@Attributes/extends/attribute/components/SideBars/AttributeSideBarElement';
 import LanguageTreeSelect from '@Core/components/Selects/LanguageTreeSelect';
 import {
+    DRAGGED_ELEMENT,
+} from '@Core/defaults/grid';
+import {
     deepClone,
 } from '@Core/models/objectWrapper';
 import {
     getItems,
 } from '@Core/services/sidebar';
-import ListSearchSelectHeader from '@UI/components/List/ListSearchSelectHeader';
-import Preloader from '@UI/components/Preloader/Preloader';
-import SideBar from '@UI/components/SideBar/SideBar';
 import debounce from 'debounce';
 import {
     mapGetters,
@@ -55,13 +57,14 @@ import {
 export default {
     name: 'SystemAttributesSideBar',
     components: {
-        Preloader,
-        ListSearchSelectHeader,
         AttributeSideBarElement,
-        SideBar,
         LanguageTreeSelect,
     },
     props: {
+        scope: {
+            type: String,
+            default: '',
+        },
         isSelectLanguage: {
             type: Boolean,
             default: true,
@@ -69,6 +72,13 @@ export default {
         disabled: {
             type: Boolean,
             default: false,
+        },
+        /**
+         * Type of the place from where element is dragging
+         */
+        draggingElementType: {
+            type: String,
+            default: DRAGGED_ELEMENT.LIST,
         },
     },
     async fetch() {

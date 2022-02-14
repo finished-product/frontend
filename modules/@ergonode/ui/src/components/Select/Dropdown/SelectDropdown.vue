@@ -11,12 +11,15 @@
         <slot name="body">
             <slot name="dropdown">
                 <SelectList
+                    :items-max-height="itemsMaxHeight"
                     :value="value"
                     :search-value="searchValue"
                     :items="options"
                     :size="size"
                     :searchable="searchable"
                     :multiselect="multiselect"
+                    :option-key="optionKey"
+                    :option-value="optionValue"
                     @input="onValueChange"
                     @search="onSearch">
                     <template #item="{ index, item, isSelected }">
@@ -54,19 +57,12 @@
 import {
     SIZE,
 } from '@Core/defaults/theme';
-import Dropdown from '@UI/components/Select/Dropdown/Dropdown';
-import MultiselectDropdownFooter from '@UI/components/Select/Dropdown/Footers/MultiselectDropdownFooter';
-import SelectDropdownFooter from '@UI/components/Select/Dropdown/Footers/SelectDropdownFooter';
-import SelectList from '@UI/components/SelectList/SelectList';
+import {
+    DROPDOWN_MAX_HEIGHT,
+} from '@UI/assets/scss/_js-variables/sizes.scss';
 
 export default {
     name: 'SelectDropdown',
-    components: {
-        SelectDropdownFooter,
-        MultiselectDropdownFooter,
-        Dropdown,
-        SelectList,
-    },
     props: {
         /**
          * The size of the component
@@ -143,11 +139,29 @@ export default {
         /**
          * The vue component reference to which dropdown is hooked
          */
+        // eslint-disable-next-line vue/require-prop-types
         parentReference: {
             required: true,
         },
+        /**
+         * The key of the option
+         */
+        optionKey: {
+            type: String,
+            default: '',
+        },
+        /**
+         * The key of the value
+         */
+        optionValue: {
+            type: String,
+            default: '',
+        },
     },
     computed: {
+        itemsMaxHeight() {
+            return DROPDOWN_MAX_HEIGHT;
+        },
         isAnyOption() {
             return this.options.length > 0;
         },
@@ -184,9 +198,6 @@ export default {
         },
         onSearch(value) {
             this.$emit('search', value);
-        },
-        onClearSearch() {
-            this.onSearch('');
         },
         onValueChange(value) {
             this.$emit('input', value);

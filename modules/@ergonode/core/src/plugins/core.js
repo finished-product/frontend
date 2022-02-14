@@ -3,7 +3,14 @@
  * See LICENSE for license details.
  */
 import {
+    GRID_LAYOUT,
+} from '@Core/defaults/grid';
+import {
+    changeCookiePosition,
     getCookieKey,
+    getGridCookieKey,
+    insertCookieAtIndex,
+    removeCookieAtIndex,
 } from '@Core/models/cookies';
 import {
     isEmpty,
@@ -15,15 +22,77 @@ export default ({
     app,
     store,
 }, inject) => {
+    inject('gridCookies', {
+        set(layout = GRID_LAYOUT.TABLE, value) {
+            app.$cookies.set(getGridCookieKey(store, app.context.route.name, layout), value);
+        },
+        get(layout = GRID_LAYOUT.TABLE) {
+            return app.$cookies.get(getGridCookieKey(store, app.context.route.name, layout)) || '';
+        },
+        remove(layout = GRID_LAYOUT.TABLE) {
+            app.$cookies.remove(getGridCookieKey(store, app.context.route.name, layout));
+        },
+        insertAtIndex(layout = GRID_LAYOUT.TABLE, index, value) {
+            insertCookieAtIndex({
+                cookies: app.$cookies,
+                cookieName: getGridCookieKey(store, app.context.route.name, layout),
+                index,
+                data: value,
+            });
+        },
+        removeAtIndex(layout = GRID_LAYOUT.TABLE, index) {
+            removeCookieAtIndex({
+                cookies: app.$cookies,
+                cookieName: getGridCookieKey(store, app.context.route.name, layout),
+                index,
+            });
+        },
+        changePosition(layout = GRID_LAYOUT.TABLE, from, to) {
+            changeCookiePosition({
+                cookies: app.$cookies,
+                cookieName: getGridCookieKey(store, app.context.route.name, layout),
+                from,
+                to,
+            });
+        },
+    });
+    inject('getExtendedLayoutSlot', ({
+        key, layout,
+    }) => {
+        const extendedSlot = app.$getExtendSlot(key);
+
+        if (Array.isArray(extendedSlot)) {
+            return extendedSlot.filter(
+                slot => !slot.layouts
+                    || slot.layouts.length === 0
+                    || slot.layouts.some(l => l === layout),
+            );
+        }
+
+        Object.keys(extendedSlot).reduce((prev, curr) => {
+            if (!extendedSlot[curr].layouts
+                || extendedSlot[curr].layouts.length === 0
+                || extendedSlot[curr].layouts.some(l => l === layout)) {
+                return {
+                    ...prev,
+                    [curr]: extendedSlot[curr],
+                };
+            }
+
+            return prev;
+        }, {});
+
+        return extendedSlot;
+    });
     inject('userCookies', {
         set(key, value) {
-            getCookieKey(store, key, userKey => app.$cookies.set(userKey, value));
+            app.$cookies.set(getCookieKey(store, key), value);
         },
         get(key) {
-            return getCookieKey(store, key, userKey => app.$cookies.get(userKey));
+            return app.$cookies.get(getCookieKey(store, key));
         },
         remove(key) {
-            getCookieKey(store, key, userKey => app.$cookies.remove(userKey));
+            app.$cookies.remove(getCookieKey(store, key));
         },
     });
     inject('confirm', (payload) => {

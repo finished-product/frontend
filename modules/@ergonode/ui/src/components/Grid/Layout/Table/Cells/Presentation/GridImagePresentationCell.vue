@@ -10,18 +10,15 @@
         <LazyImage
             v-if="value"
             :href="`multimedia/${value}/download/default`"
+            object-fit="contain"
             :value="value" />
     </div>
 </template>
 
 <script>
-import LazyImage from '@UI/components/LazyImage/LazyImage';
 
 export default {
     name: 'GridImagePresentationCell',
-    components: {
-        LazyImage,
-    },
     props: {
         /**
          * Component value
@@ -37,6 +34,7 @@ export default {
 <style lang="scss" scoped>
     .grid-image-presentation-cell {
         display: flex;
+        flex: 1;
         height: 100%;
         padding: 8px;
         box-sizing: border-box;

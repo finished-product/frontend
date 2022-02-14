@@ -32,29 +32,24 @@
 <script>
 import beforeRouteEnterMixin from '@Core/mixins/route/beforeRouteEnterMixin';
 import beforeRouteLeaveMixin from '@Core/mixins/route/beforeRouteLeaveMixin';
+import beforeRouteUpdateMixin from '@Core/mixins/route/beforeRouteUpdateMixin';
 import asyncTabsMixin from '@Core/mixins/tab/asyncTabsMixin';
 import RemoveProductTemplateButton from '@Templates/components/Buttons/RemoveProductTemplateButton';
 import PRIVILEGES from '@Templates/config/privileges';
-import Page from '@UI/components/Layout/Page';
-import HorizontalRoutingTabBar from '@UI/components/TabBar/Routing/HorizontalRoutingTabBar';
-import TitleBar from '@UI/components/TitleBar/TitleBar';
 import {
-    mapActions,
     mapState,
 } from 'vuex';
 
 export default {
     name: 'Edit',
     components: {
-        Page,
-        TitleBar,
-        HorizontalRoutingTabBar,
         RemoveProductTemplateButton,
     },
     mixins: [
         asyncTabsMixin,
         beforeRouteEnterMixin,
         beforeRouteLeaveMixin,
+        beforeRouteUpdateMixin,
     ],
     validate({
         params,
@@ -62,9 +57,17 @@ export default {
         return /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/.test(params.id);
     },
     async fetch({
-        store, params,
+        store,
+        params,
     }) {
-        await store.dispatch('productTemplate/getTemplate', params);
+        await store.dispatch('productTemplate/getTemplate', {
+            id: params.id,
+        });
+        await store.dispatch('dictionaries/getInitialDictionaries', {
+            keys: [
+                'attrTypes',
+            ],
+        });
     },
     computed: {
         ...mapState('productTemplate', [
@@ -77,21 +80,7 @@ export default {
             return this.$isReadOnly(PRIVILEGES.TEMPLATE_DESIGNER.namespace);
         },
     },
-    beforeDestroy() {
-        this.__clearListStorage();
-        this.__clearStorage();
-        this.__clearFeedbackStorage();
-    },
     methods: {
-        ...mapActions('productTemplate', [
-            '__clearStorage',
-        ]),
-        ...mapActions('list', {
-            __clearListStorage: '__clearStorage',
-        }),
-        ...mapActions('feedback', {
-            __clearFeedbackStorage: '__clearStorage',
-        }),
         bindingProps({
             props = {},
         }) {

@@ -11,6 +11,7 @@
         :subtitle="subtitle"
         :disabled="disabled"
         :menu-items="menuItems"
+        :menu-position="{ right: '8px' }"
         @select-menu-option="onSelectValue">
         <template #prepend>
             <IconButton
@@ -37,14 +38,10 @@ import {
     THEME,
 } from '@Core/defaults/theme';
 import DesignerItem from '@UI/components/Designer/DesignerItem';
-import IconButton from '@UI/components/IconButton/IconButton';
-import IconArrowDouble from '@UI/components/Icons/Arrows/IconArrowDouble';
 
 export default {
     name: 'TreeDesignerItem',
     components: {
-        IconArrowDouble,
-        IconButton,
         DesignerItem,
     },
     props: {

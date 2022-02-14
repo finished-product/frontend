@@ -12,6 +12,7 @@
         :disabled="!isAllowedToUpdate"
         :errors="errors"
         :change-values="changeValues"
+        :errors-presentation-mapper="errorMapper"
         @proceed="onProceed"
         @submit="onSubmit">
         <template #body>
@@ -37,6 +38,7 @@
                         v-if="schema"
                         :value="configuration"
                         :schema="schema"
+                        :widgets="schemaWidgets"
                         :errors="errors"
                         :disabled="!isAllowedToUpdate"
                         @input="setConfigurationValue" />
@@ -55,16 +57,13 @@
 <script>
 import formFeedbackMixin from '@Core/mixins/feedback/formFeedbackMixin';
 import formActionsMixin from '@Core/mixins/form/formActionsMixin';
+import {
+    getMappedPresentationErrors,
+} from '@Core/models/mappers/errorsMapper';
 import PRIVILEGES from '@Import/config/privileges';
 import {
     GRAPHITE,
 } from '@UI/assets/scss/_js-variables/colors.scss';
-import Form from '@UI/components/Form/Form';
-import JSONSchemaForm from '@UI/components/Form/JSONSchemaForm/JSONSchemaForm';
-import FormSection from '@UI/components/Form/Section/FormSection';
-import IconSpinner from '@UI/components/Icons/Feedback/IconSpinner';
-import Select from '@UI/components/Select/Select';
-import FadeTransition from '@UI/components/Transitions/FadeTransition';
 import {
     mapActions,
     mapState,
@@ -72,14 +71,6 @@ import {
 
 export default {
     name: 'ImportProfileForm',
-    components: {
-        IconSpinner,
-        JSONSchemaForm,
-        Form,
-        FormSection,
-        Select,
-        FadeTransition,
-    },
     mixins: [
         formActionsMixin,
         formFeedbackMixin,
@@ -115,6 +106,11 @@ export default {
 
             return this.schemas[this.type];
         },
+        schemaWidgets() {
+            return {
+                dictionary: () => import('@UI/components/Form/JSONSchemaForm/Widget/JSONSchemaFormDictionaryWidget'),
+            };
+        },
         isAllowedToUpdate() {
             return this.$hasAccess([
                 PRIVILEGES.IMPORT.update,
@@ -142,6 +138,9 @@ export default {
             '__setState',
             'getConfiguration',
         ]),
+        errorMapper(errors) {
+            return getMappedPresentationErrors(errors);
+        },
         bindingProps({
             props,
         }) {

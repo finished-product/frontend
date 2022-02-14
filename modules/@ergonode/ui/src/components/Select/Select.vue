@@ -3,113 +3,126 @@
  * See LICENSE for license details.
  */
 <template>
-    <Component
-        :is="styleComponent"
-        ref="activator"
-        :data-cy="dataCy"
-        :focused="isFocused"
-        :error="isError"
-        :disabled="disabled"
-        :alignment="alignment"
-        :size="size"
-        :height="height"
-        :details-label="informationLabel"
-        @keydown.native="onKeyDown"
-        @mousedown="onMouseDown"
-        @mouseup="onMouseUp">
-        <template #activator>
-            <InputController
-                :size="size">
-                <slot name="prepend" />
-                <InputSelectValue
-                    :data-cy="`${dataCy}-value`"
-                    :size="size"
-                    :alignment="alignment"
-                    :disabled="disabled"
-                    :value="multiselect ? value.join(', ') : value">
-                    <template #value>
-                        <slot name="value" />
-                    </template>
-                </InputSelectValue>
-                <input
-                    :id="associatedLabel"
-                    :class="classes"
-                    ref="input"
-                    :placeholder="placeholderValue"
-                    :disabled="disabled"
-                    :aria-label="label || 'no description'"
-                    type="text"
-                    readonly
-                    @focus="onFocus"
-                    @blur="onBlur">
-                <InputLabel
-                    v-if="label"
-                    :for="associatedLabel"
-                    :required="required"
-                    :size="size"
-                    :floating="isFocused || hasAnyValueSelected"
-                    :focused="isFocused"
-                    :disabled="disabled"
-                    :error="isError"
-                    :label="label" />
-                <template #append>
-                    <slot name="append" />
-                    <ErrorHint
-                        v-if="isError"
-                        :hint="errorMessages" />
-                    <IconArrowDropdown :state="dropDownState" />
+    <InputUUIDProvider>
+        <template #default="{ uuid }">
+            <Component
+                :is="styleComponent"
+                ref="activator"
+                :data-cy="dataCy"
+                :focused="isFocused"
+                :error="isError"
+                :disabled="disabled"
+                :alignment="alignment"
+                :size="size"
+                :height="height"
+                :details-label="informationLabel"
+                @keydown.native="onKeyDown"
+                @mousedown="onMouseDown"
+                @mouseup="onMouseUp">
+                <template #activator="{ inputReference }">
+                    <InputController>
+                        <!--
+                            @slot Prepend element - icon recommended
+                        -->
+                        <slot name="prepend" />
+                        <InputSelectValue
+                            :data-cy="`${dataCy}-value`"
+                            :size="size"
+                            :alignment="alignment"
+                            :disabled="disabled"
+                            :value="presentingValue"
+                            :wrap="wrapValue">
+                            <template #value>
+                                <slot name="value" />
+                            </template>
+                        </InputSelectValue>
+                        <input
+                            :id="uuid"
+                            :class="classes"
+                            ref="input"
+                            :placeholder="placeholderValue"
+                            :disabled="disabled"
+                            :aria-label="label || 'no description'"
+                            type="text"
+                            readonly
+                            @focus="onFocus"
+                            @blur="onBlur">
+                        <InputLabel
+                            v-if="label"
+                            :for="uuid"
+                            :required="required"
+                            :size="size"
+                            :floating="isFocused || hasAnyValueSelected"
+                            :focused="isFocused"
+                            :disabled="disabled"
+                            :error="isError"
+                            :label="label" />
+                        <!--
+                            @slot Append element - icon recommended
+                        -->
+                        <slot name="append" />
+                        <ErrorHint
+                            v-if="isError"
+                            :hint="errorMessages" />
+                        <IconArrowDropdown :state="dropDownState" />
+                    </InputController>
+                    <SelectDropdown
+                        v-if="isReadyToRender"
+                        ref="menu"
+                        :value="value"
+                        :parent-reference="inputReference"
+                        :data-cy="`${dataCy}-dropdown`"
+                        :fixed="fixedContent"
+                        :size="size"
+                        :multiselect="multiselect"
+                        :clearable="clearable"
+                        :fixed-content="fixedContent"
+                        :searchable="searchable"
+                        :options="options"
+                        :search-value="searchValue"
+                        :option-key="optionKey"
+                        :option-value="optionValue"
+                        :is-visible="isFocused"
+                        @dismiss="onDismiss"
+                        @clear="onClear"
+                        @search="onSearch"
+                        @input="onSelectValue"
+                        @click-outside="onClickOutside">
+                        <template #body>
+                            <slot name="dropdownBody" />
+                        </template>
+                        <template #noDataPlaceholder>
+                            <slot name="noDataPlaceholder" />
+                        </template>
+                        <template #noResultsPlaceholder>
+                            <slot name="noResultsPlaceholder" />
+                        </template>
+                        <template #dropdown>
+                            <slot
+                                name="dropdown"
+                                :on-select-value="onSelectValue"
+                                :on-apply="onDismiss"
+                                :on-clear="onClear" />
+                        </template>
+                        <template #item="{ index, item, isSelected, isSmallSize }">
+                            <slot
+                                name="option"
+                                :option="item"
+                                :is-selected="isSelected"
+                                :is-small-size="isSmallSize"
+                                :index="index" />
+                        </template>
+                    </SelectDropdown>
                 </template>
-            </InputController>
+                <template #details>
+                    <!--
+                        @slot Details element - text recommended
+                    -->
+                    <slot name="details" />
+                </template>
+            </Component>
         </template>
-        <SelectDropdown
-            v-if="isReadyToRender"
-            ref="menu"
-            :value="value"
-            :parent-reference="$refs.activator"
-            :data-cy="`${dataCy}-drop-down`"
-            :fixed="fixedContent"
-            :size="size"
-            :multiselect="multiselect"
-            :clearable="clearable"
-            :fixed-content="fixedContent"
-            :searchable="searchable"
-            :options="options"
-            :search-value="searchValue"
-            :is-visible="isFocused"
-            @dismiss="onDismiss"
-            @clear="onClear"
-            @search="onSearch"
-            @input="onSelectValue"
-            @click-outside="onClickOutside">
-            <template #body>
-                <slot name="dropdownBody" />
-            </template>
-            <template #noDataPlaceholder>
-                <slot name="noDataPlaceholder" />
-            </template>
-            <template #noResultsPlaceholder>
-                <slot name="noResultsPlaceholder" />
-            </template>
-            <template #dropdown>
-                <slot
-                    name="dropdown"
-                    :on-select-value="onSelectValue"
-                    :on-apply="onDismiss"
-                    :on-clear="onClear" />
-            </template>
-            <template #item="{ index, item, isSelected, isSmallSize }">
-                <slot
-                    name="option"
-                    :option="item"
-                    :is-selected="isSelected"
-                    :is-small-size="isSmallSize"
-                    :index="index" />
-            </template>
-        </SelectDropdown>
-        <template #details>
-            <slot name="details" />
-        </template>
-    </Component>
+    </InputUUIDProvider>
 </template>
 
 <script>
@@ -121,29 +134,16 @@ import {
     INPUT_TYPE,
     SIZE,
 } from '@Core/defaults/theme';
-import IconArrowDropdown from '@UI/components/Icons/Arrows/IconArrowDropdown';
-import InputController from '@UI/components/Input/InputController';
-import InputLabel from '@UI/components/Input/InputLabel';
-import InputSelectValue from '@UI/components/Input/InputSelectValue';
 import InputSolidStyle from '@UI/components/Input/InputSolidStyle';
 import InputUnderlineStyle from '@UI/components/Input/InputUnderlineStyle';
 import SelectDropdown from '@UI/components/Select/Dropdown/SelectDropdown';
-import associatedLabelMixin from '@UI/mixins/inputs/associatedLabelMixin';
 
 export default {
     name: 'Select',
     components: {
         InputSolidStyle,
         SelectDropdown,
-        IconArrowDropdown,
-        InputController,
-        InputLabel,
-        InputSelectValue,
-        ErrorHint: () => import('@UI/components/Hints/ErrorHint'),
     },
-    mixins: [
-        associatedLabelMixin,
-    ],
     props: {
         /**
          * Component value
@@ -234,6 +234,13 @@ export default {
             default: '',
         },
         /**
+         * Wrapping selected values
+         */
+        wrapValue: {
+            type: Boolean,
+            default: false,
+        },
+        /**
          * Determines if the given component is required
          */
         required: {
@@ -283,6 +290,20 @@ export default {
             default: '',
         },
         /**
+         * The key of the option
+         */
+        optionKey: {
+            type: String,
+            default: '',
+        },
+        /**
+         * The key of the value
+         */
+        optionValue: {
+            type: String,
+            default: '',
+        },
+        /**
          * Unique identifier for cypress
          */
         dataCy: {
@@ -299,7 +320,30 @@ export default {
         };
     },
     computed: {
+        presentingValue() {
+            if (!this.value) {
+                return '';
+            }
+
+            let value = [
+                this.value,
+            ];
+
+            if (this.multiselect) {
+                value = this.value;
+            }
+
+            if (this.optionValue || this.optionKey) {
+                return value.map(item => item[this.optionValue] || `#${item[this.optionKey]}`).join(', ');
+            }
+
+            return value.join(', ');
+        },
         height() {
+            if (this.wrapValue) {
+                return '';
+            }
+
             return this.size === SIZE.SMALL
                 ? '32px'
                 : '40px';

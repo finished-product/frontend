@@ -4,6 +4,7 @@
  */
 <template>
     <LoginForm
+        data-cy="login-form"
         :submit-title="$t('@Authentication.authentication.components.LoginCredentialsForm.button')"
         :is-submitting="isSubmitting"
         :errors="scopeErrors"
@@ -26,8 +27,10 @@
             <div class="login-help-area">
                 <Toggler
                     v-model="isPasswordVisible"
+                    data-cy="show-password"
                     :label="$t('@Authentication.authentication.components.LoginCredentialsForm.toggle')" />
                 <LinkButton
+                    data-cy="forgot-password"
                     :title="$t('@Authentication.authentication.components.LoginCredentialsForm.forgot')"
                     @click.native="redirectToRecovery" />
             </div>
@@ -45,9 +48,6 @@ import {
     INPUT_TYPE,
 } from '@Core/defaults/theme';
 import modalFeedbackMixin from '@Core/mixins/feedback/modalFeedbackMixin';
-import LinkButton from '@UI/components/LinkButton/LinkButton';
-import TextField from '@UI/components/TextField/TextField';
-import Toggler from '@UI/components/Toggler/Toggler';
 import {
     mapActions,
 } from 'vuex';
@@ -56,9 +56,6 @@ export default {
     name: 'LoginCredentialsForm',
     components: {
         LoginForm,
-        TextField,
-        LinkButton,
-        Toggler,
         IconLogoName,
     },
     mixins: [

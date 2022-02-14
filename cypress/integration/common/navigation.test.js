@@ -4,6 +4,7 @@
  */
 import {
     And,
+    Given,
     Then,
     When,
 } from 'cypress-cucumber-preprocessor/steps';
@@ -13,6 +14,7 @@ import {
 } from '../../models';
 import {
     checkGridRow,
+    checkGridRows,
     noGridRow,
 } from '../../models/navigation';
 
@@ -54,10 +56,16 @@ MultiSteps([
     Then,
     And,
 ], 'I see {string} page', (page) => {
-    const url = page.replace(/%\w+%/g, '(.*?)');
+    cy.checkUrl(page);
+});
 
-    cy.url()
-        .should('match', new RegExp(url));
+Given('I open {string} page', (page) => {
+    cy.openPage({
+        page,
+        requestAliases: [
+            `@${Cypress.spec.name}_GET`,
+        ],
+    });
 });
 
 MultiSteps([
@@ -75,6 +83,17 @@ MultiSteps([
 MultiSteps([
     And,
     Then,
+    When,
+], 'On {string} I can see rows with {string} values', (id, values) => {
+    checkGridRows({
+        id,
+        values,
+    });
+});
+
+MultiSteps([
+    And,
+    Then,
 ], 'On {string} I can not see row with {string} value', (gridId, searchValue) => {
     noGridRow({
         gridId,
@@ -86,7 +105,7 @@ MultiSteps([
     Then,
     And,
 ], 'I see a form validation error that says {string}', (errors) => {
-    const parsedErrors = JSON.parse(errors.replace(/'/g, '"'));
+    const parsedErrors = JSON.parse(errors.replace(/'/g, '"').replace(/`/g, "'").replace(/\/"/g, "'"));
 
     cy
         .get('[data-cy=form-errors]')
@@ -94,12 +113,13 @@ MultiSteps([
         .as('formErrorsWrapper');
     cy
         .get('@formErrorsWrapper')
-        .find('.errors-list__links > button')
+        .find('.errors-list > button')
         .as('errorList');
 
     cy.get('@errorList')
-        .should('have.length', parsedErrors.length)
-        .each(($error, i) => {
-            expect($error.find('span').text().trim()).to.equal(parsedErrors[i]);
-        });
+        .should('have.length', parsedErrors.length);
+
+    parsedErrors.forEach((error) => {
+        cy.get('@errorList').contains('span', error);
+    });
 });

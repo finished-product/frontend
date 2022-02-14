@@ -4,6 +4,7 @@
  */
 <template>
     <Grid
+        :scope="scope"
         :columns="columns"
         :data-count="filtered"
         :rows="rows"
@@ -13,16 +14,19 @@
         :sort-order="localParams.sortOrder"
         :collection-cell-binding="collectionCellBinding"
         :extended-components="extendedGridComponents"
+        :layout="layout"
         :is-prefetching-data="isPrefetchingData"
         :is-collection-layout="true"
         :is-editable="true"
         :is-header-visible="true"
         :is-basic-filter="true"
+        :is-action-column="false"
         @cell-value="onCellValueChange"
         @pagination="onPaginationChange"
         @sort-column="onColumnSortChange"
         @remove-all-filters="onRemoveAllFilters"
         @filter="onFilterChange"
+        @layout="onLayoutChange"
         v-bind="extendedProps['grid']">
         <template #actionsHeader="actionsHeaderProps">
             <Component
@@ -64,6 +68,7 @@ import {
 import {
     DEFAULT_GRID_FETCH_PARAMS,
     DEFAULT_GRID_PAGINATION,
+    GRID_LAYOUT,
 } from '@Core/defaults/grid';
 import extendPropsMixin from '@Core/mixins/extend/extendProps';
 import extendedGridComponentsMixin from '@Core/mixins/grid/extendedGridComponentsMixin';
@@ -76,8 +81,6 @@ import {
 } from '@Core/services/grid/getGridData.service';
 import PRIVILEGES from '@Products/config/privileges';
 import UpdateProductsAttachmentButton from '@Products/extends/components/Buttons/UpdateProductsAttachmentButton';
-import Grid from '@UI/components/Grid/Grid';
-import GridNoDataPlaceholder from '@UI/components/Grid/GridNoDataPlaceholder';
 import {
     mapActions,
 } from 'vuex';
@@ -86,8 +89,6 @@ export default {
     name: 'ProductsToAttachForGroupGrid',
     components: {
         UpdateProductsAttachmentButton,
-        Grid,
-        GridNoDataPlaceholder,
     },
     mixins: [
         extendPropsMixin({
@@ -120,6 +121,7 @@ export default {
     },
     data() {
         return {
+            layout: GRID_LAYOUT.TABLE,
             columns: [],
             rows: [],
             filtered: 0,
@@ -157,6 +159,9 @@ export default {
         ...mapActions('feedback', [
             'onScopeValueChange',
         ]),
+        onLayoutChange(layout) {
+            this.layout = layout;
+        },
         onPaginationChange(pagination) {
             this.pagination = pagination;
             this.localParams.limit = pagination.itemsPerPage;
@@ -212,8 +217,6 @@ export default {
             };
 
             await getGridData({
-                $route: this.$route,
-                $cookies: this.$userCookies,
                 $axios: this.$axios,
                 path: `products/${this.$route.params.id}/children-and-available-products`,
                 params,
@@ -257,12 +260,7 @@ export default {
                     editable: false,
                 };
             });
-            this.rows = rows.map(({
-                // eslint-disable-next-line no-unused-vars
-                _links, ...rest
-            }) => ({
-                ...rest,
-            }));
+            this.rows = rows;
             this.filtered = filtered;
 
             this.isPrefetchingData = false;

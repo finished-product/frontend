@@ -13,6 +13,9 @@
         :label="$t('@AttributeGroups.attributeGroup.components.AttributeGroupsAutocomplete.groupLabel')"
         :custom-fetch-event="attributeGroupCreatedEventName"
         :error-messages="errorMessages"
+        :wrap-value="true"
+        option-key="id"
+        option-value="label"
         :disabled="disabled"
         href="attributes/groups/autocomplete"
         @input="onValueChange">
@@ -33,15 +36,11 @@ import CreateAttributeGroupButton from '@AttributeGroups/components/Buttons/Crea
 import {
     ATTRIBUTE_GROUP_CREATED_EVENT_NAME,
 } from '@AttributeGroups/defaults';
-import Autocomplete from '@UI/components/Autocomplete/Autocomplete';
-import SelectListNoDataPlaceholder from '@UI/components/SelectList/SelectListNoDataPlaceholder';
 
 export default {
     name: 'AttributeGroupsAutocomplete',
     components: {
         CreateAttributeGroupButton,
-        SelectListNoDataPlaceholder,
-        Autocomplete,
     },
     props: {
         value: {

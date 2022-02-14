@@ -4,6 +4,7 @@
  */
 <template>
     <GridDraggableColumn
+        :scope="scope"
         :index="columnIndex"
         :column="column"
         :key="column.id"
@@ -35,30 +36,33 @@
                     :column-id="column.id"
                     :filter="column.filter"
                     @edit-filter-cell="onEditFilterCell"
-                    @filter-value="onFilterValueChange" />
+                    @filter-value="onFilterValueChange"
+                    @filter-clear="onFilterValueClear" />
                 <GridTableCell
                     v-else
                     :locked="true"
                     :row="rowsOffset + basicFiltersOffset"
                     :column="columnIndex" />
             </template>
-            <GridDataCell
-                v-for="(row, rowIndex) in rows"
-                :key="`${rowIds[rowIndex]}|${column.id}`"
-                :component="dataCellComponents[column.type]"
-                :data="row[column.id]"
-                :drafts="drafts"
-                :column="column"
-                :error-messages="errors[`${rowIds[rowIndex]}/${column.id}`]"
-                :row-id="rowIds[rowIndex]"
-                :column-index="columnIndex"
-                :row-index="rowsOffset + rowIndex + basicFiltersOffset + 1"
-                :is-disabled="disabledRows[rowIds[rowIndex]]"
-                :is-locked="!(column.editable && isEditable)"
-                :is-copyable="column.editable && isEditable && !disabledRows[rowIds[rowIndex]]"
-                :is-selected="getSelectedRowState(rowIndex)"
-                @cell-value="onCellValueChange"
-                @edit-cell="onEditCell" />
+            <template v-if="isColumnInRow">
+                <GridDataCell
+                    v-for="(row, rowIndex) in rows"
+                    :key="`${rowIds[rowIndex]}|${column.id}`"
+                    :component="dataCellComponents[column.type]"
+                    :data="getRowData(row, column)"
+                    :drafts="drafts"
+                    :column="column"
+                    :error-messages="errors[`${rowIds[rowIndex]}/${column.id}`]"
+                    :row-id="rowIds[rowIndex]"
+                    :column-index="columnIndex"
+                    :row-index="rowsOffset + rowIndex + basicFiltersOffset + 1"
+                    :is-disabled="disabledRows[rowIds[rowIndex]]"
+                    :is-locked="!(column.editable && isEditable)"
+                    :is-copyable="column.editable && isEditable && !disabledRows[rowIds[rowIndex]]"
+                    :is-selected="getSelectedRowState(rowIndex)"
+                    @cell-value="onCellValueChange"
+                    @edit-cell="onEditCell" />
+            </template>
         </GridColumn>
     </GridDraggableColumn>
 </template>
@@ -66,8 +70,6 @@
 <script>
 import GridFilterDataCell from '@UI/components/Grid/Layout/Table/Cells/Data/Filter/GridFilterDataCell';
 import GridDataCell from '@UI/components/Grid/Layout/Table/Cells/Data/GridDataCell';
-import GridTableCell from '@UI/components/Grid/Layout/Table/Cells/GridTableCell';
-import GridHeaderCell from '@UI/components/Grid/Layout/Table/Cells/Header/GridHeaderCell';
 import GridColumn from '@UI/components/Grid/Layout/Table/Columns/GridColumn';
 import GridDraggableColumn from '@UI/components/Grid/Layout/Table/Columns/GridDraggableColumn';
 
@@ -76,12 +78,17 @@ export default {
     components: {
         GridDataCell,
         GridFilterDataCell,
-        GridTableCell,
-        GridHeaderCell,
         GridColumn,
         GridDraggableColumn,
     },
     props: {
+        /**
+         * Context scope
+         */
+        scope: {
+            type: String,
+            default: '',
+        },
         /**
          * Column index of given component at the loop
          */
@@ -206,6 +213,11 @@ export default {
         basicFiltersOffset() {
             return this.isBasicFilter ? 1 : 0;
         },
+        isColumnInRow() {
+            return this.column && this.column.id
+                ? this.rows.every(row => this.column.id in row)
+                : false;
+        },
     },
     methods: {
         onRemoveColumn(payload) {
@@ -226,6 +238,9 @@ export default {
         onFilterValueChange(payload) {
             this.$emit('filter-value', payload);
         },
+        onFilterValueClear(payload) {
+            this.$emit('filter-clear', payload);
+        },
         onCellValueChange(payload) {
             this.$emit('cell-value', payload);
         },
@@ -235,6 +250,11 @@ export default {
         getSelectedRowState(index) {
             return this.selectedRows[this.rowIds[index]]
                 || (this.isSelectedAll && !this.excludedFromSelectionRows[this.rowIds[index]]);
+        },
+        getRowData(row, column) {
+            const rowData = 'id' in column ? row[column.id] : null;
+
+            return rowData || {};
         },
     },
 };

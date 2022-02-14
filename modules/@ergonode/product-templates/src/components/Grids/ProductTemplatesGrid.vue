@@ -4,13 +4,14 @@
  */
 <template>
     <Grid
+        :scope="scope"
         :columns="columns"
         :data-count="filtered"
         :rows="rows"
         :sort-order="sortOrder"
         :filters="filterValues"
         :pagination="pagination"
-        :default-layout="gridLayout.COLLECTION"
+        :layout="layout"
         :collection-cell-binding="collectionCellBinding"
         :extended-components="extendedGridComponents"
         :is-editable="isAllowedToUpdate"
@@ -26,6 +27,7 @@
         @sort-column="onColumnSortChange"
         @filter="onFilterChange"
         @remove-all-filters="onRemoveAllFilters"
+        @layout="onLayoutChange"
         v-bind="extendedProps['grid']">
         <template #actionsHeader="actionsHeaderProps">
             <Component
@@ -85,15 +87,11 @@ import {
 import {
     PRODUCT_TEMPLATE_CREATED_EVENT_NAME,
 } from '@Templates/defaults';
-import Grid from '@UI/components/Grid/Grid';
-import GridNoDataPlaceholder from '@UI/components/Grid/GridNoDataPlaceholder';
 
 export default {
     name: 'ProductTemplatesGrid',
     components: {
         CreateProductTemplateButton,
-        Grid,
-        GridNoDataPlaceholder,
     },
     mixins: [
         extendPropsMixin({
@@ -104,6 +102,12 @@ export default {
         }),
         extendedGridComponentsMixin,
     ],
+    props: {
+        scope: {
+            type: String,
+            default: '',
+        },
+    },
     async fetch() {
         await this.onFetchData();
 
@@ -120,6 +124,7 @@ export default {
             filterValues,
             pagination,
             sortOrder,
+            layout: GRID_LAYOUT.COLLECTION,
             rows: [],
             columns: [],
             filtered: 0,
@@ -139,9 +144,6 @@ export default {
                 descriptionColumn: 'name',
             };
         },
-        gridLayout() {
-            return GRID_LAYOUT;
-        },
         isAllowedToUpdate() {
             return this.$hasAccess([
                 PRIVILEGES.TEMPLATE_DESIGNER.update,
@@ -149,8 +151,8 @@ export default {
         },
     },
     watch: {
-        async $route(from, to) {
-            if (from.name !== to.name) {
+        async $route(to, from) {
+            if (from.name !== to.name || from.query.layout !== to.query.layout) {
                 return;
             }
 
@@ -182,6 +184,9 @@ export default {
         );
     },
     methods: {
+        onLayoutChange(layout) {
+            this.layout = layout;
+        },
         onProductTemplateCreated() {
             this.onFetchData();
         },
@@ -204,13 +209,14 @@ export default {
         },
         async onFetchData() {
             await getGridData({
-                $route: this.$route,
-                $cookies: this.$userCookies,
+                $cookies: this.$gridCookies,
+                layout: this.layout,
                 $axios: this.$axios,
                 path: 'templates',
                 params: getParams({
                     $route: this.$route,
-                    $cookies: this.$userCookies,
+                    $cookies: this.$gridCookies,
+                    layout: this.layout,
                 }),
                 onSuccess: this.onFetchDataSuccess,
                 onError: this.onFetchDataError,

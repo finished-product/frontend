@@ -11,6 +11,7 @@ import {
     ROUTE_NAME,
 } from '@Attributes/config/routes';
 import {
+    DRAGGED_ELEMENT,
     TYPES,
 } from '@Attributes/defaults';
 import {
@@ -69,11 +70,6 @@ const AttributeIcons = {
     [TYPES.PRICE]: [
         {
             component: Icons.IconPrice,
-        },
-    ],
-    [TYPES.IMAGE]: [
-        {
-            component: Icons.IconImage,
         },
     ],
 };
@@ -141,7 +137,17 @@ export default {
                 path: '/dictionary/attributes/types',
                 config: {},
             },
-            dataMapper: response => response,
+            dataMapper: (response, $app) => Object.keys(response).reduce((acc, type) => {
+                const tmpObject = acc;
+
+                if ($app.i18n.te(`@Attributes.attribute._.types.${type}`)) {
+                    tmpObject[type] = $app.i18n.t(`@Attributes.attribute._.types.${type}`);
+                } else {
+                    tmpObject[type] = response[type];
+                }
+
+                return tmpObject;
+            }, {}),
         },
     ],
     extendStore: {
@@ -161,6 +167,7 @@ export default {
                 component: Components.AttributesVerticalTab,
                 icon: Icons.IconAttributes,
                 props: {
+                    scope: $this.scope,
                     isSelectLanguage: false,
                     ...props,
                 },
@@ -173,11 +180,40 @@ export default {
                 title: $this.$t('@Attributes.attributeExtend.components.AttributesVerticalTab.title'),
                 component: Components.AttributesVerticalTab,
                 icon: Icons.IconAttributes,
+                props: {
+                    scope: $this.scope,
+                },
             },
             {
                 title: $this.$t('@Attributes.attributeExtend.components.SystemAttributesVerticalTab.title'),
                 component: Components.SystemAttributesVerticalTab,
                 icon: Icons.IconSettings,
+                props: {
+                    scope: $this.scope,
+                },
+            },
+        ],
+        '@Products/components/Modals/AddProductRelationsModalGrid/verticalTabs': ({
+            $this,
+        }) => [
+            {
+                title: $this.$t('@Attributes.attributeExtend.components.AttributesVerticalTab.title'),
+                component: Components.AttributesVerticalTab,
+                icon: Icons.IconAttributes,
+                props: {
+                    scope: $this.scope,
+                    isAddingEnabled: false,
+                    draggingElementType: DRAGGED_ELEMENT.RELATION_ATTRIBUTE,
+                },
+            },
+            {
+                title: $this.$t('@Attributes.attributeExtend.components.SystemAttributesVerticalTab.title'),
+                component: Components.SystemAttributesVerticalTab,
+                icon: Icons.IconSettings,
+                props: {
+                    scope: $this.scope,
+                    draggingElementType: DRAGGED_ELEMENT.RELATION_ATTRIBUTE,
+                },
             },
         ],
         '@Attributes/store/attribute/action/createAttribute/__before': ({
@@ -287,7 +323,7 @@ export default {
             switch (type) {
             case TYPES.SELECT:
             case TYPES.MULTI_SELECT:
-                $this.commit('attribute/REMOVE_UPDATED_OPTION');
+                $this.commit('attribute/REMOVE_OPTIONS_STATE');
                 break;
             default:
                 break;

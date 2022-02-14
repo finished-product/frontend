@@ -9,25 +9,39 @@
         :columns="columns"
         :row-height="rowHeight"
         :disabled="!isAllowedToUpdate"
-        @remove-items="onRemoveItems"
+        @remove-items="onRemoveLanguageItems"
         @add-item="onAddItem"
         @input="onValueChange">
-        <template #itemDescription="{ item, childrenLength }">
-            <DesignerItemDescription
-                :title="item.name || `#${item.code}`"
-                :subtitle="childrenLength ? `Inherited languages: ${childrenLength}` : ''" />
+        <template
+            #item="{
+                item,
+                gap,
+                disabled,
+                isExpanded,
+                childrenLength,
+                onExpandItem,
+                onRemoveItems,
+            }">
+            <LanguageInheritanceTreeDesignerItem
+                :key="item.id"
+                :item="item"
+                :gap="gap"
+                :children-length="childrenLength"
+                :is-expanded="isExpanded"
+                :disabled="disabled"
+                @expand-item="onExpandItem"
+                @remove-item="onRemoveItems" />
         </template>
     </TreeDesigner>
 </template>
 
 <script>
+import LanguageInheritanceTreeDesignerItem from '@Core/components/LanguageInheritanceTreeDesigner/LanguageInheritanceTreeDesignerItem';
 import PRIVILEGES from '@Core/config/privileges';
 import {
     COLUMNS,
     ROW_HEIGHT,
 } from '@Core/defaults/languagesDesigner';
-import DesignerItemDescription from '@UI/components/Designer/DesignerItemDescription';
-import TreeDesigner from '@UI/components/TreeDesigner/TreeDesigner';
 import {
     mapActions,
     mapState,
@@ -36,8 +50,7 @@ import {
 export default {
     name: 'LanguageInheritanceTreeDesigner',
     components: {
-        TreeDesigner,
-        DesignerItemDescription,
+        LanguageInheritanceTreeDesignerItem,
     },
     props: {
         scope: {
@@ -74,10 +87,13 @@ export default {
     },
     created() {
         this.inheritedLanguagesTree.forEach((node) => {
-            this.setDisabledElement({
-                languageCode: this.languageCode,
-                elementId: node.id,
-                disabled: true,
+            this.setDisabledScopeElement({
+                scope: this.scope,
+                disabledElement: {
+                    languageCode: this.languageCode,
+                    elementId: node.id,
+                    disabled: true,
+                },
             });
         });
     },
@@ -89,14 +105,23 @@ export default {
             'onScopeValueChange',
         ]),
         ...mapActions('list', [
-            'removeDisabledElement',
-            'setDisabledElement',
+            'removeDisabledScopeElement',
+            'setDisabledScopeElement',
         ]),
-        onRemoveItems(ids) {
+        itemSubtitle(childrenLength) {
+            if (childrenLength) {
+                return this.$t('@Core.core.components.LanguageInheritanceTreeDesigner.itemSubtitle', {
+                    info: childrenLength,
+                });
+            }
+            return '';
+        },
+        onRemoveLanguageItems(ids) {
             ids.forEach((id) => {
-                this.removeDisabledElement({
+                this.removeDisabledScopeElement({
                     languageCode: this.languageCode,
                     elementId: id,
+                    scope: this.scope,
                 });
             });
 
@@ -107,10 +132,13 @@ export default {
             });
         },
         onAddItem(item) {
-            this.setDisabledElement({
-                languageCode: this.languageCode,
-                elementId: item.id,
-                disabled: true,
+            this.setDisabledScopeElement({
+                scope: this.scope,
+                disabledElement: {
+                    languageCode: this.languageCode,
+                    elementId: item.id,
+                    disabled: true,
+                },
             });
         },
         onValueChange(value) {

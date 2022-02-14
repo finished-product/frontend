@@ -3,7 +3,7 @@
  * See LICENSE for license details.
  */
 <template>
-    <li :class="['upload-file-list-element', { 'upload-file-list-element--error': isError }]">
+    <li :class="classes">
         <div class="horizontal-wrapper">
             <div class="vertical-wrapper">
                 <span
@@ -56,21 +56,9 @@ import {
     GREEN,
     RED,
 } from '@UI/assets/scss/_js-variables/colors.scss';
-import IconButton from '@UI/components/IconButton/IconButton';
-import IconCheck from '@UI/components/Icons/Feedback/IconCheck';
-import IconError from '@UI/components/Icons/Feedback/IconError';
-import IconFilledClose from '@UI/components/Icons/Window/IconFilledClose';
-import ProgressBar from '@UI/components/ProgressBar/ProgressBar';
 
 export default {
     name: 'UploadFileListElement',
-    components: {
-        ProgressBar,
-        IconCheck,
-        IconError,
-        IconFilledClose,
-        IconButton,
-    },
     props: {
         file: {
             type: Object,
@@ -78,6 +66,14 @@ export default {
         },
     },
     computed: {
+        classes() {
+            return [
+                'upload-file-list-element',
+                {
+                    'upload-file-list-element--error': this.isError,
+                },
+            ];
+        },
         greenColor() {
             return GREEN;
         },
@@ -121,10 +117,13 @@ export default {
 
         display: flex;
         flex-direction: column;
+        overflow: hidden;
 
         &__file-name {
             color: $GRAPHITE_DARK;
             font: $FONT_MEDIUM_12_16;
+            text-overflow: ellipsis;
+            overflow: hidden;
         }
 
         &__file-size {
@@ -152,6 +151,8 @@ export default {
 
     .vertical-wrapper {
         display: flex;
+        flex: 1;
         flex-direction: column;
+        width: 0;
     }
 </style>

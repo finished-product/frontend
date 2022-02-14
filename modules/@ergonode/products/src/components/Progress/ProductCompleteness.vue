@@ -21,7 +21,6 @@ import {
     RED,
     YELLOW,
 } from '@UI/assets/scss/_js-variables/colors.scss';
-import ProgressBar from '@UI/components/ProgressBar/ProgressBar';
 import {
     mapActions,
     mapState,
@@ -29,9 +28,6 @@ import {
 
 export default {
     name: 'ProductCompleteness',
-    components: {
-        ProgressBar,
-    },
     props: {
         languageCode: {
             type: String,
@@ -105,15 +101,13 @@ export default {
             'getProductCompleteness',
         ]),
         async onGetProductCompleteness() {
-            if (typeof this.completeness[this.languageCode] === 'undefined') {
-                this.isFetchingData = true;
+            this.isFetchingData = true;
 
-                await this.getProductCompleteness({
-                    languageCode: this.languageCode,
-                });
+            await this.getProductCompleteness({
+                languageCode: this.languageCode,
+            });
 
-                this.isFetchingData = false;
-            }
+            this.isFetchingData = false;
         },
     },
 };

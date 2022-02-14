@@ -6,6 +6,9 @@ import {
     ALERT_TYPE,
 } from '@Core/defaults/alerts';
 import {
+    toCamelCase,
+} from '@Core/models/stringWrapper';
+import {
     get,
     getMetadata,
     getRelation,
@@ -38,14 +41,21 @@ export default {
                 name,
                 extension,
                 alt,
+                mime,
             } = data;
             const translations = {
-                alt: Array.isArray(alt) ? {} : alt,
+                alt,
             };
+
+            dispatch('__clearStorage');
 
             commit('__SET_STATE', {
                 key: 'id',
                 value: id,
+            });
+            commit('__SET_STATE', {
+                key: 'type',
+                value: mime.split('/')[0],
             });
             commit('__SET_STATE', {
                 key: 'name',
@@ -94,7 +104,9 @@ export default {
                     const tmpArray = acc;
 
                     tmpArray.push({
-                        name: current,
+                        name: this.app.i18n.te(`@Media.media.store.metadata.${toCamelCase(current)}`)
+                            ? this.app.i18n.t(`@Media.media.store.metadata.${toCamelCase(current)}`)
+                            : current,
                         value: metadata[current].toString(),
                     });
 
@@ -194,7 +206,7 @@ export default {
             if (this.app.$axios.isCancel(e)) {
                 this.app.$addAlert({
                     type: ALERT_TYPE.WARNING,
-                    message: 'Updating resource has been canceled',
+                    message: this.app.i18n.t('@Media.media.store.action.updateCancel'),
                 });
 
                 return;
@@ -242,7 +254,7 @@ export default {
             if (this.app.$axios.isCancel(e)) {
                 this.app.$addAlert({
                     type: ALERT_TYPE.WARNING,
-                    message: 'Removing resource has been canceled',
+                    message: this.app.i18n.t('@Media.media.store.action.removeCancel'),
                 });
 
                 return;

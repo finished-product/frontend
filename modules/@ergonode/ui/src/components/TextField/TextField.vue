@@ -3,68 +3,67 @@
  * See LICENSE for license details.
  */
 <template>
-    <Component
-        :is="styleComponent"
-        ref="activator"
-        :focused="isFocused"
-        :error="isError"
-        :data-cy="dataCy"
-        :disabled="disabled"
-        :alignment="alignment"
-        :size="size"
-        :height="height"
-        :details-label="informationLabel"
-        @mousedown="onMouseDown"
-        @mouseup="onMouseUp">
-        <template #activator>
-            <InputController
-                ref="activator"
-                :size="size">
-                <!--
-                    @slot Prepend element - icon recommended
-                -->
-                <slot name="prepend" />
-                <input
-                    :id="associatedLabel"
-                    :class="classes"
-                    ref="input"
-                    v-bind="{ ...input }"
-                    :value="value"
-                    :placeholder="placeholderValue"
-                    autocomplete="on"
-                    :disabled="disabled"
-                    :aria-label="label || 'no description'"
-                    @input="onValueChange"
-                    @focus="onFocus"
-                    @blur="onBlur">
-                <InputLabel
-                    v-if="label"
-                    :for="associatedLabel"
-                    :required="required"
-                    :size="size"
-                    :floating="isFocused || !isEmpty"
-                    :focused="isFocused"
-                    :disabled="disabled"
-                    :error="isError"
-                    :label="label" />
-                <template #append>
-                    <!--
-                        @slot Append element - icon recommended
-                    -->
-                    <slot name="append" />
-                    <ErrorHint
-                        v-if="isError"
-                        :hint="errorMessages" />
+    <InputUUIDProvider>
+        <template #default="{ uuid }">
+            <Component
+                :is="styleComponent"
+                :focused="isFocused"
+                :error="isError"
+                :data-cy="dataCy"
+                :disabled="disabled"
+                :alignment="alignment"
+                :size="size"
+                :height="height"
+                :details-label="informationLabel"
+                @mousedown="onMouseDown"
+                @mouseup="onMouseUp">
+                <template #activator>
+                    <InputController ref="activator">
+                        <!--
+                            @slot Prepend element - icon recommended
+                        -->
+                        <slot name="prepend" />
+                        <input
+                            :id="uuid"
+                            :class="classes"
+                            ref="input"
+                            v-bind="{ ...input }"
+                            :value="value"
+                            :placeholder="placeholderValue"
+                            autocomplete="on"
+                            :disabled="disabled"
+                            :aria-label="label || 'no description'"
+                            @input="onValueChange"
+                            @focus="onFocus"
+                            @blur="onBlur">
+                        <InputLabel
+                            v-if="label"
+                            :for="uuid"
+                            :required="required"
+                            :size="size"
+                            :floating="isFocused || !isEmpty"
+                            :focused="isFocused"
+                            :disabled="disabled"
+                            :error="isError"
+                            :label="label" />
+                        <!--
+                            @slot Append element - icon recommended
+                        -->
+                        <slot name="append" />
+                        <ErrorHint
+                            v-if="isError"
+                            :hint="errorMessages" />
+                    </InputController>
                 </template>
-            </InputController>
+                <template #details>
+                    <!--
+                        @slot Details element - text recommended
+                    -->
+                    <slot name="details" />
+                </template>
+            </Component>
         </template>
-        <template #details>
-            <!--
-                @slot Details element - text recommended
-            -->
-            <slot name="details" />
-        </template>
-    </Component>
+    </InputUUIDProvider>
 </template>
 
 <script>
@@ -73,11 +72,9 @@ import {
     INPUT_TYPE,
     SIZE,
 } from '@Core/defaults/theme';
-import InputController from '@UI/components/Input/InputController';
-import InputLabel from '@UI/components/Input/InputLabel';
 import InputSolidStyle from '@UI/components/Input/InputSolidStyle';
 import InputUnderlineStyle from '@UI/components/Input/InputUnderlineStyle';
-import associatedLabelMixin from '@UI/mixins/inputs/associatedLabelMixin';
+
 /**
  * `TextField` is a default text input component.
  *  It might be configured with `prepend` and `append` slots.
@@ -85,14 +82,6 @@ import associatedLabelMixin from '@UI/mixins/inputs/associatedLabelMixin';
 
 export default {
     name: 'TextField',
-    components: {
-        InputController,
-        InputLabel,
-        ErrorHint: () => import('@UI/components/Hints/ErrorHint'),
-    },
-    mixins: [
-        associatedLabelMixin,
-    ],
     props: {
         /**
          * The input HTML attributes
@@ -286,12 +275,14 @@ export default {
     .text-field {
         z-index: $Z_INDEX_LVL_2;
         flex: 1;
+        align-self: center;
         outline: none;
         width: 100%;
         max-width: 100%;
         min-width: 0;
         border: none;
-        padding: 0;
+        padding: 0 4px;
+        margin: 0;
         background-color: transparent;
         box-shadow: none;
         color: $GRAPHITE_DARK;

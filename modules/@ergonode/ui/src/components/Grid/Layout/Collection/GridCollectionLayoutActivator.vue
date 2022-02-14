@@ -23,20 +23,14 @@ import {
     GRAPHITE,
     GREEN,
 } from '@UI/assets/scss/_js-variables/colors.scss';
-import Fab from '@UI/components/Fab/Fab';
-import IconGrid from '@UI/components/Icons/Others/IconGrid';
 
 export default {
     name: 'GridCollectionLayoutActivator',
-    components: {
-        Fab,
-        IconGrid,
-    },
     props: {
         /**
          * Determines if component is selected
          */
-        isSelected: {
+        selected: {
             type: Boolean,
             default: false,
         },
@@ -46,7 +40,7 @@ export default {
             return THEME.SECONDARY;
         },
         fillColor() {
-            return this.isSelected ? GREEN : GRAPHITE;
+            return this.selected ? GREEN : GRAPHITE;
         },
     },
     methods: {

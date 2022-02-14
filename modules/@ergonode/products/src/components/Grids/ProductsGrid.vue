@@ -4,6 +4,7 @@
  */
 <template>
     <Grid
+        :scope="scope"
         :columns="columns"
         :rows="rows"
         :drafts="drafts"
@@ -12,6 +13,8 @@
         :errors="errors"
         :data-count="filtered"
         :pagination="pagination"
+        :layout="layout"
+        :custom-layouts="customLayouts"
         :collection-cell-binding="collectionCellBinding"
         :extended-components="extendedGridComponents"
         :is-editable="isAllowedToUpdate"
@@ -30,6 +33,7 @@
         @pagination="onPaginationChange"
         @sort-column="onColumnSortChange"
         @remove-all-filters="onRemoveAllFilters"
+        @layout="onLayoutChange"
         v-bind="extendedProps['grid']">
         <template #actionsHeader="actionsHeaderProps">
             <Component
@@ -54,28 +58,19 @@
                 @drop="onDropFilter" />
         </template>
         <template #appendHeader>
-            <div
+            <ProductAdvancedFilters
                 v-show="isFiltersExpanded"
-                class="products-advanced-filters">
-                <AdvancedFilters
-                    :value="advancedFilterValues"
-                    :filters="advancedFilters"
-                    :extended-filters="extendedAdvancedFilters"
-                    @swap="onAdvancedFilterPositionChange"
-                    @remove="onAdvancedFilterRemove"
-                    @remove-all="onAdvancedFilterRemoveAll"
-                    @input="onAdvancedFilterChange" />
-            </div>
+                :scope="scope"
+                :value="advancedFilterValues"
+                :filters="advancedFilters"
+                :extended-filters="extendedAdvancedFilters"
+                @swap="onAdvancedFilterPositionChange"
+                @remove="onAdvancedFilterRemove"
+                @remove-all="onAdvancedFilterRemoveAll"
+                @input="onAdvancedFilterChange" />
         </template>
         <template #noDataPlaceholder>
-            <GridNoDataPlaceholder
-                v-if="!isAnyFilter && filtered === 0"
-                :title="$t('@Products.product._.noProduct')"
-                :subtitle="$t('@Products.product._.createFirst')">
-                <template #action>
-                    <CreateProductButton />
-                </template>
-            </GridNoDataPlaceholder>
+            <ProductsGridNoDataPlaceholder v-if="!isAnyFilter && filtered === 0" />
             <GridNoResultsPlaceholder
                 v-else
                 @clear="onRemoveAllFilters" />
@@ -120,11 +115,16 @@ import {
     getParsedFilters,
 } from '@Core/models/mappers/gridDataMapper';
 import {
+    getDisabledElement,
+    getDisabledElements,
+} from '@Core/models/mappers/sideBarDataMapper';
+import {
     getAdvancedFiltersData,
     getGridData,
 } from '@Core/services/grid/getGridData.service';
-import CreateProductButton from '@Products/components/Buttons/CreateProductButton';
+import ProductAdvancedFilters from '@Products/components/AdvancedFilters/ProductAdvancedFilters';
 import UpdateProductsButton from '@Products/components/Buttons/UpdateProductsButton';
+import ProductsGridNoDataPlaceholder from '@Products/components/Placeholders/ProductsGridNoDataPlaceholder';
 import PRIVILEGES from '@Products/config/privileges';
 import {
     ROUTE_NAME,
@@ -133,14 +133,6 @@ import {
     PRODUCT_CREATED_EVENT_NAME,
 } from '@Products/defaults';
 import AdvancedFilters from '@UI/components/AdvancedFilters/AdvancedFilters';
-import Button from '@UI/components/Button/Button';
-import AddFilterDropZone from '@UI/components/Grid/DropZone/AddFilterDropZone';
-import RemoveFilterAndColumnDropZone from '@UI/components/Grid/DropZone/RemoveFilterAndColumnDropZone';
-import Grid from '@UI/components/Grid/Grid';
-import GridNoDataPlaceholder from '@UI/components/Grid/GridNoDataPlaceholder';
-import GridNoResultsPlaceholder from '@UI/components/Grid/GridNoResultsPlaceholder';
-import IconSpinner from '@UI/components/Icons/Feedback/IconSpinner';
-import VerticalTabBar from '@UI/components/TabBar/VerticalTabBar';
 import {
     mapActions,
     mapState,
@@ -149,15 +141,8 @@ import {
 export default {
     name: 'ProductsGrid',
     components: {
-        CreateProductButton,
-        Grid,
-        GridNoDataPlaceholder,
-        GridNoResultsPlaceholder,
-        AddFilterDropZone,
-        RemoveFilterAndColumnDropZone,
-        Button,
-        VerticalTabBar,
-        IconSpinner,
+        ProductsGridNoDataPlaceholder,
+        ProductAdvancedFilters,
         UpdateProductsButton,
         ExpandNumericButton,
         AdvancedFilters,
@@ -173,6 +158,10 @@ export default {
         extendedGridComponentsMixin,
     ],
     props: {
+        layout: {
+            type: String,
+            required: true,
+        },
         scope: {
             type: String,
             default: '',
@@ -197,13 +186,18 @@ export default {
         }
 
         await Promise.all(requests);
-
-        this.setDisabledElements(this.getDisabledElements({
-            columns: this.columns,
-            filters: this.advancedFilters,
-        }));
-
         this.isPrefetchingData = false;
+
+        this.setDisabledScopeElements({
+            scope: this.scope,
+            disabledElements: getDisabledElements({
+                elements: [
+                    ...this.columns.filter(column => column.visible),
+                    ...this.advancedFilters,
+                ],
+                defaultLanguageCode: this.userLanguageCode,
+            }),
+        });
     },
     data() {
         const {
@@ -222,6 +216,7 @@ export default {
             columns: [],
             filtered: 0,
             advancedFilters: [],
+            customLayouts: [],
             isFiltersExpanded: false,
             isPrefetchingData: true,
         };
@@ -234,24 +229,33 @@ export default {
             'disabledElements',
         ]),
         extendedActionHeader() {
-            return this.$getExtendSlot('@Products/components/Grids/ProductsGrid/actionHeader');
+            return this.$getExtendedLayoutSlot({
+                key: '@Products/components/Grids/ProductsGrid/actionHeader',
+                layout: this.layout,
+            });
         },
         extendedFooter() {
-            return this.$getExtendSlot('@Products/components/Grids/ProductsGrid/footer');
+            return this.$getExtendedLayoutSlot({
+                key: '@Products/components/Grids/ProductsGrid/footer',
+                layout: this.layout,
+            });
         },
         extendedAdvancedFilters() {
-            return this.$getExtendSlot('@Products/components/Grids/ProductsGrid/advancedFilters');
-        },
-        isAnyFilter() {
-            return this.filtered === 0
-                && (Object.keys(this.filterValues).length > 0
-                    || Object.keys(this.advancedFilterValues).length > 0);
+            return this.$getExtendedLayoutSlot({
+                key: '@Products/components/Grids/ProductsGrid/advancedFilters',
+                layout: this.layout,
+            });
         },
         collectionCellBinding() {
             return {
                 imageColumn: 'esa_default_image',
                 descriptionColumn: 'esa_default_label',
             };
+        },
+        isAnyFilter() {
+            return this.filtered === 0
+                && (Object.keys(this.filterValues).length > 0
+                    || Object.keys(this.advancedFilterValues).length > 0);
         },
         isAllowedToUpdate() {
             return this.$hasAccess([
@@ -260,11 +264,12 @@ export default {
         },
     },
     watch: {
-        async $route(from, to) {
+        async $route(to, from) {
             if (from.name !== to.name) {
                 return;
             }
 
+            this.isPrefetchingData = true;
             const {
                 filterValues,
                 advancedFilterValues,
@@ -282,7 +287,9 @@ export default {
             this.isPrefetchingData = false;
         },
     },
-    mounted() {
+    async mounted() {
+        await this.extendedCustomLayouts();
+
         document.documentElement.addEventListener(
             PRODUCT_CREATED_EVENT_NAME,
             this.onProductCreated,
@@ -302,55 +309,80 @@ export default {
             'validateProduct',
         ]),
         ...mapActions('list', [
-            'removeDisabledElement',
-            'setDisabledElement',
-            'setDisabledElements',
+            'removeDisabledScopeElement',
+            'setDisabledScopeElement',
+            'setDisabledScopeElements',
         ]),
-        onProductCreated() {
-            this.onFetchData();
+        onLayoutChange(layout) {
+            this.$emit('layout', layout);
+        },
+        async onProductCreated() {
+            this.isPrefetchingData = true;
+
+            await this.onFetchData();
+
+            this.isPrefetchingData = false;
+        },
+        async extendedCustomLayouts() {
+            const customLayouts = await this.$getExtendMethod('@Products/components/Grids/ProductsGrid/customLayouts', {
+                $this: this,
+            });
+
+            this.customLayouts = []
+                .concat(...customLayouts)
+                .filter(layout => typeof layout.layout !== 'undefined');
         },
         async onDropColumn(payload) {
-            try {
-                const columnCode = payload.split('/')[1];
+            const columnCode = payload.split('/')[1];
 
-                insertCookieAtIndex({
-                    cookies: this.$userCookies,
-                    cookieName: `GRID_CONFIG:${this.$route.name}`,
-                    index: 0,
-                    data: columnCode,
-                });
+            this.$gridCookies.insertAtIndex(
+                this.layout,
+                0,
+                columnCode,
+            );
 
-                await this.onFetchData();
+            await getGridData({
+                $cookies: this.$gridCookies,
+                $axios: this.$axios,
+                layout: this.layout,
+                path: 'products',
+                params: getParams({
+                    $route: this.$route,
+                    $cookies: this.$gridCookies,
+                    layout: this.layout,
+                    defaultColumns: 'esa_index,esa_sku,esa_default_image,esa_default_label',
+                }),
+                onSuccess: (data) => {
+                    this.onFetchDataSuccess(data);
 
-                const column = this.columns.find(({
-                    id,
-                }) => id === columnCode);
+                    const column = this.columns.find(({
+                        id,
+                    }) => id === columnCode);
 
-                if (column && column.element_id) {
-                    this.setDisabledElement(this.getDisabledListElement({
-                        languageCode: column.language,
-                        attributeId: column.element_id,
-                        disabledElements: this.disabledElements,
-                    }));
-                }
-            } catch {
-                removeCookieAtIndex({
-                    cookies: this.$userCookies,
-                    cookieName: `GRID_CONFIG:${this.$route.name}`,
-                    index: 0,
-                });
-            }
+                    if (column && column.element_id) {
+                        this.setDisabledScopeElement({
+                            disabledElement: getDisabledElement({
+                                languageCode: column.language,
+                                elementId: column.element_id,
+                                disabledElements: this.disabledElements[this.scope],
+                            }),
+                            scope: this.scope,
+                        });
+                    }
+                },
+                onError: () => {
+                    this.$gridCookies.removeAtIndex(
+                        this.layout,
+                        0,
+                    );
+                },
+            });
         },
         onSwapColumns({
             from,
             to,
         }) {
-            changeCookiePosition({
-                cookies: this.$userCookies,
-                cookieName: `GRID_CONFIG:${this.$route.name}`,
-                from,
-                to,
-            });
+            this.$gridCookies.changePosition(this.layout, from, to);
         },
         onRemoveColumn({
             index,
@@ -366,29 +398,28 @@ export default {
                     language: languageCode = this.userLanguageCode,
                 } = column;
 
-                if (this.disabledElements[languageCode][element_id]) {
-                    this.setDisabledElement({
-                        languageCode,
-                        elementId: element_id,
-                        disabled: false,
+                if (this.disabledElements[this.scope][languageCode][element_id]) {
+                    this.setDisabledScopeElement({
+                        scope: this.scope,
+                        disabledElement: {
+                            languageCode,
+                            elementId: element_id,
+                            disabled: false,
+                        },
                     });
                 } else {
-                    this.removeDisabledElement({
+                    this.removeDisabledScopeElement({
                         languageCode,
                         elementId: element_id,
+                        scope: this.scope,
                     });
                 }
             }
 
             const isReplaceRequired = this.sortOrder.field === column.id
-                || typeof this.filterValues[column.id] !== 'undefined'
-                || typeof this.advancedFilterValues[column.id] !== 'undefined';
+                || typeof this.filterValues[column.id] !== 'undefined';
 
-            removeCookieAtIndex({
-                cookies: this.$userCookies,
-                cookieName: `GRID_CONFIG:${this.$route.name}`,
-                index,
-            });
+            this.$gridCookies.removeAtIndex(this.layout, index);
 
             if (isReplaceRequired) {
                 delete this.filterValues[id];
@@ -515,34 +546,6 @@ export default {
                 },
             });
         },
-        getDisabledElements({
-            columns,
-            filters,
-        }) {
-            const disabledElements = {};
-
-            [
-                ...columns,
-                ...filters,
-            ].forEach((element) => {
-                const attributeId = element.attributeId || element.element_id;
-
-                if (attributeId) {
-                    const languageCode = element.language || this.userLanguageCode;
-
-                    if (typeof disabledElements[languageCode] === 'undefined') {
-                        disabledElements[languageCode] = {};
-                    }
-
-                    disabledElements[languageCode][attributeId] = Boolean(
-                        disabledElements[languageCode]
-                        && typeof disabledElements[languageCode][attributeId] !== 'undefined',
-                    );
-                }
-            });
-
-            return disabledElements;
-        },
         bindingProps({
             props = {},
         }) {
@@ -555,6 +558,9 @@ export default {
             };
         },
         async onProductsUpdated() {
+            this.isPrefetchingData = true;
+            await this.onFetchData();
+
             const rows = [];
 
             Object.keys(this.drafts).forEach((row) => {
@@ -563,9 +569,8 @@ export default {
                 }
             });
 
-            await this.onFetchData();
-
             this.removeDrafts(rows);
+            this.isPrefetchingData = false;
         },
         onFiltersExpand() {
             this.isFiltersExpanded = !this.isFiltersExpanded;
@@ -630,11 +635,14 @@ export default {
                 }) => id === filterCode);
 
                 if (filter.attributeId) {
-                    this.setDisabledElement(this.getDisabledListElement({
-                        languageCode: filter.languageCode,
-                        attributeId: filter.attributeId,
-                        disabledElements: this.disabledElements,
-                    }));
+                    this.setDisabledScopeElement({
+                        disabledElement: getDisabledElement({
+                            languageCode: filter.languageCode,
+                            elementId: filter.attributeId,
+                            disabledElements: this.disabledElements[this.scope],
+                        }),
+                        scope: this.scope,
+                    });
                 }
 
                 this.advancedFilters.unshift(filter);
@@ -662,30 +670,22 @@ export default {
             languageCode,
             attributeId,
         }) {
-            if (this.disabledElements[languageCode][attributeId]) {
-                this.setDisabledElement({
-                    languageCode,
-                    elementId: attributeId,
-                    disabled: false,
+            if (this.disabledElements[this.scope][languageCode][attributeId]) {
+                this.setDisabledScopeElement({
+                    scope: this.scope,
+                    disabledElement: {
+                        languageCode,
+                        elementId: attributeId,
+                        disabled: false,
+                    },
                 });
             } else {
-                this.removeDisabledElement({
+                this.removeDisabledScopeElement({
                     languageCode,
                     elementId: attributeId,
+                    scope: this.scope,
                 });
             }
-        },
-        getDisabledListElement({
-            languageCode,
-            attributeId,
-            disabledElements,
-        }) {
-            return {
-                languageCode,
-                elementId: attributeId,
-                disabled: Boolean(disabledElements[languageCode]
-                    && typeof disabledElements[languageCode][attributeId] !== 'undefined'),
-            };
         },
         async onCellValueChange(cellValues) {
             const cachedElementIds = {};
@@ -720,6 +720,7 @@ export default {
                     fieldKey: `${rowId}/${columnId}`,
                     languageCode: columnId.split(':')[1],
                     elementId: cachedElementIds[columnId],
+                    productId: rowId,
                     value,
                     scope: this.scope,
                 });
@@ -733,23 +734,28 @@ export default {
 
             await Promise.all(requests);
         },
-        onRemoveRow() {
+        async onRemoveRow() {
+            this.isPrefetchingData = true;
+
+            await this.onFetchData();
             this.$addAlert({
                 type: ALERT_TYPE.SUCCESS,
                 message: this.$t('@Products.product.components.ProductsGrid.removeSuccessMessage'),
             });
-            this.onFetchData();
+
+            this.isPrefetchingData = false;
         },
         async onFetchData() {
             await getGridData({
-                $route: this.$route,
-                $cookies: this.$userCookies,
+                $cookies: this.$gridCookies,
                 $axios: this.$axios,
+                layout: this.layout,
                 path: 'products',
                 params: getParams({
                     $route: this.$route,
-                    $cookies: this.$userCookies,
-                    defaultColumns: 'index,sku,_links,esa_default_image,esa_default_label',
+                    $cookies: this.$gridCookies,
+                    layout: this.layout,
+                    defaultColumns: 'esa_index,esa_sku,esa_default_image,esa_default_label',
                 }),
                 onSuccess: this.onFetchDataSuccess,
                 onError: this.onFetchDataError,
@@ -782,8 +788,6 @@ export default {
             this.$router.replace({
                 query,
             });
-
-            this.isPrefetchingData = true;
         },
         onFilterChange(filters) {
             const query = {
@@ -819,9 +823,3 @@ export default {
     },
 };
 </script>
-
-<style lang="scss" scoped>
-    .products-advanced-filters {
-        margin-left: 16px;
-    }
-</style>

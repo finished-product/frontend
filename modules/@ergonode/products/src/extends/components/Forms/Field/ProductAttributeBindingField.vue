@@ -6,13 +6,15 @@
     <FormListElementField
         :field-key="index"
         @remove="onRemove">
-        <TranslationSelect
+        <Select
             :value="attribute"
             required
             :label="$t('@Products.productExtend.components.ProductAttributeBindingField.label')"
             :error-messages="errorMessages"
             :size="smallSize"
             :options="filteredOptions"
+            option-key="key"
+            option-value="value"
             @input="onValueChange" />
     </FormListElementField>
 </template>
@@ -21,15 +23,9 @@
 import {
     SIZE,
 } from '@Core/defaults/theme';
-import FormListElementField from '@UI/components/Form/Field/FormListElementField';
-import TranslationSelect from '@UI/components/Select/TranslationSelect';
 
 export default {
     name: 'ProductAttributeBindingField',
-    components: {
-        FormListElementField,
-        TranslationSelect,
-    },
     props: {
         index: {
             type: Number,

@@ -4,6 +4,7 @@
  */
 <template>
     <AdvancedFilter
+        :scope="scope"
         :index="index"
         :value="parsedFilterValue"
         :title="filter.label"
@@ -14,11 +15,14 @@
         @swap="onSwap">
         <template #dropdown>
             <SelectList
+                :items-max-height="itemsMaxHeight"
                 :value="filterValue"
                 :search-value="searchValue"
                 :items="options"
                 :size="smallSize"
                 :searchable="true"
+                option-key="id"
+                option-value="label"
                 @input="onValueChange"
                 @search="onSearch">
                 <template #noDataPlaceholder>
@@ -29,13 +33,6 @@
                             <CreateCategoryTreeButton />
                         </template>
                     </SelectListNoDataPlaceholder>
-                </template>
-                <template #item="{ item }">
-                    <ListElementDescription>
-                        <ListElementTitle
-                            :size="smallSize"
-                            :title="item.label || `#${item.code}`" />
-                    </ListElementDescription>
                 </template>
             </SelectList>
             <SelectDropdownFooter
@@ -56,12 +53,10 @@ import {
 import {
     getAutocomplete,
 } from '@Trees/services';
+import {
+    DROPDOWN_MAX_HEIGHT,
+} from '@UI/assets/scss/_js-variables/sizes.scss';
 import AdvancedFilter from '@UI/components/AdvancedFilters/AdvancedFilter';
-import ListElementDescription from '@UI/components/List/ListElementDescription';
-import ListElementTitle from '@UI/components/List/ListElementTitle';
-import SelectDropdownFooter from '@UI/components/Select/Dropdown/Footers/SelectDropdownFooter';
-import SelectList from '@UI/components/SelectList/SelectList';
-import SelectListNoDataPlaceholder from '@UI/components/SelectList/SelectListNoDataPlaceholder';
 import debounce from 'debounce';
 
 export default {
@@ -69,13 +64,15 @@ export default {
     components: {
         CreateCategoryTreeButton,
         AdvancedFilter,
-        SelectDropdownFooter,
-        SelectList,
-        SelectListNoDataPlaceholder,
-        ListElementDescription,
-        ListElementTitle,
     },
     props: {
+        /**
+         * Context scope
+         */
+        scope: {
+            type: String,
+            default: '',
+        },
         /**
          * Index of given component at the loop
          */
@@ -109,6 +106,9 @@ export default {
         };
     },
     computed: {
+        itemsMaxHeight() {
+            return DROPDOWN_MAX_HEIGHT;
+        },
         placeholder() {
             return {
                 title: this.$t('@Trees.tree._.noTrees'),
@@ -214,7 +214,7 @@ export default {
             try {
                 this.isFetchingData = true;
 
-                this.options = await getAutocomplete({
+                const options = await getAutocomplete({
                     $axios: this.$axios,
                     config: {
                         params: {
@@ -223,6 +223,11 @@ export default {
                         },
                     },
                 });
+
+                this.options = options.map(option => ({
+                    id: option.id,
+                    label: option.label || `#${option.code}`,
+                }));
 
                 this.isFetchingData = false;
             } catch (e) {

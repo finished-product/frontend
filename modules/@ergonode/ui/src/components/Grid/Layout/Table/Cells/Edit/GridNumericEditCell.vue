@@ -4,17 +4,25 @@
  */
 <template>
     <GridEditNavigationCell @edit="onEditCell">
-        <GridTextEditContentCell :style="positionStyle">
+        <GridEditContentCell
+            :bounds="bounds"
+            :padding="8"
+            :centered="true"
+            :shadow="true">
             <TextField
+                v-if="!disabled"
                 v-model="localValue"
                 autofocus
                 :alignment="leftAlignment"
-                :disabled="disabled"
                 :error-messages="errorMessages"
                 :input="{ type: 'number' }"
                 :size="smallSize"
                 :type="underlineType" />
-        </GridTextEditContentCell>
+            <Paragraph
+                v-else
+                :title="localValue"
+                :size="smallSize" />
+        </GridEditContentCell>
     </GridEditNavigationCell>
 </template>
 
@@ -24,16 +32,10 @@ import {
     INPUT_TYPE,
     SIZE,
 } from '@Core/defaults/theme';
-import GridTextEditContentCell from '@UI/components/Grid/Layout/Table/Cells/Edit/Content/GridTextEditContentCell';
-import TextField from '@UI/components/TextField/TextField';
 import gridEditCellMixin from '@UI/mixins/grid/gridEditCellMixin';
 
 export default {
     name: 'GridNumericEditCell',
-    components: {
-        GridTextEditContentCell,
-        TextField,
-    },
     mixins: [
         gridEditCellMixin,
     ],
@@ -50,21 +52,6 @@ export default {
         },
     },
     computed: {
-        positionStyle() {
-            const {
-                x,
-                y,
-                width,
-                height,
-            } = this.bounds;
-
-            return {
-                top: `${y}px`,
-                left: `${x}px`,
-                width: `${width + 8}px`,
-                minHeight: `${height + 8}px`,
-            };
-        },
         underlineType() {
             return INPUT_TYPE.UNDERLINE;
         },

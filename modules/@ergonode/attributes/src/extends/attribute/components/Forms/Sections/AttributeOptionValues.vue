@@ -5,11 +5,12 @@
 <template>
     <FormSection :title="$t('@Attributes.attributeExtend.components.AttributeOptionValues.optionTitle')">
         <AttributeOptionValue
-            v-for="(index, i) in optionIndexes"
+            v-for="(id, i) in optionsOrder"
             :data-cy="`attribute-option_${languageCode}_${i}`"
-            :key="index"
-            :index="index"
-            :option="options[index]"
+            :key="id"
+            :index="id"
+            :option="options[id]"
+            :scope="scope"
             :disabled="disabled"
             :language-code="languageCode" />
     </FormSection>
@@ -17,7 +18,6 @@
 
 <script>
 import AttributeOptionValue from '@Attributes/extends/attribute/components/Forms/Sections/AttributeOptionValue';
-import FormSection from '@UI/components/Form/Section/FormSection';
 import {
     mapState,
 } from 'vuex';
@@ -26,7 +26,6 @@ export default {
     name: 'AttributeOptionValues',
     components: {
         AttributeOptionValue,
-        FormSection,
     },
     props: {
         languageCode: {
@@ -37,14 +36,16 @@ export default {
             type: Boolean,
             required: true,
         },
+        scope: {
+            type: String,
+            required: true,
+        },
     },
     computed: {
         ...mapState('attribute', [
+            'optionsOrder',
             'options',
         ]),
-        optionIndexes() {
-            return Object.keys(this.options);
-        },
     },
 };
 </script>

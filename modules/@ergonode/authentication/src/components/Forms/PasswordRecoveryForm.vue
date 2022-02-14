@@ -4,6 +4,7 @@
  */
 <template>
     <LoginForm
+        data-cy="password-recovery-form"
         :submit-title="$t('@Authentication.authentication.components.PasswordRecoveryForm.button')"
         :is-submitting="isSubmitting"
         :errors="errors"
@@ -19,6 +20,7 @@
         <template #body>
             <Paragraph :title="$t('@Authentication.authentication.components.PasswordRecoveryForm.info')" />
             <TextField
+                data-cy="recovery-email"
                 v-model="email"
                 required
                 :error-messages="errors[emialFieldKey]"
@@ -33,11 +35,6 @@ import {
     LOGIN_STATE,
 } from '@Authentication/defaults/login-state';
 import modalFeedbackMixin from '@Core/mixins/feedback/modalFeedbackMixin';
-import Fab from '@UI/components/Fab/Fab';
-import FormHeader from '@UI/components/Form/FormHeader';
-import IconArrowPointer from '@UI/components/Icons/Arrows/IconArrowPointer';
-import Paragraph from '@UI/components/Paragraph/Paragraph';
-import TextField from '@UI/components/TextField/TextField';
 import {
     mapActions,
 } from 'vuex';
@@ -45,12 +42,7 @@ import {
 export default {
     name: 'PasswordRecoveryForm',
     components: {
-        FormHeader,
         LoginForm,
-        Fab,
-        Paragraph,
-        IconArrowPointer,
-        TextField,
     },
     mixins: [
         modalFeedbackMixin,

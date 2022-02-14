@@ -31,12 +31,13 @@ export const PINNED_COLUMN_STATE = {
 };
 
 export const ROW_HEIGHT = {
-    SMALL: 32,
-    MEDIUM: 40,
-    LARGE: 80,
+    TINY: 32,
+    SMALL: 40,
+    MEDIUM: 64,
+    LARGE: 96,
 };
 
-export const IMAGE_SCALING = {
+export const OBJECT_FIT = {
     FIT_TO_SIZE: {
         value: 'contain',
         description: 'Fit to size',
@@ -87,11 +88,25 @@ export const DATA_LIMIT = 25;
 
 export const DEFAULT_PAGE = 1;
 
+export const DEFAULT_EDIT_CELL_CONTENT_HEIGHT = 180;
+
+export const DEFAULT_LARGE_EDIT_CELL_CONTENT_HEIGHT = 360;
+
+export const DEFAULT_EDIT_CELL_CONTENT_WIDTH = 320;
+
 export const DEFAULT_GRID_FETCH_PARAMS = () => ({
     extended: true,
     offset: 0,
     limit: DATA_LIMIT,
     filter: '',
+    sortOrder: {},
+});
+
+export const DEFAULT_POST_GRID_FETCH_PARAMS = () => ({
+    extended: true,
+    offset: 0,
+    limit: DATA_LIMIT,
+    filters: {},
     sortOrder: {},
 });
 

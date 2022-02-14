@@ -7,10 +7,16 @@
     <Select
         v-bind="$attrs"
         v-on="$listeners">
+        <template #prepend>
+            <slot name="prepend" />
+        </template>
         <template #value>
-            <span
-                :style="{ color: $attrs.value }"
-                v-text="$attrs.value" />
+            <slot name="value">
+                <span v-text="$attrs.value" />
+            </slot>
+        </template>
+        <template #append>
+            <slot name="append" />
         </template>
         <template
             #dropdown="{
@@ -44,18 +50,15 @@ import {
     SIZE,
     THEME,
 } from '@Core/defaults/theme';
-import Button from '@UI/components/Button/Button';
 import ColorPickerContent from '@UI/components/ColorPicker/ColorPickerContent';
 import DropdownFooter from '@UI/components/Select/Dropdown/Footers/DropdownFooter';
-import Select from '@UI/components/Select/Select';
 
 export default {
     name: 'ColorPicker',
     components: {
-        Select,
         ColorPickerContent,
         DropdownFooter,
-        Button,
+
     },
     computed: {
         tinySize() {

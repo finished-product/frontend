@@ -35,29 +35,24 @@ import {
 } from '@Core/defaults/alerts';
 import beforeRouteEnterMixin from '@Core/mixins/route/beforeRouteEnterMixin';
 import beforeRouteLeaveMixin from '@Core/mixins/route/beforeRouteLeaveMixin';
+import beforeRouteUpdateMixin from '@Core/mixins/route/beforeRouteUpdateMixin';
 import asyncTabsMixin from '@Core/mixins/tab/asyncTabsMixin';
 import RemoveStatusTransitionButton from '@Transitions/components/Buttons/RemoveStatusTransitionButton';
 import PRIVILEGES from '@Transitions/config/privileges';
-import Page from '@UI/components/Layout/Page';
-import HorizontalRoutingTabBar from '@UI/components/TabBar/Routing/HorizontalRoutingTabBar';
-import TitleBar from '@UI/components/TitleBar/TitleBar';
 import {
-    mapActions,
     mapState,
 } from 'vuex';
 
 export default {
     name: 'TransitionEdit',
     components: {
-        Page,
-        TitleBar,
-        HorizontalRoutingTabBar,
         RemoveStatusTransitionButton,
     },
     mixins: [
         asyncTabsMixin,
         beforeRouteEnterMixin,
         beforeRouteLeaveMixin,
+        beforeRouteUpdateMixin,
     ],
     async fetch({
         app,
@@ -77,11 +72,11 @@ export default {
     },
     computed: {
         ...mapState('statusTransition', [
-            'source',
-            'destination',
+            'from',
+            'to',
         ]),
         title() {
-            return `${this.source.value} -> ${this.destination.value}`;
+            return `${this.from.value} -> ${this.to.value}`;
         },
         extendedMainAction() {
             return this.$getExtendSlot('@Transitions/pages/status-transitions/_transition/mainAction');
@@ -90,21 +85,7 @@ export default {
             return this.$isReadOnly(PRIVILEGES.WORKFLOW.namespace);
         },
     },
-    beforeDestroy() {
-        this.__clearTransitionStorage();
-        this.__clearConditionStorage();
-        this.__clearFeedbackStorage();
-    },
     methods: {
-        ...mapActions('condition', {
-            __clearConditionStorage: '__clearStorage',
-        }),
-        ...mapActions('statusTransition', {
-            __clearTransitionStorage: '__clearStorage',
-        }),
-        ...mapActions('feedback', {
-            __clearFeedbackStorage: '__clearStorage',
-        }),
         bindingProps({
             props = {},
         }) {

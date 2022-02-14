@@ -25,7 +25,7 @@ export const getMappedErrors = ({
 
                 mappedErrors[fieldKey] = errorMessage;
             } else {
-                mappedErrors[fieldKey] = errorMessages.join(', ');
+                mappedErrors[fieldKey] = errorMessages.join(' ');
             }
         } else if (typeof errorMessages === 'object') {
             mappedErrors = {
@@ -74,3 +74,10 @@ export const getMappedTranslationErrors = ({
 
     return translationErrors;
 };
+
+export const getMappedPresentationErrors = errors => Object.keys(errors).reduce((prev, curr) => [
+    ...prev,
+    ...(typeof errors[curr] === 'string' ? [
+        errors[curr],
+    ] : getMappedPresentationErrors(errors[curr])),
+], []);

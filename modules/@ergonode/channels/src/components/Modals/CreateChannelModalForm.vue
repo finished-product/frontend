@@ -30,7 +30,6 @@ import {
     ALERT_TYPE,
 } from '@Core/defaults/alerts';
 import modalFeedbackMixin from '@Core/mixins/feedback/modalFeedbackMixin';
-import ModalForm from '@UI/components/Modal/ModalForm';
 import {
     mapActions,
 } from 'vuex';
@@ -38,13 +37,14 @@ import {
 export default {
     name: 'CreateChannelModalForm',
     components: {
-        ModalForm,
         ChannelForm,
     },
     mixins: [
         modalFeedbackMixin,
     ],
     async fetch() {
+        this.__clearStorage();
+
         await this.getInitialDictionaries({
             keys: [
                 'channels',

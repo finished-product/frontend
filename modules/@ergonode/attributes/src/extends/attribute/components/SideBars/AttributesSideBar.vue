@@ -39,12 +39,15 @@
             <AttributeSideBarGroupElement
                 v-if="item.rootId === null"
                 :group="item"
+                :dragging-element-type="draggingElementType"
                 :is-prefetching-data="isPrefetchingGroupData[item.id]"
                 @click.native="onExpandGroup({ item, onExpand })" />
             <AttributeSideBarElement
                 v-else
+                :scope="scope"
                 :item="item"
                 :language-code="languageCode"
+                :dragging-element-type="draggingElementType"
                 :disabled="disabled" />
         </template>
     </SideBar>
@@ -59,6 +62,9 @@ import AttributeSideBarElement from '@Attributes/extends/attribute/components/Si
 import AttributeSideBarGroupElement from '@Attributes/extends/attribute/components/SideBars/AttributeSideBarGroupElement';
 import LanguageTreeSelect from '@Core/components/Selects/LanguageTreeSelect';
 import {
+    DRAGGED_ELEMENT,
+} from '@Core/defaults/grid';
+import {
     UNASSIGNED_GROUP_ID,
 } from '@Core/defaults/list';
 import {
@@ -71,10 +77,6 @@ import {
     getGroups,
     getItems,
 } from '@Core/services/sidebar';
-import ListSearchSelectHeader from '@UI/components/List/ListSearchSelectHeader';
-import Preloader from '@UI/components/Preloader/Preloader';
-import SideBar from '@UI/components/SideBar/SideBar';
-import SideBarNoDataPlaceholder from '@UI/components/SideBar/SideBarNoDataPlaceholder';
 import debounce from 'debounce';
 import {
     mapActions,
@@ -85,15 +87,15 @@ export default {
     name: 'AttributesSideBar',
     components: {
         CreateAttributeButton,
-        SideBarNoDataPlaceholder,
         AttributeSideBarGroupElement,
-        SideBar,
-        ListSearchSelectHeader,
         LanguageTreeSelect,
-        Preloader,
         AttributeSideBarElement,
     },
     props: {
+        scope: {
+            type: String,
+            default: '',
+        },
         isSelectLanguage: {
             type: Boolean,
             default: true,
@@ -101,6 +103,13 @@ export default {
         disabled: {
             type: Boolean,
             default: false,
+        },
+        /**
+         * Type of the place from where element is dragging
+         */
+        draggingElementType: {
+            type: String,
+            default: DRAGGED_ELEMENT.LIST,
         },
     },
     async fetch() {
@@ -149,7 +158,7 @@ export default {
         );
     },
     beforeDestroy() {
-        this.setDisabledElements({});
+        this.removeDisabledScopeElements(this.scope);
 
         document.documentElement.removeEventListener(
             ATTRIBUTE_CREATED_EVENT_NAME,
@@ -158,7 +167,7 @@ export default {
     },
     methods: {
         ...mapActions('list', [
-            'setDisabledElements',
+            'removeDisabledScopeElements',
         ]),
         async onAttributeCreated() {
             await this.getAttributesForLanguage({

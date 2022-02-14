@@ -22,16 +22,10 @@
     </GridTableCell>
 </template>
 <script>
-import GridPresentationCell from '@UI/components/Grid/Layout/Table/Cells/Presentation/GridPresentationCell';
-import GridSuffixPresentationCell from '@UI/components/Grid/Layout/Table/Cells/Presentation/GridSuffixPresentationCell';
 import gridDataCellMixin from '@UI/mixins/grid/gridDataCellMixin';
 
 export default {
     name: 'GridTextDataCell',
-    components: {
-        GridPresentationCell,
-        GridSuffixPresentationCell,
-    },
     mixins: [
         gridDataCellMixin,
     ],
@@ -41,7 +35,7 @@ export default {
                 type: this.column.type,
                 props: {
                     isRichEdit: Boolean(this.column.parameters && this.column.parameters.rich_edit),
-                    bounds: this.$el.getBoundingClientRect(),
+                    bounds: this.$el.getBoundingClientRect().toJSON(),
                     value: this.cellData.value,
                     row: this.rowIndex,
                     column: this.columnIndex,

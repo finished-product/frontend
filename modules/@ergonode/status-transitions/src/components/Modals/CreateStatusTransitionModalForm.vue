@@ -30,7 +30,6 @@ import TransitionForm from '@Transitions/components/Forms/TransitionForm';
 import {
     ROUTE_NAME,
 } from '@Transitions/config/routes';
-import ModalForm from '@UI/components/Modal/ModalForm';
 import {
     mapActions,
     mapState,
@@ -39,12 +38,14 @@ import {
 export default {
     name: 'CreateStatusTransitionModalForm',
     components: {
-        ModalForm,
         TransitionForm,
     },
     mixins: [
         modalFeedbackMixin,
     ],
+    fetch() {
+        this.__clearStorage();
+    },
     data() {
         return {
             isSubmitting: false,
@@ -53,8 +54,8 @@ export default {
     },
     computed: {
         ...mapState('statusTransition', [
-            'source',
-            'destination',
+            'from',
+            'to',
         ]),
     },
     created() {
@@ -122,7 +123,7 @@ export default {
             this.$router.push({
                 name: ROUTE_NAME.STATUS_TRANSITION_EDIT_GENERAL,
                 params: {
-                    id: `${this.source.key}--${this.destination.key}`,
+                    id: `${this.from.key}--${this.to.key}`,
                 },
             });
         },

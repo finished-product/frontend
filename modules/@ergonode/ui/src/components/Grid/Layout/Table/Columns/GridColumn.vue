@@ -8,20 +8,19 @@
             <slot name="header" />
         </div>
         <slot />
-        <GridColumnResizer
-            v-if="resizeable"
-            @width-change="onUpdateWidth"
-            @resize="onResize" />
+        <ClientOnly v-if="resizeable">
+            <GridColumnResizer
+                :position="resizerPosition"
+                :parent-reference="$el"
+                @width-change="onUpdateWidth"
+                @resize="onResize" />
+        </ClientOnly>
     </div>
 </template>
 <script>
-import GridColumnResizer from '@UI/components/Grid/Layout/Table/Columns/Resizer/GridColumnResizer';
 
 export default {
     name: 'GridColumn',
-    components: {
-        GridColumnResizer,
-    },
     props: {
         /**
          * Index of given component at the loop
@@ -48,6 +47,12 @@ export default {
             return [
                 'grid-column',
             ];
+        },
+        resizerPosition() {
+            return {
+                top: '0',
+                right: '1.25px',
+            };
         },
     },
     methods: {

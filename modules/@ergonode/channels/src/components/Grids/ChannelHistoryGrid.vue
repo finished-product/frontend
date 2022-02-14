@@ -4,6 +4,7 @@
  */
 <template>
     <Grid
+        :scope="scope"
         :columns="columns"
         :data-count="filtered"
         :rows="rows"
@@ -43,7 +44,7 @@
         <template #noDataPlaceholder>
             <GridNoDataPlaceholder
                 :title="$t('@Channels.channel.components.ChannelHistoryGrid.placeholderTitle')"
-                :subtitle="$t('@Import.channel.components.ChannelHistoryGrid.placeholderSubtitle')">
+                :subtitle="$t('@Channels.channel.components.ChannelHistoryGrid.placeholderSubtitle')">
                 <template #action>
                     <CreateExportButton />
                 </template>
@@ -80,15 +81,11 @@ import {
 import {
     getGridData,
 } from '@Core/services/grid/getGridData.service';
-import Grid from '@UI/components/Grid/Grid';
-import GridNoDataPlaceholder from '@UI/components/Grid/GridNoDataPlaceholder';
 
 export default {
     name: 'ChannelHistoryGrid',
     components: {
         CreateExportButton,
-        Grid,
-        GridNoDataPlaceholder,
         ExportDetailsModalGrid: () => import('@Channels/components/Modals/ExportDetailsModalGrid'),
     },
     mixins: [
@@ -100,6 +97,12 @@ export default {
         }),
         extendedGridComponentsMixin,
     ],
+    props: {
+        scope: {
+            type: String,
+            default: '',
+        },
+    },
     async fetch() {
         await this.onFetchData();
 
@@ -141,8 +144,8 @@ export default {
         },
     },
     watch: {
-        async $route(from, to) {
-            if (from.name !== to.name) {
+        async $route(to, from) {
+            if (from.name !== to.name || from.query.layout !== to.query.layout) {
                 return;
             }
 
@@ -201,13 +204,12 @@ export default {
         },
         async onFetchData() {
             await getGridData({
-                $route: this.$route,
-                $cookies: this.$userCookies,
+                $cookies: this.$gridCookies,
                 $axios: this.$axios,
                 path: `channels/${this.$route.params.id}/exports`,
                 params: getParams({
                     $route: this.$route,
-                    $cookies: this.$userCookies,
+                    $cookies: this.$gridCookies,
                 }),
                 onSuccess: this.onFetchDataSuccess,
                 onError: this.onFetchDataError,

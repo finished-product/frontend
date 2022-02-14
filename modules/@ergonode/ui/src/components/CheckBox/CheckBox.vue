@@ -4,39 +4,39 @@
  */
 
 <template>
-    <div :class="classes">
-        <input
-            :id="associatedLabel"
-            ref="checkbox"
-            type="checkbox"
-            :value="label"
-            :disabled="disabled"
-            v-model="checkValue">
-        <label :for="associatedLabel">
-            <svg
-                class="checkbox__box"
-                viewBox="0 0 14 10">
-                <path
-                    class="checkbox__mark"
-                    :d="markDrawingCommands" />
-            </svg>
-            <span
-                v-if="label"
-                class="checkbox__label"
-                v-text="label" />
-        </label>
-        <slot name="append" />
-    </div>
+    <InputUUIDProvider>
+        <template #default="{ uuid }">
+            <div :class="classes">
+                <input
+                    :id="uuid"
+                    ref="checkbox"
+                    type="checkbox"
+                    :value="label"
+                    :disabled="disabled"
+                    v-model="checkValue">
+                <label :for="uuid">
+                    <svg
+                        class="checkbox__box"
+                        viewBox="0 0 14 10">
+                        <path
+                            class="checkbox__mark"
+                            :d="markDrawingCommands" />
+                    </svg>
+                    <span
+                        v-if="label"
+                        class="checkbox__label"
+                        v-text="label" />
+                </label>
+                <slot name="append" />
+            </div>
+        </template>
+    </InputUUIDProvider>
 </template>
 
 <script>
-import associatedLabelMixin from '@UI/mixins/inputs/associatedLabelMixin';
 
 export default {
     name: 'CheckBox',
-    mixins: [
-        associatedLabelMixin,
-    ],
     props: {
         /**
          * Component value
@@ -120,9 +120,8 @@ export default {
         display: grid;
         grid-template-columns: max-content;
         grid-auto-flow: column;
-        column-gap: 8px;
+        column-gap: 4px;
         align-items: center;
-        margin: 4px;
 
         & label {
             position: relative;
@@ -131,6 +130,7 @@ export default {
 
             &::after {
                 position: absolute;
+                left: 4px;
                 width: 16px;
                 height: 16px;
                 box-shadow: $ELEVATOR_HOVER_FOCUS;
@@ -151,7 +151,9 @@ export default {
             width: 16px;
             height: 16px;
             border: $BORDER_1_GREY;
+            margin: 4px;
             box-sizing: border-box;
+            background-color: $WHITE;
         }
 
         &__mark {
@@ -165,6 +167,11 @@ export default {
 
             & label {
                 flex-direction: row-reverse;
+
+                &::after {
+                    left: unset;
+                    right: 4px;
+                }
             }
 
             #{$checkbox}__label {

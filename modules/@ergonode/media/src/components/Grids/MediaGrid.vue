@@ -4,6 +4,7 @@
  */
 <template>
     <Grid
+        :scope="scope"
         :columns="columns"
         :data-count="filtered"
         :rows="rows"
@@ -11,6 +12,7 @@
         :filters="filterValues"
         :pagination="pagination"
         :collection-cell-binding="collectionCellBinding"
+        :layout="layout"
         :extended-components="extendedGridComponents"
         :is-editable="isAllowedToUpdate"
         :is-prefetching-data="isPrefetchingData"
@@ -25,6 +27,7 @@
         @sort-column="onColumnSortChange"
         @filter="onFilterChange"
         @remove-all-filters="onRemoveAllFilters"
+        @layout="onLayoutChange"
         v-bind="extendedProps['grid']">
         <template #actionsHeader="actionsHeaderProps">
             <Component
@@ -63,6 +66,7 @@ import {
 } from '@Core/defaults/alerts';
 import {
     DEFAULT_PAGE,
+    GRID_LAYOUT,
 } from '@Core/defaults/grid';
 import extendPropsMixin from '@Core/mixins/extend/extendProps';
 import extendedGridComponentsMixin from '@Core/mixins/grid/extendedGridComponentsMixin';
@@ -83,15 +87,11 @@ import {
 import {
     RESOURCES_UPLOADED_EVENT_NAME,
 } from '@Media/defaults';
-import Grid from '@UI/components/Grid/Grid';
-import GridNoDataPlaceholder from '@UI/components/Grid/GridNoDataPlaceholder';
 
 export default {
     name: 'MediaGrid',
     components: {
         UploadResourcesButton,
-        Grid,
-        GridNoDataPlaceholder,
     },
     mixins: [
         extendPropsMixin({
@@ -102,6 +102,12 @@ export default {
         }),
         extendedGridComponentsMixin,
     ],
+    props: {
+        scope: {
+            type: String,
+            default: '',
+        },
+    },
     async fetch() {
         await this.onFetchData();
 
@@ -118,6 +124,7 @@ export default {
             filterValues,
             pagination,
             sortOrder,
+            layout: GRID_LAYOUT.TABLE,
             rows: [],
             columns: [],
             filtered: 0,
@@ -135,6 +142,10 @@ export default {
             return {
                 imageColumn: 'image',
                 descriptionColumn: 'name',
+                type: 'IMAGE_PREVIEW',
+                additionalColumns: [
+                    'type',
+                ],
             };
         },
         isAllowedToUpdate() {
@@ -144,8 +155,8 @@ export default {
         },
     },
     watch: {
-        async $route(from, to) {
-            if (from.name !== to.name) {
+        async $route(to, from) {
+            if (from.name !== to.name || from.query.layout !== to.query.layout) {
                 return;
             }
 
@@ -177,6 +188,9 @@ export default {
         );
     },
     methods: {
+        onLayoutChange(layout) {
+            this.layout = layout;
+        },
         onResourcesUploaded() {
             this.onFetchData();
         },
@@ -199,13 +213,13 @@ export default {
         },
         async onFetchData() {
             await getGridData({
-                $route: this.$route,
-                $cookies: this.$userCookies,
+                $cookies: this.$gridCookies,
+                layout: this.layout,
                 $axios: this.$axios,
                 path: 'multimedia',
                 params: getParams({
                     $route: this.$route,
-                    $cookies: this.$userCookies,
+                    $cookies: this.$gridCookies,
                 }),
                 onSuccess: this.onFetchDataSuccess,
                 onError: this.onFetchDataError,
@@ -216,7 +230,16 @@ export default {
             rows,
             filtered,
         }) {
-            this.columns = columns;
+            this.columns = columns.map((column) => {
+                if (column.id === 'image') {
+                    return {
+                        ...column,
+                        type: 'IMAGE_PREVIEW',
+                    };
+                }
+
+                return column;
+            });
             this.rows = rows;
             this.filtered = filtered;
         },

@@ -4,7 +4,7 @@
  */
 <template>
     <ModalForm
-        title="Restore parent value"
+        :title="$t('@Products.product.components.RestoreProductAttributesModalForm.title')"
         @close="onClose">
         <template #body>
             <RestoreForm
@@ -30,7 +30,6 @@ import {
 } from '@Core/defaults/alerts';
 import modalFeedbackMixin from '@Core/mixins/feedback/modalFeedbackMixin';
 import RestoreForm from '@Products/components/Forms/RestoreForm';
-import ModalForm from '@UI/components/Modal/ModalForm';
 import {
     mapActions,
     mapState,
@@ -39,7 +38,6 @@ import {
 export default {
     name: 'RestoreProductAttributesModalForm',
     components: {
-        ModalForm,
         RestoreForm,
     },
     mixins: [

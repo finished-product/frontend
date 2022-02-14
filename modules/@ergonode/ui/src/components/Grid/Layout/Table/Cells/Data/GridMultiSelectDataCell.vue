@@ -30,15 +30,11 @@
 import {
     arraysAreEqual,
 } from '@Core/models/arrayWrapper';
-import GridPresentationCell from '@UI/components/Grid/Layout/Table/Cells/Presentation/GridPresentationCell';
-import GridSuffixPresentationCell from '@UI/components/Grid/Layout/Table/Cells/Presentation/GridSuffixPresentationCell';
 import gridDataCellMixin from '@UI/mixins/grid/gridDataCellMixin';
 
 export default {
     name: 'GridMultiSelectDataCell',
     components: {
-        GridPresentationCell,
-        GridSuffixPresentationCell,
         IconArrowDropdown: () => import('@UI/components/Icons/Arrows/IconArrowDropdown'),
     },
     mixins: [
@@ -86,7 +82,7 @@ export default {
             this.$emit('edit-cell', {
                 type: this.column.type,
                 props: {
-                    bounds: this.$el.getBoundingClientRect(),
+                    bounds: this.$el.getBoundingClientRect().toJSON(),
                     value: this.cellData.value,
                     row: this.rowIndex,
                     column: this.columnIndex,

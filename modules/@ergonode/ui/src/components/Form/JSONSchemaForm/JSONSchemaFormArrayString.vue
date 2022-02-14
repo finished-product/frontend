@@ -5,7 +5,7 @@
 <template>
     <FormSubsection
         :title="schema.title"
-        :required="schema.isRequired">
+        :required="required">
         <FormFieldset>
             <CheckBox
                 v-for="title in schema.items.enum_titles"
@@ -19,17 +19,9 @@
 </template>
 
 <script>
-import CheckBox from '@UI/components/CheckBox/CheckBox';
-import FormFieldset from '@UI/components/Form/FormFieldset';
-import FormSubsection from '@UI/components/Form/Subsection/FormSubsection';
 
 export default {
     name: 'JSONSchemaFormArrayString',
-    components: {
-        FormSubsection,
-        FormFieldset,
-        CheckBox,
-    },
     props: {
         /**
          * JSON schema
@@ -44,6 +36,13 @@ export default {
         value: {
             type: Array,
             default: () => [],
+        },
+        /**
+         * Determines if the given field is required
+         */
+        required: {
+            type: Boolean,
+            default: false,
         },
     },
     data() {

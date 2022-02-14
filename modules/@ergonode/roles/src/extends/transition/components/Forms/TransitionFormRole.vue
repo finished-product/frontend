@@ -5,6 +5,7 @@
 <template>
     <FormSection :title="$t('@Roles.transition.components.TransitionFormRole.sectionTitle')">
         <RolesAutocomplete
+            :data-cy="dataCyGenerator(roleFieldKey)"
             :value="roles"
             :clearable="true"
             :multiselect="true"
@@ -17,7 +18,6 @@
 <script>
 import formFeedbackMixin from '@Core/mixins/feedback/formFeedbackMixin';
 import RolesAutocomplete from '@Roles/components/Autocompletes/RolesAutocomplete';
-import FormSection from '@UI/components/Form/Section/FormSection';
 import {
     mapActions,
     mapState,
@@ -27,7 +27,6 @@ export default {
     name: 'TransitionFormRole',
     components: {
         RolesAutocomplete,
-        FormSection,
     },
     mixins: [
         formFeedbackMixin,
@@ -60,6 +59,9 @@ export default {
                 fieldKey: 'roles',
                 value,
             });
+        },
+        dataCyGenerator(key) {
+            return `transition-${key}`;
         },
     },
 };

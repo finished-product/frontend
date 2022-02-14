@@ -23,7 +23,9 @@
         </template>
         <template #item="{ item }">
             <CategorySideBarElement
+                :scope="scope"
                 :item="item"
+                :dragging-element-type="draggingElementType"
                 :language-code="languageCode"
                 :disabled="disabled" />
         </template>
@@ -37,14 +39,14 @@ import {
 } from '@Categories/defaults/attributes';
 import CategorySideBarElement from '@Categories/extends/categoryTree/components/SideBars/CategorySideBarElement';
 import {
+    DRAGGED_ELEMENT,
+} from '@Core/defaults/grid';
+import {
     deepClone,
 } from '@Core/models/objectWrapper';
 import {
     getItems,
 } from '@Core/services/sidebar';
-import Preloader from '@UI/components/Preloader/Preloader';
-import SideBar from '@UI/components/SideBar/SideBar';
-import SideBarNoDataPlaceholder from '@UI/components/SideBar/SideBarNoDataPlaceholder';
 import debounce from 'debounce';
 import {
     mapActions,
@@ -54,13 +56,14 @@ import {
 export default {
     name: 'CategoriesSideBar',
     components: {
-        Preloader,
-        SideBarNoDataPlaceholder,
         CreateCategoryButton,
         CategorySideBarElement,
-        SideBar,
     },
     props: {
+        scope: {
+            type: String,
+            default: '',
+        },
         isSelectLanguage: {
             type: Boolean,
             default: true,
@@ -68,6 +71,13 @@ export default {
         disabled: {
             type: Boolean,
             default: false,
+        },
+        /**
+         * Type of the place from where element is dragging
+         */
+        draggingElementType: {
+            type: String,
+            default: DRAGGED_ELEMENT.LIST,
         },
     },
     async fetch() {
@@ -102,7 +112,7 @@ export default {
         );
     },
     beforeDestroy() {
-        this.setDisabledElements({});
+        this.removeDisabledScopeElements(this.scope);
 
         document.documentElement.removeEventListener(
             CATEGORY_CREATED_EVENT_NAME,
@@ -111,7 +121,7 @@ export default {
     },
     methods: {
         ...mapActions('list', [
-            'setDisabledElements',
+            'removeDisabledScopeElements',
         ]),
         async onCategoryCreated() {
             await this.getItems();

@@ -1,0 +1,140 @@
+{
+  "@Workflow": {
+    "_": {
+      "submit": "Save changes",
+      "create": "Create",
+      "proceed": "Create & Edit",
+      "cancel": "Cancel",
+      "deleteConfirm": "Yes, remove",
+      "routes": {
+        "title": "Statuses & transitions",
+        "group": "Workflow",
+        "editOption": "Options",
+        "editTranslations": "Translations",
+        "editConditions": "Conditions"
+      }
+    },
+    "workflow": {
+      "_": {
+        "title": "Statuses & transitions",
+        "headTitle": "Statuses & transitions - Ergonode"
+      },
+      "pages": {
+        "id": {
+          "getStatusRequest": "Status hasn't been fetched properly",
+          "getTransitionRequest": "Transition hasn't been fetched properly"
+        }
+      },
+      "store": {
+        "action": {
+          "createStatusCancel": "Creating status has been canceled",
+          "updateStatusCancel": "Updating status has been canceled",
+          "deleteStatusCancel": "Removing status has been canceled",
+          "updateTransitionsCancel": "Updating transitions has been canceled",
+          "createTransitionCancel": "Creating transition has been canceled",
+          "updateTransitionCancel": "Updating transition has been canceled",
+          "deleteTransitionCancel": "Removing transition has been canceled"
+        }
+      },
+      "components": {
+        "ConditionsSideBar": {
+          "title": "Conditions"
+        },
+        "WorkflowStatusPreview": {
+          "label": "Status preview"
+        },
+        "ConditionsVerticalTab": {
+          "title": "Conditions"
+        },
+        "ConditionSetTreeDesignerNoTypeItemParameter": {
+          "placeholderTitle": "No support for {info} type of condition parameter"
+        },
+        "RemoveWorkflowTransitionButton": {
+          "title": "DELETE TRANSITION",
+          "confirmTitle": "Do you want to delete this transition?",
+          "confirmSubtitle": "Transition will be permanently deleted from the system.",
+          "deleteConfirm": "DELETE TRANSITION",
+          "successMessage": "Transition removed",
+          "errorMessage": "Transition hasn`t been deleted"
+        },
+        "RemoveWorkflowTransitionFab": {
+          "title": "Delete transition",
+          "confirmTitle": "Do you want to delete this transition?",
+          "confirmSubtitle": "Transition will be permanently deleted from the system.",
+          "deleteConfirm": "DELETE TRANSITION"
+        },
+        "UpdateWorkflowTransitionFab": {
+          "title": "Edit transition"
+        },
+        "UpdateWorkflowTransitionConditionDesignerButton": {
+          "successMessage": "Transition conditions have been updated"
+        },
+        "WorkflowTransitionForm": {
+          "title": "Status change",
+          "fromLabel": "From",
+          "toLabel": "To"
+        },
+        "RemoveTransitionConditionDropZone": {
+          "title": "REMOVE CONDITION"
+        },
+        "WorkflowTransitionGeneralTab": {
+          "successMessage": "Transition has been updated"
+        },
+        "CreateWorkflowTransitionButton": {
+          "title": "NEW TRANSITION"
+        },
+        "WorkflowDesignerDefaultStatusPlaceholder": {
+          "title": "This is product default status",
+          "subtitle": "Create another status to add transitions."
+        },
+        "WorkflowDesigner": {
+          "errorMessage": "Workflow haven’t been fetched properly",
+          "warningMessage": "No possible combinations for this status",
+          "updateSuccessMessage": "Transitions have been created",
+          "updateErrorMessage": "Transitions haven’t been created",
+          "confirmTitle": "You must save changes before editing this transition",
+          "confirmSubtitle": "To edit a newly created transition, you must first save the workflow.",
+          "applyTitle": "SAVE CHANGES",
+          "cancelTitle": "DON'T SAVE"
+        },
+        "CreateWorkflowTransitionsButton": {
+          "successMessage": "Transitions have been created",
+          "errorMessage": "Transitions haven’t been created"
+        },
+        "WorkflowStatusGeneralTab": {
+          "successMessage": "Status has been updated"
+        },
+        "CreateWorkflowStatusModalForm": {
+          "title": "Create new status",
+          "successMessage": "Status created"
+        },
+        "WorkflowStatusForm": {
+          "title": "Options",
+          "nameLabel": "System name",
+          "nameHint": "System name must be unique",
+          "defaultStatusLabel": "Default status of new products",
+          "defaultStatusHint": "You may set only one status as a default",
+          "badgeLabel": "Color"
+        },
+        "WorkflowStatusTranslationForm": {
+          "nameLabel": "Status name",
+          "descriptionLabel": "Status description"
+        },
+        "CreateWorkflowStatusButton": {
+          "title": "New status"
+        },
+        "RemoveWorkflowStatusButton": {
+          "title": "Delete status",
+          "confirmTitle": "Do you want to delete this status?",
+          "confirmSubtitle": "Status will be permanently deleted from the system.",
+          "applyTitle": "DELETE STATUS",
+          "successMessage": "Status removed",
+          "errorMessage": "Status hasn`t been deleted"
+        },
+        "UpdateWorkflowTranslationButton": {
+          "successMessage": "Status translations have been updated"
+        }
+      }
+    }
+  }
+}

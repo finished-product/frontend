@@ -2,6 +2,10 @@
  * Copyright © Ergonode Sp. z o.o. All rights reserved.
  * See LICENSE for license details.
  */
+import {
+    deepClone,
+} from '@Core/models/objectWrapper';
+
 /**
  * Returns object with max value in array by object key
  * @function
@@ -29,7 +33,7 @@ export function getMaxValueObject(array, key) {
  * @returns {Array}
  */
 export function swapItemPosition(array, pos1, pos2) {
-    const tmpArray = array;
+    const tmpArray = deepClone(array);
     // local variables
     let i;
     let tmp;
@@ -225,6 +229,8 @@ export function dfsSearch(
  * @returns {boolean}
  */
 export function arraysAreEqual(arr1, arr2) {
+    if (!Array.isArray(arr1) || !Array.isArray(arr2)) return false;
+
     const {
         length: arr1Length,
     } = arr1;
@@ -327,14 +333,14 @@ export function sumIntegers(array) {
  * Returns object from array with objects
  * @function
  * @param {Array} array
- * @param {string} keyField
+ * @param {string} fieldKey
  * @param {string} value
  * @returns {Object} Flat object
  */
-export function arrayToObject(array, keyField, value) {
+export function arrayToObject(array, fieldKey, value) {
     return array.reduce((prev, current) => ({
         ...prev,
-        [current[keyField]]: current[value],
+        [current[fieldKey]]: current[value],
     }), {});
 }
 

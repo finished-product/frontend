@@ -30,7 +30,6 @@ import ImportProfileForm from '@Import/components/Forms/ImportProfileForm';
 import {
     ROUTE_NAME,
 } from '@Import/config/routes';
-import ModalForm from '@UI/components/Modal/ModalForm';
 import {
     mapActions,
 } from 'vuex';
@@ -38,13 +37,14 @@ import {
 export default {
     name: 'CreateImportProfileModalForm',
     components: {
-        ModalForm,
         ImportProfileForm,
     },
     mixins: [
         modalFeedbackMixin,
     ],
     async fetch() {
+        this.__clearStorage();
+
         await this.getInitialDictionaries({
             keys: [
                 'sources',
@@ -68,6 +68,7 @@ export default {
         onClose() {
             this.__clearStorage();
             this.removeScopeData(this.scope);
+
             this.$emit('close');
         },
         onSubmit() {

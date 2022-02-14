@@ -8,12 +8,16 @@
         :value="value"
         :required="required"
         :searchable="true"
+        :wrap-value="true"
         :multiselect="multiselect"
         :clearable="clearable"
         :label="$t('@Templates.productTemplate.components.ProductTemplateAutocomplete.label')"
         :custom-fetch-event="productTemplateCreatedEventName"
         :error-messages="errorMessages"
         :disabled="disabled"
+        :sort-order="sortOrder"
+        option-key="id"
+        option-value="label"
         href="templates/autocomplete"
         @input="onValueChange">
         <template #noDataPlaceholder>
@@ -29,19 +33,18 @@
 </template>
 
 <script>
+import {
+    SORTING_ORDER,
+} from '@Core/defaults/icons';
 import CreateProductTemplateButton from '@Templates/components/Buttons/CreateProductTemplateButton';
 import {
     PRODUCT_TEMPLATE_CREATED_EVENT_NAME,
 } from '@Templates/defaults';
-import Autocomplete from '@UI/components/Autocomplete/Autocomplete';
-import SelectListNoDataPlaceholder from '@UI/components/SelectList/SelectListNoDataPlaceholder';
 
 export default {
     name: 'ProductTemplateAutocomplete',
     components: {
         CreateProductTemplateButton,
-        SelectListNoDataPlaceholder,
-        Autocomplete,
     },
     props: {
         value: {
@@ -84,6 +87,12 @@ export default {
             return {
                 title: this.$t('@Templates.productTemplate._.noTemplate'),
                 subtitle: this.$t('@Templates.productTemplate._.createFirst'),
+            };
+        },
+        sortOrder() {
+            return {
+                order: SORTING_ORDER.ASC,
+                field: 'label',
             };
         },
     },

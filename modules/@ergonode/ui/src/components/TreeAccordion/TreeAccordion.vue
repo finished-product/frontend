@@ -58,27 +58,13 @@
 import {
     SIZE,
 } from '@Core/defaults/theme';
-import SelectListNoDataPlaceholder from '@UI/components/SelectList/SelectListNoDataPlaceholder';
-import SelectListNoResultsPlaceholder from '@UI/components/SelectList/SelectListNoResultsPlaceholder';
-import SelectListSearch from '@UI/components/SelectList/SelectListSearch';
-import TreeAccordionItem from '@UI/components/TreeAccordion/TreeAccordionItem';
 import {
     getSelectedItems,
     getSelectedNodes,
 } from '@UI/models/treeAccordion';
-import {
-    ExpandingList,
-} from 'vue-windowing';
 
 export default {
     name: 'TreeAccordion',
-    components: {
-        SelectListNoResultsPlaceholder,
-        SelectListNoDataPlaceholder,
-        ExpandingList,
-        TreeAccordionItem,
-        SelectListSearch,
-    },
     props: {
         /**
          * Map of selected item values

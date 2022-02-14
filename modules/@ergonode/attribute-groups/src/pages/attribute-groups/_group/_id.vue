@@ -36,27 +36,22 @@ import {
 } from '@Core/defaults/alerts';
 import beforeRouteEnterMixin from '@Core/mixins/route/beforeRouteEnterMixin';
 import beforeRouteLeaveMixin from '@Core/mixins/route/beforeRouteLeaveMixin';
+import beforeRouteUpdateMixin from '@Core/mixins/route/beforeRouteUpdateMixin';
 import asyncTabsMixin from '@Core/mixins/tab/asyncTabsMixin';
-import Page from '@UI/components/Layout/Page';
-import HorizontalRoutingTabBar from '@UI/components/TabBar/Routing/HorizontalRoutingTabBar';
-import TitleBar from '@UI/components/TitleBar/TitleBar';
 import {
-    mapActions,
     mapState,
 } from 'vuex';
 
 export default {
     name: 'EditAttributeGroup',
     components: {
-        Page,
-        TitleBar,
-        HorizontalRoutingTabBar,
         RemoveAttributeGroupButton,
     },
     mixins: [
         asyncTabsMixin,
         beforeRouteEnterMixin,
         beforeRouteLeaveMixin,
+        beforeRouteUpdateMixin,
     ],
     validate({
         params,
@@ -89,21 +84,7 @@ export default {
             return this.$isReadOnly(PRIVILEGES.ATTRIBUTE_GROUP.namespace);
         },
     },
-    beforeDestroy() {
-        this.__clearStorage();
-        this.__clearTranslationsStorage();
-        this.__clearFeedbackStorage();
-    },
     methods: {
-        ...mapActions('attributeGroup', [
-            '__clearStorage',
-        ]),
-        ...mapActions('feedback', {
-            __clearFeedbackStorage: '__clearStorage',
-        }),
-        ...mapActions('tab', {
-            __clearTranslationsStorage: '__clearStorage',
-        }),
         bindingProps({
             props = {},
         }) {

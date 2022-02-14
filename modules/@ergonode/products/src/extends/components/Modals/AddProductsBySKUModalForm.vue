@@ -31,7 +31,6 @@ import AddProductsBySKUForm from '@Products/extends/components/Forms/AddProducts
 import {
     PRODUCTS_ATTACHMENT_UPDATED_EVENT_NAME,
 } from '@Products/extends/defaults';
-import ModalForm from '@UI/components/Modal/ModalForm';
 import {
     mapActions,
 } from 'vuex';
@@ -40,7 +39,6 @@ export default {
     name: 'AddProductsBySKUModalForm',
     components: {
         AddProductsBySKUForm,
-        ModalForm,
     },
     mixins: [
         modalFeedbackMixin,
@@ -92,6 +90,8 @@ export default {
             }
 
             this.$emit('submitted');
+
+            this.onClose();
         },
         onAddError(errors) {
             this.onError(errors);

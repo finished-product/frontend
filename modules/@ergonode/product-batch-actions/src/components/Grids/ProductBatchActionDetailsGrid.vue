@@ -4,6 +4,7 @@
  */
 <template>
     <Grid
+        :scope="scope"
         :columns="columns"
         :data-count="filtered"
         :rows="rows"
@@ -64,14 +65,13 @@ import {
     getGridData,
 } from '@Core/services/grid/getGridData.service';
 import PRIVILEGES from '@Products/config/privileges';
-import Grid from '@UI/components/Grid/Grid';
 import Tile from '@UI/components/Tile/Tile';
 
 export default {
     name: 'ProductBatchActionDetailsGrid',
     components: {
         Tile,
-        Grid,
+
     },
     mixins: [
         extendPropsMixin({
@@ -83,6 +83,10 @@ export default {
         extendedGridComponentsMixin,
     ],
     props: {
+        scope: {
+            type: String,
+            default: '',
+        },
         item: {
             type: Object,
             required: true,
@@ -163,8 +167,6 @@ export default {
             };
 
             await getGridData({
-                $route: this.$route,
-                $cookies: this.$userCookies,
                 $axios: this.$axios,
                 path: `batch-action/${this.item.objectId}/entries`,
                 params,

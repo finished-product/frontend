@@ -6,14 +6,14 @@
     <ListDraggableElement
         :disabled="disabled"
         :draggable-id="item.type"
-        :label="item.label"
+        :label="typeTranslation"
         @drag-start="onDragStart"
         @drag-end="onDragEnd">
         <ListElementIcon>
             <IconFontSize />
         </ListElementIcon>
         <ListElementDescription>
-            <ListElementTitle :title="item.label" />
+            <ListElementTitle :title="typeTranslation" />
             <ListElementHint :title="item.code" />
         </ListElementDescription>
     </ListDraggableElement>
@@ -24,11 +24,6 @@ import {
     DRAGGED_ELEMENT,
 } from '@Core/defaults/grid';
 import IconFontSize from '@UI/components/Icons/Editor/IconFontSize';
-import ListDraggableElement from '@UI/components/List/ListDraggableElement';
-import ListElementDescription from '@UI/components/List/ListElementDescription';
-import ListElementHint from '@UI/components/List/ListElementHint';
-import ListElementIcon from '@UI/components/List/ListElementIcon';
-import ListElementTitle from '@UI/components/List/ListElementTitle';
 import {
     mapActions,
 } from 'vuex';
@@ -36,14 +31,13 @@ import {
 export default {
     name: 'WidgetSideBarElement',
     components: {
-        ListElementDescription,
-        ListElementTitle,
-        ListDraggableElement,
-        ListElementIcon,
-        ListElementHint,
         IconFontSize,
     },
     props: {
+        scope: {
+            type: String,
+            default: '',
+        },
         item: {
             type: Object,
             required: true,
@@ -51,6 +45,27 @@ export default {
         disabled: {
             type: Boolean,
             default: false,
+        },
+        /**
+         * Type of the place from where element is dragging
+         */
+        draggingElementType: {
+            type: String,
+            default: DRAGGED_ELEMENT.LIST,
+        },
+    },
+    computed: {
+        typeTranslation() {
+            const {
+                type: keyType,
+                label,
+            } = this.item;
+
+            if (this.$te(`@Templates.productTemplate._.types.${keyType}`)) {
+                return this.$t(`@Templates.productTemplate._.types.${keyType}`);
+            }
+
+            return label;
         },
     },
     methods: {
@@ -60,11 +75,15 @@ export default {
         onDragStart() {
             this.__setState({
                 key: 'isElementDragging',
-                value: DRAGGED_ELEMENT.LIST,
+                value: this.draggingElementType,
             });
             this.__setState({
                 key: 'draggedElement',
                 value: this.item.type,
+            });
+            this.__setState({
+                key: 'draggedInScope',
+                value: this.scope,
             });
         },
         onDragEnd() {
@@ -75,6 +94,10 @@ export default {
             this.__setState({
                 key: 'draggedElement',
                 value: null,
+            });
+            this.__setState({
+                key: 'draggedInScope',
+                value: '',
             });
         },
     },

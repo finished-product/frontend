@@ -4,6 +4,7 @@
  */
 <template>
     <Grid
+        :scope="scope"
         :columns="columns"
         :rows="rows"
         :drafts="drafts"
@@ -56,7 +57,6 @@ import {
 import UpdateRolePrivilegesButton from '@Roles/components/Buttons/UpdateRolePrivilegesButton';
 import PRIVILEGES from '@Roles/config/privileges';
 import privilegesDefaults from '@Roles/defaults/privileges';
-import Grid from '@UI/components/Grid/Grid';
 import {
     getMappedGridData,
 } from '@Users/models/gridDataMapper';
@@ -68,7 +68,6 @@ import {
 export default {
     name: 'RolePrivilegesGrid',
     components: {
-        Grid,
         UpdateRolePrivilegesButton,
     },
     mixins: [
@@ -197,9 +196,8 @@ export default {
                 defaults: privilegesDefaults,
                 isEditable: this.isAllowedToUpdate,
             });
-            const config = this.$userCookies.get(`GRID_CONFIG:${this.$route.name}`) || '';
 
-            this.columns = getSortedColumnsByIDs(columns, config.split(','));
+            this.columns = getSortedColumnsByIDs(columns, this.$gridCookies.get().split(','));
             this.filtered = this.privilegesDictionary.length;
             this.rows = rows;
 

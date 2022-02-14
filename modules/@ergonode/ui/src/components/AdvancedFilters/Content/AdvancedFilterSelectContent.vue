@@ -4,12 +4,14 @@
  */
 <template>
     <SelectList
-        :style="styles"
+        :items-max-height="itemsMaxHeight"
         :value="filterValue"
         :items="options"
         :size="smallSize"
         :searchable="!value.isEmptyRecord"
         :multiselect="true"
+        option-key="key"
+        option-value="value"
         @input="onSelectValue"
         @search="onSearch">
         <template #prependHeader>
@@ -20,14 +22,6 @@
         </template>
         <template #body>
             <div v-if="value.isEmptyRecord" />
-        </template>
-        <template #item="{ item }">
-            <ListElementDescription>
-                <ListElementTitle
-                    :size="smallSize"
-                    :hint="item.value ? `#${item.key} ${languageCode}` : ''"
-                    :title="item.value || `#${item.key}`" />
-            </ListElementDescription>
         </template>
     </SelectList>
 </template>
@@ -46,19 +40,11 @@ import {
     DROPDOWN_MAX_HEIGHT,
 } from '@UI/assets/scss/_js-variables/sizes.scss';
 import AdvancedFilterShowOnly from '@UI/components/AdvancedFilters/AdvancedFilterShowOnly';
-import Divider from '@UI/components/Dividers/Divider';
-import ListElementDescription from '@UI/components/List/ListElementDescription';
-import ListElementTitle from '@UI/components/List/ListElementTitle';
-import SelectList from '@UI/components/SelectList/SelectList';
 
 export default {
     name: 'AdvancedFilterSelectContent',
     components: {
-        SelectList,
-        ListElementDescription,
-        ListElementTitle,
         AdvancedFilterShowOnly,
-        Divider,
     },
     props: {
         /**
@@ -92,10 +78,8 @@ export default {
         };
     },
     computed: {
-        styles() {
-            return {
-                maxHeight: DROPDOWN_MAX_HEIGHT,
-            };
+        itemsMaxHeight() {
+            return DROPDOWN_MAX_HEIGHT;
         },
         smallSize() {
             return SIZE.SMALL;

@@ -38,10 +38,6 @@ import {
 import {
     Z_INDEX_LVL_2,
 } from '@UI/assets/scss/_js-variables/indexes.scss';
-import Button from '@UI/components/Button/Button';
-import FeedbackProvider from '@UI/components/Feedback/FeedbackProvider';
-import IconSpinner from '@UI/components/Icons/Feedback/IconSpinner';
-import IconSync from '@UI/components/Icons/Feedback/IconSync';
 import {
     mapActions,
     mapState,
@@ -49,12 +45,6 @@ import {
 
 export default {
     name: 'UpdateLanguagesInheritanceButton',
-    components: {
-        FeedbackProvider,
-        Button,
-        IconSpinner,
-        IconSync,
-    },
     mixins: [
         updateButtonFeedbackMixin,
     ],
@@ -113,7 +103,7 @@ export default {
             } else {
                 this.$addAlert({
                     type: ALERT_TYPE.WARNING,
-                    message: 'Language inheritance tree cannot be saved without any language',
+                    message: this.$t('@Core.core.components.UpdateLanguagesInheritanceButton.warningMessage'),
                 });
             }
         },
@@ -134,7 +124,7 @@ export default {
         onGetUserSuccess() {
             this.$addAlert({
                 type: ALERT_TYPE.SUCCESS,
-                message: 'Languages tree has been updated',
+                message: this.$t('@Core.core.components.UpdateLanguagesInheritanceButton.successMessage'),
             });
             this.isSubmitting = false;
 

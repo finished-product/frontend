@@ -28,7 +28,6 @@ import {
 } from '@Core/defaults/alerts';
 import modalFeedbackMixin from '@Core/mixins/feedback/modalFeedbackMixin';
 import AddProductsFromSegmentForm from '@Segments/components/Forms/AddProductsFromSegmentForm';
-import ModalForm from '@UI/components/Modal/ModalForm';
 import {
     mapActions,
 } from 'vuex';
@@ -37,7 +36,6 @@ export default {
     name: 'AddProductsFromSegmentModalForm',
     components: {
         AddProductsFromSegmentForm,
-        ModalForm,
     },
     mixins: [
         modalFeedbackMixin,
@@ -82,6 +80,7 @@ export default {
             this.isAdding = false;
 
             this.$emit('submitted');
+
             this.onClose();
         },
         onAddError(errors) {

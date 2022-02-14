@@ -13,7 +13,7 @@
         @hover="onHover"
         @input="onSelect">
         <template #button>
-            <IconButton
+            <Fab
                 :theme="theme"
                 :size="size"
                 :disabled="disabled">
@@ -26,7 +26,7 @@
                         name="icon"
                         :color="iconFillColor" />
                 </template>
-            </IconButton>
+            </Fab>
         </template>
         <template #option="{ option }">
             <!--
@@ -51,8 +51,6 @@ import {
     GREY_DARK,
     WHITE,
 } from '@UI/assets/scss/_js-variables/colors.scss';
-import ActionBaseButton from '@UI/components/ActionButton/ActionBaseButton';
-import IconButton from '@UI/components/IconButton/IconButton';
 
 /**
  * `ActionIconButton` is an `ActionBaseButton` with a `IconButton` inside named slot `button`.
@@ -60,10 +58,6 @@ import IconButton from '@UI/components/IconButton/IconButton';
  */
 export default {
     name: 'ActionIconButton',
-    components: {
-        ActionBaseButton,
-        IconButton,
-    },
     props: {
         /**
          * The theme of the component

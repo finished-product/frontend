@@ -22,6 +22,9 @@
         :clearable="clearable"
         :multiselect="multiselect"
         :searchable="searchable"
+        :wrap-value="wrapValue"
+        :option-key="optionKey"
+        :option-value="optionValue"
         :data-cy="dataCy"
         @focus="onFocus"
         @search="onSearch"
@@ -30,7 +33,11 @@
             <slot name="prepend" />
         </template>
         <template #value>
-            <span v-text="parsedValue" />
+            <slot
+                name="value"
+                :selected-options="selectedOptions">
+                <span v-text="parsedValue" />
+            </slot>
         </template>
         <template #append>
             <slot name="append" />
@@ -81,30 +88,12 @@ import {
 import {
     GRAPHITE,
 } from '@UI/assets/scss/_js-variables/colors.scss';
-import CheckBox from '@UI/components/CheckBox/CheckBox';
-import IconSpinner from '@UI/components/Icons/Feedback/IconSpinner';
-import ListElementAction from '@UI/components/List/ListElementAction';
-import ListElementDescription from '@UI/components/List/ListElementDescription';
-import ListElementTitle from '@UI/components/List/ListElementTitle';
-import Preloader from '@UI/components/Preloader/Preloader';
-import Select from '@UI/components/Select/Select';
-import FadeTransition from '@UI/components/Transitions/FadeTransition';
 import {
     debounce,
 } from 'debounce';
 
 export default {
     name: 'Autocomplete',
-    components: {
-        Preloader,
-        Select,
-        IconSpinner,
-        FadeTransition,
-        ListElementDescription,
-        ListElementTitle,
-        ListElementAction,
-        CheckBox,
-    },
     props: {
         /**
          * Component value
@@ -142,6 +131,13 @@ export default {
             type: String,
             default: INPUT_TYPE.SOLID,
             validator: value => Object.values(INPUT_TYPE).indexOf(value) !== -1,
+        },
+        /**
+         * Wrapping selected values
+         */
+        wrapValue: {
+            type: Boolean,
+            default: false,
         },
         /**
          * The flag which tells if the dropdown has fixed content to it's parent width
@@ -262,6 +258,27 @@ export default {
             type: String,
             default: '',
         },
+        /**
+         * The data model of sorted column
+         */
+        sortOrder: {
+            type: Object,
+            default: null,
+        },
+        /**
+         * The key of the option
+         */
+        optionKey: {
+            type: String,
+            default: '',
+        },
+        /**
+         * The key of the value
+         */
+        optionValue: {
+            type: String,
+            default: '',
+        },
     },
     data() {
         return {
@@ -362,12 +379,19 @@ export default {
             try {
                 this.isFetchingData = true;
 
-                const options = await this.$axios.$get(this.href, {
+                const config = {
                     params: {
                         search: this.searchValue,
                         ...this.params,
                     },
-                });
+                };
+
+                if (this.sortOrder) {
+                    config.params.order = this.sortOrder.order;
+                    config.params.field = this.sortOrder.field;
+                }
+
+                const options = await this.$axios.$get(this.href, config);
 
                 if (this.additionalStaticOptions.length) {
                     const lowerCaseSearchValue = this.searchValue.toLowerCase();

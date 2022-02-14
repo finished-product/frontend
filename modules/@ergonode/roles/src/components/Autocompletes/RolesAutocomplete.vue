@@ -8,12 +8,15 @@
         :value="value"
         :required="required"
         :searchable="true"
+        :wrap-value="true"
         :multiselect="multiselect"
         :clearable="clearable"
         :label="$t('@Roles.role.components.RolesAutocomplete.roleLabel')"
         :custom-fetch-event="roleCreatedEventName"
         :error-messages="errorMessages"
         :disabled="disabled"
+        option-key="id"
+        option-value="label"
         href="roles/autocomplete"
         @input="onValueChange">
         <template #noDataPlaceholder>
@@ -33,15 +36,11 @@ import CreateRoleButton from '@Roles/components/Buttons/CreateRoleButton';
 import {
     ROLE_CREATED_EVENT_NAME,
 } from '@Roles/defaults';
-import Autocomplete from '@UI/components/Autocomplete/Autocomplete';
-import SelectListNoDataPlaceholder from '@UI/components/SelectList/SelectListNoDataPlaceholder';
 
 export default {
     name: 'RolesAutocomplete',
     components: {
         CreateRoleButton,
-        SelectListNoDataPlaceholder,
-        Autocomplete,
     },
     props: {
         value: {

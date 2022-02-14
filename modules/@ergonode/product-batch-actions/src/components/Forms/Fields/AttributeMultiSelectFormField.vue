@@ -3,7 +3,7 @@
  * See LICENSE for license details.
  */
 <template>
-    <TranslationSelect
+    <Select
         :value="parsedValue"
         :hint="hint"
         :placeholder="placeholder"
@@ -12,6 +12,8 @@
         :clearable="true"
         :options="options"
         :error-messages="errorMessages"
+        option-key="key"
+        option-value="value"
         @focus="onFocus"
         @input="onValueChange">
         <template #append>
@@ -19,7 +21,7 @@
                 v-if="isFetchingData"
                 :fill-color="graphiteColor" />
         </template>
-    </TranslationSelect>
+    </Select>
 </template>
 
 <script>
@@ -27,17 +29,14 @@ import {
     getOption,
 } from '@Attributes/services';
 import {
+    getMappedTranslationArrayOptions,
+} from '@Core/models/mappers/translationsMapper';
+import {
     GRAPHITE,
 } from '@UI/assets/scss/_js-variables/colors.scss';
-import IconSpinner from '@UI/components/Icons/Feedback/IconSpinner';
-import TranslationSelect from '@UI/components/Select/TranslationSelect';
 
 export default {
     name: 'AttributeMultiSelectFormField',
-    components: {
-        TranslationSelect,
-        IconSpinner,
-    },
     props: {
         value: {
             type: Array,
@@ -62,21 +61,9 @@ export default {
             id: this.attribute.id,
         });
 
-        this.options = options.map((option) => {
-            let value = '';
-            let hint = '';
-
-            if (option.label) {
-                value = option.label[this.languageCode];
-                hint = `#${option.code} ${this.languageCode}`;
-            }
-
-            return {
-                id: option.id,
-                key: option.code,
-                value,
-                hint,
-            };
+        this.options = getMappedTranslationArrayOptions({
+            options,
+            languageCode: this.languageCode,
         });
 
         this.isFetchingData = false;

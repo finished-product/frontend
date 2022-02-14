@@ -39,6 +39,7 @@
                     :value="time"
                     :disabled="!isAllowedToUpdate || !isActive"
                     :input="timeInputType"
+                    :error-messages="errors[startFieldKey]"
                     required
                     :label="$t('@Channels.channel.components.SchedulerForm.startTimeLabel')"
                     @input="setTimeChange" />
@@ -97,15 +98,6 @@ import formActionsMixin from '@Core/mixins/form/formActionsMixin';
 import {
     BLUE,
 } from '@UI/assets/scss/_js-variables/colors.scss';
-import DatePicker from '@UI/components/DatePicker/DatePicker';
-import Divider from '@UI/components/Dividers/Divider';
-import Form from '@UI/components/Form/Form';
-import FormSection from '@UI/components/Form/Section/FormSection';
-import FormSubsection from '@UI/components/Form/Subsection/FormSubsection';
-import IconInfo from '@UI/components/Icons/Feedback/IconInfo';
-import Paragraph from '@UI/components/Paragraph/Paragraph';
-import TextField from '@UI/components/TextField/TextField';
-import Toggler from '@UI/components/Toggler/Toggler';
 import {
     DEFAULT_DATE_TIME_FORMAT,
     DEFAULT_FORMAT,
@@ -124,17 +116,6 @@ import {
 
 export default {
     name: 'SchedulerForm',
-    components: {
-        Form,
-        FormSection,
-        FormSubsection,
-        DatePicker,
-        TextField,
-        Toggler,
-        Divider,
-        IconInfo,
-        Paragraph,
-    },
     mixins: [
         formActionsMixin,
         formFeedbackMixin,
@@ -326,25 +307,27 @@ export default {
             });
         },
         setTimeChange(value) {
-            const {
-                start,
-            } = this.schedulerConfiguration;
-            const strDate = `${formatDate(start ? parseISO(start) : new Date(), DEFAULT_FORMAT)} ${value}`;
-            const date = formatISO(parseDate(strDate, DEFAULT_DATE_TIME_FORMAT, new Date()));
+            if (value) {
+                const {
+                    start,
+                } = this.schedulerConfiguration;
+                const strDate = `${formatDate(start ? parseISO(start) : new Date(), DEFAULT_FORMAT)} ${value}`;
+                const date = formatISO(parseDate(strDate, DEFAULT_DATE_TIME_FORMAT, new Date()));
 
-            this.__setState({
-                key: 'scheduler',
-                value: JSON.stringify({
-                    ...this.schedulerConfiguration,
-                    start: date,
-                }),
-            });
+                this.__setState({
+                    key: 'scheduler',
+                    value: JSON.stringify({
+                        ...this.schedulerConfiguration,
+                        start: date,
+                    }),
+                });
 
-            this.onScopeValueChange({
-                scope: this.scope,
-                fieldKey: 'time',
-                value: date,
-            });
+                this.onScopeValueChange({
+                    scope: this.scope,
+                    fieldKey: 'time',
+                    value: date,
+                });
+            }
         },
         setHourChange(value) {
             const tmpScheduler = {

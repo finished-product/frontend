@@ -13,13 +13,9 @@
 </template>
 
 <script>
-import Dropdown from '@UI/components/Select/Dropdown/Dropdown';
 
 export default {
     name: 'AdvancedFilterDropdown',
-    components: {
-        Dropdown,
-    },
     props: {
         /**
          * Determines visibility of component
@@ -38,6 +34,7 @@ export default {
         /**
          * The vue component reference to which dropdown is hooked
          */
+        // eslint-disable-next-line vue/require-prop-types
         parentReference: {
             required: true,
         },

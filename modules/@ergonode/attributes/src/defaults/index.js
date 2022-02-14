@@ -4,6 +4,13 @@
  */
 export const SKU_MODEL_ID = 'SKU';
 
+export const OPTION_STATES = {
+    ADD: 'ADD',
+    MOVE: 'MOVE',
+    DELETE: 'DELETE',
+    EDIT: 'EDIT',
+};
+
 export const SKU_MODEL = {
     id: SKU_MODEL_ID,
     code: SKU_MODEL_ID,
@@ -16,7 +23,6 @@ export const TYPES = {
     NUMERIC: 'NUMERIC',
     SELECT: 'SELECT',
     MULTI_SELECT: 'MULTI_SELECT',
-    IMAGE: 'IMAGE',
     PRICE: 'PRICE',
     UNIT: 'UNIT',
     DATE: 'DATE',
@@ -30,6 +36,10 @@ export const SYSTEM_TYPES = {
 export const SCOPE = {
     GLOBAL: 'global',
     LOCAL: 'local',
+};
+
+export const DRAGGED_ELEMENT = {
+    RELATION_ATTRIBUTE: 'RELATION_ATTRIBUTE',
 };
 
 export const ATTRIBUTE_GROUP_CREATED_EVENT_NAME = 'attribute-group-created';

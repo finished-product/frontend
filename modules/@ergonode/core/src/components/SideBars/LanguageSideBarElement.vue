@@ -21,10 +21,6 @@
 import {
     DRAGGED_ELEMENT,
 } from '@Core/defaults/grid';
-import ListDraggableElement from '@UI/components/List/ListDraggableElement';
-import ListElementDescription from '@UI/components/List/ListElementDescription';
-import ListElementHint from '@UI/components/List/ListElementHint';
-import ListElementTitle from '@UI/components/List/ListElementTitle';
 import {
     mapActions,
     mapState,
@@ -32,13 +28,11 @@ import {
 
 export default {
     name: 'LanguageSideBarElement',
-    components: {
-        ListDraggableElement,
-        ListElementDescription,
-        ListElementTitle,
-        ListElementHint,
-    },
     props: {
+        scope: {
+            type: String,
+            default: '',
+        },
         /**
          * Item data model
          */
@@ -60,6 +54,13 @@ export default {
             type: Boolean,
             default: false,
         },
+        /**
+         * Type of the place from where element is dragging
+         */
+        draggingElementType: {
+            type: String,
+            default: DRAGGED_ELEMENT.LIST,
+        },
     },
     computed: {
         ...mapState('list', [
@@ -67,8 +68,9 @@ export default {
         ]),
         isDisabled() {
             return this.disabled
-                || (this.disabledElements[this.languageCode]
-                    && this.disabledElements[this.languageCode][this.item.id]);
+                || (this.disabledElements[this.scope]
+                    && this.disabledElements[this.scope][this.languageCode]
+                    && this.disabledElements[this.scope][this.languageCode][this.item.id]);
         },
     },
     methods: {
@@ -78,7 +80,7 @@ export default {
         onDragStart() {
             this.__setState({
                 key: 'isElementDragging',
-                value: DRAGGED_ELEMENT.LIST,
+                value: this.draggingElementType,
             });
             this.__setState({
                 key: 'draggedElement',
@@ -87,6 +89,10 @@ export default {
                     code: this.item.code,
                     name: this.item.name,
                 },
+            });
+            this.__setState({
+                key: 'draggedInScope',
+                value: this.scope,
             });
         },
         onDragEnd() {
@@ -97,6 +103,10 @@ export default {
             this.__setState({
                 key: 'draggedElement',
                 value: null,
+            });
+            this.__setState({
+                key: 'draggedInScope',
+                value: '',
             });
         },
     },

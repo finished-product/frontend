@@ -47,9 +47,6 @@ import {
     getStatusesCount,
 } from '@Dashboard/services';
 import ProductStatusBadge from '@Products/components/Badges/ProductStatusBadge';
-import ActionButton from '@UI/components/ActionButton/ActionButton';
-import Preloader from '@UI/components/Preloader/Preloader';
-import Widget from '@UI/components/Widget/Widget';
 import {
     mapGetters,
     mapState,
@@ -58,10 +55,7 @@ import {
 export default {
     name: 'StatusesWidget',
     components: {
-        Widget,
         ProductStatusBadge,
-        ActionButton,
-        Preloader,
     },
     async fetch() {
         await this.getStatusesCount();
@@ -120,7 +114,13 @@ export default {
                         id: status_id,
                         color,
                         label: label || `#${code}`,
-                        value: `${value} products`,
+                        value: value === 1
+                            ? this.$t('@Dashboard.dashboard.components.StatusesWidget.productsCountSingularLabel', {
+                                info: value,
+                            })
+                            : this.$t('@Dashboard.dashboard.components.StatusesWidget.productsCountPluralLabel', {
+                                info: value,
+                            }),
                     };
                 });
 

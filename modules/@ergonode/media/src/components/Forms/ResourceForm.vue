@@ -21,13 +21,21 @@
                     required
                     :error-messages="errors[nameFieldKey]"
                     :disabled="!isAllowedToUpdate"
+                    :data-cy="dataCyGenerator(nameFieldKey)"
                     :label="$t('@Media.media.components.ResourceForm.filenameLabel')"
                     @input="setNameValue" />
                 <UploadImageFile
+                    v-if="type === 'image'"
                     :value="id"
-                    disabled
+                    :editable="false"
+                    :downloadable="true"
                     :label="$t('@Media.media.components.ResourceForm.previewLabel')"
                     height="246px" />
+                <FilePreview
+                    v-else
+                    :value="id"
+                    :downloadable="true"
+                    :label="$t('@Media.media.components.ResourceForm.previewLabel')" />
                 <template v-for="(field, index) in extendedForm">
                     <Component
                         :is="field.component"
@@ -42,11 +50,9 @@
 <script>
 import formFeedbackMixin from '@Core/mixins/feedback/formFeedbackMixin';
 import formActionsMixin from '@Core/mixins/form/formActionsMixin';
+import FilePreview from '@Media/components/Inputs/FilePreview';
 import UploadImageFile from '@Media/components/Inputs/UploadFile/UploadImageFile';
 import PRIVILEGES from '@Media/config/privileges';
-import Form from '@UI/components/Form/Form';
-import FormSection from '@UI/components/Form/Section/FormSection';
-import TextField from '@UI/components/TextField/TextField';
 import {
     mapActions,
     mapState,
@@ -55,9 +61,7 @@ import {
 export default {
     name: 'ResourceForm',
     components: {
-        Form,
-        FormSection,
-        TextField,
+        FilePreview,
         UploadImageFile,
     },
     mixins: [
@@ -68,6 +72,7 @@ export default {
         ...mapState('media', [
             'id',
             'name',
+            'type',
         ]),
         extendedForm() {
             return this.$extendedForm({
@@ -114,6 +119,9 @@ export default {
                 fieldKey: this.nameFieldKey,
                 value,
             });
+        },
+        dataCyGenerator(key) {
+            return `resource-${key}`;
         },
     },
 };

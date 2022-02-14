@@ -8,6 +8,8 @@
         :label="label"
         :size="smallSize"
         :options="languageOptions"
+        option-key="key"
+        option-value="value"
         @input="onSelect" />
 </template>
 
@@ -15,16 +17,12 @@
 import {
     SIZE,
 } from '@Core/defaults/theme';
-import TreeSelect from '@UI/components/Select/Tree/TreeSelect';
 import {
     mapState,
 } from 'vuex';
 
 export default {
     name: 'LanguageTreeSelect',
-    components: {
-        TreeSelect,
-    },
     props: {
         value: {
             type: String,

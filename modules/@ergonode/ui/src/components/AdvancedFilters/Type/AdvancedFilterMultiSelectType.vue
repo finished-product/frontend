@@ -4,6 +4,7 @@
  */
 <template>
     <AdvancedFilter
+        :scope="scope"
         :index="index"
         :value="filterValue"
         :hint="hint"
@@ -33,16 +34,21 @@ import {
 } from '@Core/defaults/operators';
 import AdvancedFilter from '@UI/components/AdvancedFilters/AdvancedFilter';
 import AdvancedFilterMultiselectContent from '@UI/components/AdvancedFilters/Content/AdvancedFilterMultiselectContent';
-import MultiselectDropdownFooter from '@UI/components/Select/Dropdown/Footers/MultiselectDropdownFooter';
 
 export default {
     name: 'AdvancedFilterMultiSelectType',
     components: {
         AdvancedFilter,
         AdvancedFilterMultiselectContent,
-        MultiselectDropdownFooter,
     },
     props: {
+        /**
+         * Context scope
+         */
+        scope: {
+            type: String,
+            default: '',
+        },
         /**
          * Index of given component at the loop
          */

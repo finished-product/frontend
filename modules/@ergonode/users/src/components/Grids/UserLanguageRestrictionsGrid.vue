@@ -4,6 +4,7 @@
  */
 <template>
     <Grid
+        :scope="scope"
         :columns="columns"
         :rows="rows"
         :drafts="drafts"
@@ -49,7 +50,6 @@ import {
     getFilterQueryParams,
     getSortedColumnsByIDs,
 } from '@Core/models/mappers/gridDataMapper';
-import Grid from '@UI/components/Grid/Grid';
 import UpdateLanguageRestrictionsButton from '@Users/components/Buttons/UpdateLanguageRestrictionsButton';
 import PRIVILEGES from '@Users/config/privileges';
 import privilegeDefaults from '@Users/defaults/languages';
@@ -65,7 +65,6 @@ import {
 export default {
     name: 'UserLanguageRestrictionsGrid',
     components: {
-        Grid,
         UpdateLanguageRestrictionsButton,
     },
     mixins: [
@@ -185,9 +184,8 @@ export default {
                 defaults: privilegeDefaults,
                 isEditable: this.isAllowedToUpdate,
             });
-            const config = this.$userCookies.get(`GRID_CONFIG:${this.$route.name}`) || '';
 
-            this.columns = getSortedColumnsByIDs(columns, config.split(','));
+            this.columns = getSortedColumnsByIDs(columns, this.$gridCookies.get().split(','));
             this.rows = rows;
             this.filtered = fullDataList.length;
         },

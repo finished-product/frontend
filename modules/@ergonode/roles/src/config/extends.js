@@ -15,6 +15,10 @@ import {
     getRole,
     setRole,
 } from '@Roles/extends/user/methods';
+import {
+    getWorkflowTransition,
+    setWorkflowTransition,
+} from '@Roles/extends/workflow/methods';
 
 export default {
     dictionaries: [
@@ -31,6 +35,7 @@ export default {
     extendStore: {
         user: Store.User,
         statusTransition: Store.Transition,
+        workflow: Store.Workflow,
     },
     extendRoutesChildren,
     extendComponents: {
@@ -46,6 +51,14 @@ export default {
             __ALL: [
                 {
                     component: Components.TransitionFormRole,
+                    order: 10,
+                },
+            ],
+        },
+        '@Workflow/components/Forms/WorkflowTransitionForm': {
+            __ALL: [
+                {
+                    component: Components.WorkflowTransitionFormRole,
                     order: 10,
                 },
             ],
@@ -94,5 +107,18 @@ export default {
         }) => getTransition({
             $this,
         }),
+        '@Workflow/store/workflow/action/updateTransition/__before': ({
+            $this,
+        }) => getWorkflowTransition({
+            $this,
+        }),
+        '@Workflow/store/workflow/action/getTransition/__after': ({
+            $this, data,
+        }) => {
+            setWorkflowTransition({
+                $this,
+                data,
+            });
+        },
     },
 };

@@ -56,6 +56,13 @@ export default {
             default: ALIGNMENT.LEFT,
             validator: value => Object.values(ALIGNMENT).indexOf(value) !== -1,
         },
+        /**
+         * Wrapping selected values
+         */
+        wrap: {
+            type: Boolean,
+            default: false,
+        },
     },
     computed: {
         classes() {
@@ -65,6 +72,7 @@ export default {
                 `input-select-value--${this.alignment}`,
                 {
                     'input-select-value--disabled': this.disabled,
+                    'input-select-value--wrap': this.wrap,
                 },
             ];
         },
@@ -75,11 +83,14 @@ export default {
 <style lang="scss" scoped>
     .input-select-value {
         display: flex;
+        align-self: center;
         align-items: center;
         width: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
         color: $GRAPHITE_DARK;
 
-        & > span {
+        &:not(&--wrap) > span {
             flex: 1 1 auto;
             width: 0;
             text-overflow: ellipsis;

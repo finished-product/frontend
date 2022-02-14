@@ -12,9 +12,12 @@
         :multiselect="multiselect"
         :clearable="clearable"
         :label="label"
+        :wrap-value="true"
         :custom-fetch-event="attributeCreatedEventName"
         :error-messages="errorMessages"
         :disabled="disabled"
+        option-key="id"
+        option-value="label"
         :additional-static-options="additionalStaticOptions"
         href="attributes/autocomplete"
         @input="onValueChange">
@@ -35,15 +38,11 @@ import CreateAttributeButton from '@Attributes/components/Buttons/CreateAttribut
 import {
     ATTRIBUTE_CREATED_EVENT_NAME,
 } from '@Attributes/defaults';
-import Autocomplete from '@UI/components/Autocomplete/Autocomplete';
-import SelectListNoDataPlaceholder from '@UI/components/SelectList/SelectListNoDataPlaceholder';
 
 export default {
     name: 'AttributesAutocomplete',
     components: {
         CreateAttributeButton,
-        SelectListNoDataPlaceholder,
-        Autocomplete,
     },
     props: {
         value: {
